@@ -90,7 +90,7 @@
       title="Messages">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
-        <i data-feather="message-square" class="w-6 h-6"></i>
+        <i data-feather="message-circle" class="w-6 h-6"></i>
       </div>
     </a>
 
@@ -204,12 +204,6 @@
 
         <!-- Friends & Groups View -->
         <div id="messagesViewFriends" class="hidden flex-1 overflow-y-auto flex flex-col">
-          <div class="p-2 space-y-1">
-            <button onclick="showFriendsDashboard()"
-              class="sub-panel-item w-full text-left font-semibold text-white bg-discord-gray-600/50">
-              <i data-feather="users" class="w-5 h-5 mr-3"></i> Friends
-            </button>
-          </div>
 
           <div class="flex-1 overflow-y-auto space-y-1 px-2" id="sidebarDMList">
           </div>
@@ -350,14 +344,14 @@
             <textarea id="chatInput" placeholder="Message #community" rows="1"
               class="flex-1 bg-transparent border-none text-white resize-none focus:outline-none"
               onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
-            <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition" onclick="openEmojiPicker()"
-              title="Pick an emoji">
+            <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition"
+              onclick="toggleEmojiPicker('communityEmojiPicker', 'chatInput')" title="Pick an emoji">
               <i data-feather="smile" class="w-5 h-5 text-gray-200"></i>
             </button>
             <button onclick="sendMessage()" class="text-discord-gray-400 hover:text-white">
               <i data-feather="send" class="w-5 h-5"></i>
             </button>
-            <div id="emojiPicker"
+            <div id="communityEmojiPicker"
               class="hidden absolute bottom-16 right-4 bg-discord-gray-800 rounded-lg shadow-lg z-50"></div>
           </div>
         </div>
@@ -418,19 +412,23 @@
             class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-discord-gray-900">
           </div>
 
-          <div class="p-4 flex-shrink-0">
+          <div class="flex-shrink-0 p-4 border-t">
             <div class="chat-input-container relative flex items-center gap-3 px-4 py-3 bg-discord-gray-600 rounded-lg">
               <label class="cursor-pointer hover:text-white text-discord-gray-400">
                 <i data-feather="plus-circle" class="w-5 h-5"></i>
                 <input type="file" id="friendsChatFile" class="hidden" onchange="sendFriendFile(event)">
               </label>
               <textarea id="friendsChatInput" rows="1"
-                class="chat-input flex-1 bg-transparent border-none focus:ring-0 text-white"
-                placeholder="Message @User"></textarea>
-              <button onclick="sendFriendMessage()" class="text-discord-blurple hover:text-white transition">
+                class="chat-input flex-1 bg-transparent border-none focus:ring-0 text-white" placeholder="Message @User"
+                onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendFriendMessage();}"></textarea>
+              <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition"
+                onclick="toggleEmojiPicker('friendsEmojiPicker', 'friendsChatInput')" title="Pick an emoji">
+                <i data-feather="smile" class="w-5 h-5 text-gray-200"></i>
+              </button>
+              <button onclick="sendFriendMessage()" class="text-discord-gray-400 hover:text-white transition">
                 <i data-feather="send" class="w-5 h-5"></i>
               </button>
-              <div id="emojiPicker"
+              <div id="friendsEmojiPicker"
                 class="hidden absolute bottom-16 right-4 bg-discord-gray-800 rounded-lg shadow-lg z-50"></div>
             </div>
           </div>
@@ -593,10 +591,14 @@
             <textarea id="groupChatInput" placeholder="Message #general" rows="1"
               class="flex-1 bg-transparent border-none text-white resize-none focus:outline-none"
               onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendGroupChatMessage();}"></textarea>
+            <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition"
+              onclick="toggleEmojiPicker('groupEmojiPicker', 'groupChatInput')" title="Pick an emoji">
+              <i data-feather="smile" class="w-5 h-5 text-gray-200"></i>
+            </button>
             <button onclick="sendGroupChatMessage()" class="text-discord-gray-400 hover:text-white">
               <i data-feather="send" class="w-5 h-5"></i>
             </button>
-            <div id="emojiPicker"
+            <div id="groupEmojiPicker"
               class="hidden absolute bottom-16 right-4 bg-discord-gray-800 rounded-lg shadow-lg z-50"></div>
           </div>
         </div>
@@ -1328,6 +1330,12 @@
     const baseUrl = window.location.origin;
     const socket = navigator.onLine ? io(baseUrl) : { emit: function () { }, on: function () { }, off: function () { } };
     window.socket = socket;
+    if (navigator.onLine) {
+      socket.on('connect', () => {
+        const u = localStorage.getItem('savedUsername');
+        if (u) socket.emit('join_user', { username: u });
+      });
+    }
     const chatInput = document.getElementById("chatInput");
     const chatMessagesCommunity = document.getElementById("chatMessagesCommunity");
     const chatMessagesAI = document.getElementById("chatMessagesAI");
@@ -1340,7 +1348,6 @@
     const email = localStorage.getItem("savedEmail") || "N/A";
     const typingIndicator = document.getElementById("typingIndicator");
     const activeTypers = new Set();
-    let emojiPickerVisible = false;
     const avatarCache = new Map();
 
     // Function to get avatar URL (Kept as is)
@@ -1558,23 +1565,27 @@
     }
 
     // openEmojiPicker (Kept as is)
-    function openEmojiPicker() {
-      const picker = document.getElementById("emojiPicker");
-      if (!emojiPickerVisible) {
+    function toggleEmojiPicker(pickerId, inputId) {
+      const picker = document.getElementById(pickerId);
+      const input = document.getElementById(inputId);
+      if (!picker || !input) return;
+
+      if (picker.classList.contains("hidden")) {
+        // Close all other pickers
+        document.querySelectorAll('[id$="EmojiPicker"]').forEach(p => p.classList.add("hidden"));
+
         picker.classList.remove("hidden");
+        picker.innerHTML = "";
         const pickerInstance = new EmojiMart.Picker({
           onEmojiSelect: (emoji) => {
-            chatInput.value += emoji.native;
-            chatInput.focus();
+            input.value += emoji.native;
+            input.focus();
           },
           theme: "dark",
         });
-        picker.innerHTML = ""; // Clear existing
         picker.appendChild(pickerInstance);
-        emojiPickerVisible = true;
       } else {
         picker.classList.add("hidden");
-        emojiPickerVisible = false;
       }
     }
 
@@ -1783,29 +1794,40 @@
       if (!container) return;
       container.innerHTML = '';
 
-      // Groups removed from this list. Rendered in main sidebar.
+      // Discord-like: "Friends" item at the top
+      const friendsHeading = document.createElement('button');
+      friendsHeading.className = `group-item w-full ${!activeFriendChat ? 'active' : ''}`;
+      friendsHeading.innerHTML = `
+        <div class="sidebar-icon-mini">
+           <i data-feather="users" class="w-4 h-4"></i>
+        </div>
+        <div class="group-info">
+          <span class="group-name">Friends</span>
+        </div>
+      `;
+      friendsHeading.onclick = () => showFriendsDashboard();
+      container.appendChild(friendsHeading);
 
       // Render DMs Section
       if (friendsState.friends.length > 0) {
         const dmsHeader = document.createElement('div');
-        dmsHeader.className = 'dm-list-section';
+        dmsHeader.className = 'dm-list-section mt-4';
         dmsHeader.textContent = 'Direct Messages';
         container.appendChild(dmsHeader);
 
         friendsState.friends.forEach(f => {
           const item = document.createElement('button');
-          // item.className is 'group-item' plus active check
-          item.className = `group-item ${activeFriendChat === f ? 'active' : ''}`;
+          item.className = `group-item w-full ${activeFriendChat === f ? 'active' : ''}`;
 
           let avatar = avatarCache.get(f) || '/images/default_avatar.png';
 
           item.innerHTML = `
             <div class="dm-avatar-wrapper">
-              <img src="${avatar}" alt="${f}'s avatar">
-              <span class="status-indicator offline"></span>
+              <img src="${avatar}" alt="${f}'s avatar" class="rounded-full w-8 h-8 object-cover">
+              <span class="status-indicator online"></span>
             </div>
             <div class="group-info">
-              <span class="group-name">${f}</span>
+              <span class="group-name text-sm opacity-80">${f}</span>
             </div>
           `;
 
@@ -1820,6 +1842,7 @@
           container.appendChild(item);
         });
       }
+      feather.replace();
     }
 
     function renderGroupSidebar() {
@@ -1899,13 +1922,6 @@
       }
     }
 
-    function showFriendsDashboard() {
-      document.getElementById('friendsDashboard').classList.remove('hidden');
-      document.getElementById('friendsChatView').classList.add('hidden');
-      activeFriendChat = null;
-      renderSidebarList(); // clear active state
-      renderFriendsDashboard();
-    }
 
     function filterFriends(filter) {
       currentFriendFilter = filter;
@@ -1967,7 +1983,7 @@
         // Note: We don't have real presence yet, assuming all friends are "Offline" visually for now or just listing them
         friendsState.friends.forEach(f => {
           const actions = `
-                  <button class="action-icon-btn" onclick="openDM('${f}')" title="Message"><i data-feather="message-square" class="w-4 h-4"></i></button>
+                  <button class="action-icon-btn" onclick="openDM('${f}')" title="Message"><i data-feather="message-circle" class="w-4 h-4"></i></button>
                   <button class="action-icon-btn danger" onclick="removeFriend('${f}')" title="Remove"><i data-feather="trash-2" class="w-4 h-4"></i></button>
               `;
           container.appendChild(createRow(f, "Friend", actions));
@@ -2261,178 +2277,97 @@
       }
     });
 
-    // ---- DMs ----
-    let dmState = { active: null };
-
-    function setActiveDM(peer) {
-      dmState.active = peer || null;
-      const header = document.getElementById('dmHeader');
-      const msgs = document.getElementById('dmMessages');
-      if (header) header.textContent = peer ? `Direct Message with ${peer}` : 'Select a friend and click Message to start.';
-      if (!peer) { if (msgs) msgs.innerHTML = ''; return; }
-      const me = localStorage.getItem('username');
-      fetch(`/api/dm/history?userA=${encodeURIComponent(me)}&userB=${encodeURIComponent(peer)}`).then(r => r.json()).then(async list => {
-        msgs.innerHTML = '';
-        for (const m of list) {
-          await appendDMMessage(m);
-        }
-        msgs.scrollTop = msgs.scrollHeight;
-      }).catch(() => { });
-    }
-
     async function sendFriendMessage() {
       const input = document.getElementById('friendsChatInput');
       const text = input.value.trim();
       if (!text || !activeFriendChat) return;
-      const me = localStorage.getItem('username');
+      const me = localStorage.getItem('savedUsername') || 'User';
 
-      // Check if DM (string) or Group (object)
+      const payload = { from: me, to: activeFriendChat, message: text, ts: Date.now() / 1000 };
+
+      // DM Logic
       if (typeof activeFriendChat === 'string') {
-        // DM Logic
-        const payload = { from: me, to: activeFriendChat, message: text };
-        if (navigator.onLine) socket.emit('send_dm', payload);
-        else {
+        if (navigator.onLine) {
+          socket.emit('send_dm', payload);
+        } else {
+          // Optimistic UI for offline
           const el = await createDiscordMessage({ ...payload, username: me });
           document.getElementById('friendsChatMessages').appendChild(el);
+          document.getElementById('friendsChatMessages').scrollTop = document.getElementById('friendsChatMessages').scrollHeight;
+          // Always attempt API for persistence when offline
+          fetch('/api/dm/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => { });
         }
-        // Also fetch to persist
-        fetch('/api/dm/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => { });
-
       } else {
         // Group Logic
-        const payload = { groupId: activeFriendChat.id, username: me, message: text };
-        if (navigator.onLine) socket.emit('send_group_message', payload);
+        const groupPayload = { groupId: activeFriendChat.id, username: me, message: text, ts: Date.now() / 1000 };
+        if (navigator.onLine) socket.emit('send_group_message', groupPayload);
       }
 
       input.value = '';
     }
 
-    function sendFriendFile(e) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const fileData = e.target.result;
-        socket.emit("send_file", {
-          username,
-          fileName: file.name,
-          fileType: file.type,
-          fileData: fileData
-        });
-      };
-      reader.readAsDataURL(file); // encodes file as base64
-    }
-
-    async function openDM(username) {
-      activeFriendChat = username;
+    async function openDM(peerUsername) {
+      activeFriendChat = peerUsername;
       renderSidebarList(); // Update active highlight
 
-      // Switch View
+      // Switch View to the Friends Chat
       document.getElementById('friendsDashboard').classList.add('hidden');
+      document.getElementById('addFriendSection').classList.add('hidden');
       const view = document.getElementById('friendsChatView');
-      view.classList.remove('hidden');
+      if (view) view.classList.remove('hidden');
+
+      // Ensure we are on the Friends tab in Col 3
+      const tabFriends = document.getElementById('tab-friends');
+      const tabMessages = document.getElementById('tab-messages');
+      if (tabFriends && tabMessages) {
+        tabMessages.classList.add('hidden');
+        tabFriends.classList.remove('hidden');
+      }
+
+      // Ensure Col 2 shows the Friends sub-panel
+      switchMessagesView('friends');
 
       // Update Header
-      document.getElementById('chatHeaderTitle').textContent = username;
+      document.getElementById('chatHeaderTitle').textContent = peerUsername;
+      const input = document.getElementById('friendsChatInput');
+      if (input) input.placeholder = `Message @${peerUsername}`;
 
       // Clear & Load Messages
       const msgsContainer = document.getElementById('friendsChatMessages');
-      msgsContainer.innerHTML = '';
+      if (!msgsContainer) return;
+      msgsContainer.innerHTML = '<div class="text-center p-4 text-discord-gray-400">Loading history...</div>';
 
-      const me = localStorage.getItem('username');
+      const me = localStorage.getItem('savedUsername') || 'User';
       try {
-        const res = await fetch(`/api/dm/history?userA=${encodeURIComponent(me)}&userB=${encodeURIComponent(username)}`);
+        const res = await fetch(`/api/dm/history?userA=${encodeURIComponent(me)}&userB=${encodeURIComponent(peerUsername)}`);
         const msgs = await res.json();
+        msgsContainer.innerHTML = '';
         for (const m of msgs) {
-          const el = await createDiscordMessage({ ...m, username: m.from }); // Reuse your existing message creator
+          const el = await createDiscordMessage({ ...m, username: m.from });
           msgsContainer.appendChild(el);
         }
         msgsContainer.scrollTop = msgsContainer.scrollHeight;
-      } catch (e) { }
-    }
-
-    async function appendDMMessage(data) {
-      const me = localStorage.getItem('username') || '';
-      const isOwn = (data.from || '') === me;
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('flex', 'items-start', 'gap-2', 'mb-2');
-      wrapper.classList.add(isOwn ? 'justify-end' : 'justify-start');
-
-      const avatar = document.createElement('img');
-      const author = isOwn ? me : (data.from || '');
-      const avatarUrl = await getUserAvatarUrl(author);
-      avatar.src = avatarUrl;
-      avatar.alt = `${author}'s avatar`;
-      avatar.className = 'w-8 h-8 rounded-full object-cover';
-      avatar.onerror = function () { this.onerror = null; this.src = '/images/default_avatar.png'; };
-
-      const bubble = document.createElement('div');
-      bubble.classList.add('message', isOwn ? 'self' : 'other');
-      const header = document.createElement('div');
-      header.className = 'text-xs opacity-75 mb-1';
-      header.textContent = `${author} | ${new Date((data.ts || Date.now()) * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-
-      let body;
-      if (data.fileData && data.fileName) {
-        const ext = (data.fileName.split('.').pop() || '').toLowerCase();
-        const imageExts = ["png", "jpg", "jpeg", "gif", "webp", "svg"];
-        const videoExts = ["mp4", "webm", "ogg", "mov", "m4v"];
-        const audioExts = ["mp3", "wav", "ogg", "m4a", "aac", "flac"];
-        if (imageExts.includes(ext)) { body = document.createElement('img'); body.src = data.fileData; body.alt = data.fileName; body.className = 'max-w-xs rounded'; }
-        else if (videoExts.includes(ext)) { const v = document.createElement('video'); v.controls = true; v.src = data.fileData; v.className = 'max-w-xs rounded'; body = v; }
-        else if (audioExts.includes(ext)) { const a = document.createElement('audio'); a.controls = true; a.src = data.fileData; body = a; }
-        else { const a = document.createElement('a'); a.href = data.fileData; a.download = data.fileName; a.textContent = `📎 ${data.fileName}`; a.className = 'text-blue-400 underline'; body = a; }
-
-      } else if (data.message) {
-        body = document.createElement('div');
-        body.textContent = data.message;
+      } catch (e) {
+        msgsContainer.innerHTML = '<div class="text-center p-4 text-discord-gray-400">Could not load history.</div>';
       }
-      bubble.appendChild(header); if (body) bubble.appendChild(body);
-      if (isOwn) { wrapper.appendChild(bubble); wrapper.appendChild(avatar); }
-      else { wrapper.appendChild(avatar); wrapper.appendChild(bubble); }
-      const msgs = document.getElementById('dmMessages');
-      msgs.appendChild(wrapper);
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-
-    function sendDMMessage() {
-      const me = localStorage.getItem('username');
-      const peer = dmState.active;
-      if (!me || !peer) return;
-      const input = document.getElementById('dmInput');
-      const msg = (input?.value || '').trim();
-      if (!msg) return;
-      const payload = { from: me, to: peer, message: msg };
-      if (navigator.onLine) socket.emit('send_dm', payload);
-      else (async () => { await appendDMMessage(payload); })();
-      input.value = ''; input.style.height = 'auto';
-      fetch('/api/dm/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => { });
-    }
-    function sendDMFile(event) {
-      const file = event.target.files?.[0];
-      const me = localStorage.getItem('username');
-      const peer = dmState.active;
-      if (!file || !me || !peer) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const payload = { from: me, to: peer, fileName: file.name, fileType: file.type, fileData: e.target.result };
-        if (navigator.onLine) {
-          socket.emit('send_dm', payload);
-        } else {  // Don't render optimistically when online - socket will handle it
-          (async () => { await appendDMMessage(payload); })();  // Only render optimistically when offline
-        }
-        fetch('/api/dm/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => { });
-        event.target.value = '';
-      };
-      reader.readAsDataURL(file);
     }
 
     if (typeof io !== 'undefined') {
       socket.on('receive_dm', async (data) => {
-        const me = localStorage.getItem('username') || '';
-        if (!dmState.active) return;
+        const me = localStorage.getItem('savedUsername') || '';
         const { from, to } = data || {};
-        if ((from === me && to === dmState.active) || (to === me && from === dmState.active)) await appendDMMessage(data);
+
+        // If we are currently chatting with this person (as the recipient or the sender)
+        if (activeFriendChat && typeof activeFriendChat === 'string') {
+          if ((from === me && to === activeFriendChat) || (to === me && from === activeFriendChat)) {
+            const el = await createDiscordMessage({ ...data, username: from });
+            const msgsContainer = document.getElementById('friendsChatMessages');
+            if (msgsContainer) {
+              msgsContainer.appendChild(el);
+              msgsContainer.scrollTop = msgsContainer.scrollHeight;
+            }
+          }
+        }
       });
     }
 
@@ -2629,8 +2564,9 @@
     function openDMFromProfile() {
       const profileUsername = document.getElementById("profileUsername")?.textContent;
       if (profileUsername) {
-        setActiveDM(profileUsername);
-        switchTab('chats');
+        switchTab('messages'); // The tab ID is 'messages'
+        switchMessagesView('friends'); // Move to friends sub-panel
+        openDM(profileUsername); // Open the specific DM
       }
     }
 
@@ -4607,29 +4543,33 @@
       if (checkbox) checkbox.checked = showHome;
     }
 
-    // === Show Friends Dashboard ===
     function showFriendsDashboard() {
-      // Show the tab-friends content
-      const tabFriends = document.getElementById('tab-friends');
-      const tabMessages = document.getElementById('tab-messages');
-      const friendsDashboard = document.getElementById('friendsDashboard');
-      const friendsChatView = document.getElementById('friendsChatView');
+      // 1. Ensure we are on the Messages tab (which hosts the Friends sub-panel and Dashboard)
+      switchTab('messages');
+      switchMessagesView('friends');
 
-      if (tabFriends && tabMessages) {
-        // Hide messages tab content, show friends tab content
-        tabMessages.classList.add('hidden');
-        tabFriends.classList.remove('hidden');
-      }
+      // 2. Hide chat view, show dashboard
+      const dashboard = document.getElementById('friendsDashboard');
+      const chatView = document.getElementById('friendsChatView');
+      if (dashboard) dashboard.classList.remove('hidden');
+      if (chatView) chatView.classList.add('hidden');
 
-      if (friendsDashboard && friendsChatView) {
-        // Show dashboard, hide chat view
-        friendsDashboard.classList.remove('hidden');
-        friendsChatView.classList.add('hidden');
-      }
+      // 3. Clear active DM state
+      activeFriendChat = null;
+      renderSidebarList();
+      renderFriendsDashboard();
 
-      // Update title
+      // 4. Update title
       const titleEl = document.getElementById('main-content-title');
       if (titleEl) titleEl.textContent = 'Friends';
+
+      // 5. Ensure tab-friends is visible in Col 3
+      const tabFriends = document.getElementById('tab-friends');
+      const tabMessages = document.getElementById('tab-messages');
+      const tabGroup = document.getElementById('tab-group');
+      if (tabFriends) tabFriends.classList.remove('hidden');
+      if (tabMessages) tabMessages.classList.add('hidden');
+      if (tabGroup) tabGroup.classList.add('hidden');
     }
 
     // === Show Messages Tab (back from Friends) ===

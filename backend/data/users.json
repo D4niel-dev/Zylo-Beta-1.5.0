@@ -40,14 +40,20 @@
     "dob": "2000-06-29",
     "gender": "",
     "phone": "",
-    "avatar": "/uploads/Daniel/explore_830545609_782025.png",
-    "banner": "/uploads/Daniel/explore_639702130_315091.png",
+    "avatar": "http://192.168.1.181:5000/uploads/Daniel/explore_830545609_782025.png",
+    "banner": "http://192.168.1.181:5000/uploads/Daniel/explore_639702130_315091.png",
     "friends": [
       "Dan"
     ],
     "friendRequests": {
       "incoming": [],
       "outgoing": []
-    }
+    },
+    "settings": {
+      "profileEffect": "pulse",
+      "bannerEffect": "blur-overlay"
+    },
+    "about": "",
+    "aboutMe": ""
   }
 ]

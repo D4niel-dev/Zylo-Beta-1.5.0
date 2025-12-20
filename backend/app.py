@@ -1371,12 +1371,19 @@ def dm_send():
     all_dms = load_dms()
     all_dms.append(entry)
     save_dms(all_dms)
-    # Push live update to both parties if they are connected
+    # Push live update only to both parties
     try:
-        emit('receive_dm', entry, broadcast=True)
+        emit('receive_dm', entry, room=f"user_{to}")
+        emit('receive_dm', entry, room=f"user_{frm}")
     except Exception:
         pass
     return jsonify({"success": True})
+
+@socketio.on('join_user')
+def handle_join_user(data):
+    username = (data or {}).get('username')
+    if username:
+        join_room(f"user_{username}")
 
 @socketio.on('send_dm')
 def handle_send_dm(data):
@@ -1397,7 +1404,9 @@ def handle_send_dm(data):
         all_dms = load_dms()
         all_dms.append(entry)
         save_dms(all_dms)
-        emit('receive_dm', entry, broadcast=True)
+        # Emit only to the sender and recipient
+        emit('receive_dm', entry, room=f"user_{to}")
+        emit('receive_dm', entry, room=f"user_{frm}")
     except Exception:
         pass
 
