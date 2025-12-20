@@ -94,12 +94,6 @@
       </div>
     </a>
 
-    <a href="#" data-tab="profile" onclick="switchTab('profile');" class="sidebar-tab group" title="Profile">
-      <div class="sidebar-pill"></div>
-      <div class="sidebar-icon">
-        <i data-feather="user" class="w-6 h-6"></i>
-      </div>
-    </a>
 
     <a href="#" data-tab="explore" onclick="switchTab('explore');" class="sidebar-tab group" title="Explore">
       <div class="sidebar-pill"></div>
@@ -240,6 +234,10 @@
           data-target="accountSettings">
           My Account
         </button>
+        <button type="button" id="tabBtnFiles" class="settings-tab sub-panel-item w-full text-left"
+          data-target="filesSettings">
+          Files
+        </button>
         <button type="button" id="tabBtnAbout" class="settings-tab sub-panel-item w-full text-left"
           data-target="aboutSettings">
           About Us
@@ -249,7 +247,9 @@
     </div>
 
     <div class="flex-shrink-0 h-14 bg-discord-gray-500/30 flex items-center justify-between px-3">
-      <div class="flex items-center gap-2 min-w-0">
+      <div
+        class="flex items-center gap-2 min-w-0 cursor-pointer hover:bg-discord-gray-600/50 transition-colors rounded-lg px-2 py-1 -ml-1 flex-1"
+        onclick="switchTab('profile')" title="My Profile">
         <img id="userPanelAvatar" src="/images/default_avatar.png" alt="Avatar" class="w-8 h-8 rounded-full">
         <div class="flex flex-col min-w-0">
           <span id="userPanelUsername" class="text-white text-sm font-semibold truncate">ZyloUser</span>
@@ -273,7 +273,7 @@
 
     <header class="flex-shrink-0 h-12 bg-discord-gray-700 shadow-md flex items-center justify-between px-4">
       <div class="flex items-center">
-        <button id="mobileMenuBtn" class="p-1 mr-2 text-discord-gray-300 hover:text-white md:hidden"
+        <button id="mobileMenuBtn" class="hidden p-1 mr-2 text-discord-gray-300 hover:text-white md:hidden"
           onclick="toggleSidebar()">
           <i id="mobileMenuIcon" data-feather="menu" class="w-6 h-6"></i>
         </button>
@@ -320,7 +320,7 @@
           <h2 class="text-xl font-bold mb-2 text-white">📢 Announcements</h2>
           <div class="bg-discord-gray-800 p-4 rounded-xl shadow-lg">
             <div class="text-sm text-discord-gray-300 space-y-1">
-              <p>🚀 v1.1 adds Friends and Groups with room chat.</p>
+              <p>🚀 v1.2 adds Friends and Groups with room chat.</p>
               <p>✨ Home quick stats now update from backend.</p>
               <p>🤖 Optional AI chat toggle in Chats tab.</p>
             </div>
@@ -412,14 +412,15 @@
             class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-discord-gray-900">
           </div>
 
-          <div class="flex-shrink-0 p-4 border-t">
+          <div class="flex-shrink-0 p-4">
             <div class="chat-input-container relative flex items-center gap-3 px-4 py-3 bg-discord-gray-600 rounded-lg">
               <label class="cursor-pointer hover:text-white text-discord-gray-400">
                 <i data-feather="plus-circle" class="w-5 h-5"></i>
                 <input type="file" id="friendsChatFile" class="hidden" onchange="sendFriendFile(event)">
               </label>
               <textarea id="friendsChatInput" rows="1"
-                class="chat-input flex-1 bg-transparent border-none focus:ring-0 text-white" placeholder="Message @User"
+                class="flex-1 bg-transparent border-none text-white resize-none focus:outline-none"
+                placeholder="Message @User"
                 onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendFriendMessage();}"></textarea>
               <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition"
                 onclick="toggleEmojiPicker('friendsEmojiPicker', 'friendsChatInput')" title="Pick an emoji">
@@ -806,13 +807,13 @@
           <div id="aboutSettings" class="settings-content w-full hidden space-y-6">
             <h2 class="text-2xl font-bold text-white">About Us</h2>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <p class="text-discord-gray-300"><strong>Zylo v1.5.7</strong> — Created by D4niel-dev</p>
+              <p class="text-discord-gray-300"><strong>Zylo v1.2.1</strong> — Created by D4niel-dev</p>
               <p class="text-discord-gray-400 text-sm mt-1">© 2025 Zylo. All rights reserved.</p>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
               <h3 class="text-lg font-semibold mb-2 text-white">Version Details</h3>
               <ul class="list-disc list-inside text-discord-gray-300 text-sm space-y-1">
-                <li>Build: 1.5.7-stable</li>
+                <li>Build: 1.2.1-stable</li>
                 <li>Release Date: August 2025</li>
                 <li>UI Framework: Tailwind CSS</li>
                 <li>Backend: Python (Flask)</li>
@@ -982,6 +983,25 @@
                 <i data-feather="save" class="w-4 h-4 inline mr-2"></i>
                 Save Account Settings
               </button>
+            </div>
+          </div>
+
+          <div id="filesSettings" class="settings-content w-full hidden space-y-6">
+            <div class="flex items-center justify-between">
+              <h2 class="text-2xl font-bold text-white">Files</h2>
+              <button onclick="refreshFilesList()"
+                class="p-2 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-discord-gray-300">
+                <i data-feather="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <p class="text-discord-gray-400 text-sm">Manage your uploaded files and shared media.</p>
+
+            <div id="filesListContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Files will be dynamically loaded here -->
+              <div class="col-span-full py-12 text-center text-discord-gray-500">
+                <i data-feather="folder" class="w-12 h-12 mx-auto mb-3 opacity-20"></i>
+                <p>No files found.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1193,9 +1213,180 @@
         </div>
       </div>
 
-      <div class="p-6">
-        <!-- Theme Editor Content would go here if populated -->
-        <p class="text-sm">Customize your theme settings here.</p>
+      <div class="flex-1 overflow-y-auto p-4 md:p-6 te-scroll-container">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Controls -->
+          <div class="space-y-6">
+            <div>
+              <h4 class="text-sm font-bold text-discord-gray-400 uppercase mb-3">UI Colors</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold">Navbar Background</label>
+                  <input type="color" id="teNavbarBg"
+                    class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold">Sidebar Background</label>
+                  <input type="color" id="teSidebarBg"
+                    class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold">Panel Background</label>
+                  <input type="color" id="tePanelBg"
+                    class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold">Text Color</label>
+                  <input type="color" id="teTextColor"
+                    class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                </div>
+                <div class="space-y-2 col-span-2">
+                  <label class="text-xs font-semibold">Accent Color</label>
+                  <input type="color" id="teAccentColor"
+                    class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-bold text-discord-gray-400 uppercase mb-3">Background Style</h4>
+              <div class="flex gap-4 mb-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="teBgMode" value="solid" class="accent-discord-blurple"> Solid
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="teBgMode" value="gradient" checked class="accent-discord-blurple"> Gradient
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="teBgMode" value="image" class="accent-discord-blurple"> Image
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="teBgMode" value="animated" class="accent-discord-blurple"> Animated
+                </label>
+              </div>
+
+              <!-- Solid Controls -->
+              <div id="teSolidControls" class="hidden space-y-2">
+                <label class="text-xs font-semibold">Background Color</label>
+                <input type="color" id="teSolidColor"
+                  class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+              </div>
+
+              <!-- Gradient Controls -->
+              <div id="teGradientControls" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="text-xs font-semibold">From</label>
+                    <input type="color" id="teGradFrom" value="#1e293b"
+                      class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-xs font-semibold">To</label>
+                    <input type="color" id="teGradTo" value="#0f172a"
+                      class="w-full h-10 rounded border border-discord-gray-900 bg-discord-gray-700 p-1">
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold">Angle (deg)</label>
+                  <input type="range" id="teGradAngle" min="0" max="360" value="135"
+                    class="w-full accent-discord-blurple">
+                </div>
+              </div>
+
+              <!-- Image Controls -->
+              <div id="teImageControls" class="hidden space-y-4">
+                <div class="flex items-center gap-3">
+                  <input type="file" id="teBgImageInput" class="hidden" accept="image/*">
+                  <button onclick="document.getElementById('teBgImageInput').click()"
+                    class="flex-1 py-2 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-sm font-medium">Choose
+                    Image</button>
+                  <button id="teClearBgImageBtn"
+                    class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-sm font-medium">Clear</button>
+                </div>
+              </div>
+
+              <!-- Animated Controls -->
+              <div id="teAnimatedControls" class="hidden space-y-3">
+                <p class="text-xs text-discord-gray-400">Choose an animation preset:</p>
+                <div class="flex flex-wrap gap-2">
+                  <button data-anim="gradientShift"
+                    class="px-3 py-1 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-xs active">Shift</button>
+                  <button data-anim="floatingBubbles"
+                    class="px-3 py-1 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-xs">Bubbles</button>
+                  <button data-anim="starfield"
+                    class="px-3 py-1 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-xs">Stars</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="flex flex-col">
+            <h4 class="text-sm font-bold text-discord-gray-400 uppercase mb-3">Preview</h4>
+            <div id="tePreview"
+              class="flex-1 rounded-xl overflow-hidden border border-discord-gray-900 shadow-inner relative min-h-[300px]"
+              style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+              <!-- Mock UI -->
+              <div class="absolute top-3 left-3 right-3 h-6 rounded bg-discord-gray-900/50 backdrop-blur-sm"></div>
+              <div class="absolute top-11 left-3 bottom-3 w-10 rounded bg-discord-gray-900/40 backdrop-blur-sm"></div>
+              <div class="absolute top-11 left-15 right-3 bottom-3 p-3 space-y-2">
+                <div class="h-4 w-3/4 rounded bg-discord-gray-600/50"></div>
+                <div class="h-4 w-1/2 rounded bg-discord-gray-600/30"></div>
+                <div class="h-20 w-full rounded bg-discord-gray-600/20 mt-4"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-discord-gray-900 flex justify-end gap-3">
+        <button id="teCancelBtn"
+          class="px-6 py-2 rounded-lg bg-discord-gray-700 hover:bg-discord-gray-600 font-medium transition">Cancel</button>
+        <button id="teApplyBgBtn"
+          class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition">Apply
+          Background</button>
+        <button id="teApplyThemeBtn"
+          class="px-6 py-2 rounded-lg bg-discord-blurple hover:bg-opacity-80 text-white font-medium transition">Apply
+          Full
+          Theme</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="userViewModalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[220] hidden"
+    onclick="closeUserViewModal()"></div>
+  <div id="userViewModal"
+    class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[230] w-[90%] max-w-sm rounded-xl overflow-hidden shadow-2xl hidden animate-pop">
+    <div class="bg-discord-gray-800 text-discord-gray-300 flex flex-col">
+      <div class="h-24 bg-discord-blurple relative">
+        <img id="uvBanner" src="/images/default_banner.png" class="w-full h-full object-cover">
+        <button onclick="closeUserViewModal()"
+          class="absolute top-2 right-2 p-1 rounded-full bg-black/20 hover:bg-black/40 text-white transition">
+          <i data-feather="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="px-4 pb-4 relative">
+        <div class="relative -mt-12 mb-3">
+          <img id="uvAvatar" src="/images/default_avatar.png"
+            class="w-20 h-20 rounded-full border-4 border-discord-gray-800 bg-discord-gray-800 object-cover shadow-lg">
+          <div id="uvStatus"
+            class="absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-discord-gray-800 bg-gray-500"></div>
+        </div>
+        <div class="space-y-1">
+          <h3 id="uvUsername" class="text-xl font-bold text-white">Username</h3>
+          <p id="uvUsertag" class="text-discord-gray-400 text-sm font-medium">@usertag</p>
+        </div>
+        <div class="mt-4 pt-4 border-t border-discord-gray-700">
+          <h4 class="text-xs font-bold text-discord-gray-400 uppercase mb-2">About Me</h4>
+          <p id="uvBio" class="text-sm text-discord-gray-200 line-clamp-3 italic">No bio shared.</p>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button id="uvMessageBtn"
+            class="flex-1 py-2 rounded bg-discord-blurple hover:bg-opacity-90 text-white text-sm font-bold transition">Message</button>
+          <button id="uvProfileBtn" class="px-3 py-2 rounded bg-discord-gray-700 hover:bg-discord-gray-600 transition">
+            <i data-feather="user" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1268,56 +1459,120 @@
   </div>
 
   <!-- Group Settings Modal -->
-  <div id="groupSettingsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
-    <div class="bg-discord-gray-700 w-full max-w-lg rounded-lg shadow-lg flex flex-col max-h-[90vh]">
-      <!-- Header -->
-      <div class="flex justify-between items-center p-6 border-b border-discord-gray-900">
-        <h3 class="text-white text-xl font-bold">Group Settings</h3>
-        <button onclick="closeGroupSettings()" class="text-discord-gray-400 hover:text-white">
-          <i data-feather="x"></i>
-        </button>
-      </div>
-
-      <!-- Content -->
-      <div class="p-6 space-y-6 overflow-y-auto">
-        <!-- Icon -->
-        <div class="flex flex-col items-center">
-          <div class="relative w-24 h-24 group cursor-pointer"
-            onclick="document.getElementById('editGroupIconInput').click()">
-            <div id="editGroupIconPreview"
-              class="w-full h-full rounded-full bg-discord-gray-600 flex items-center justify-center overflow-hidden border-2 border-transparent hover:border-discord-blurple transition">
-              <span class="text-white text-2xl font-bold" id="editGroupIconInitial">G</span>
-            </div>
-            <div
-              class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-full transition">
-              <span class="text-white text-xs font-bold">CHANGE</span>
-            </div>
-            <input type="file" id="editGroupIconInput" class="hidden" accept="image/*"
-              onchange="previewEditGroupIcon(event)">
+  <div id="groupSettingsModal"
+    class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50 animate-fadeIn">
+    <div class="bg-discord-gray-800 w-full max-w-2xl rounded-lg shadow-2xl flex flex-col h-[600px] overflow-hidden">
+      <!-- Sidebar / Tabs -->
+      <div class="flex h-full">
+        <div class="w-48 bg-discord-gray-900 p-4 space-y-1">
+          <div class="text-xs font-bold text-discord-gray-400 uppercase px-2 mb-2">Server Settings</div>
+          <button onclick="switchSettingsTab('overview')" id="tabBtn-overview"
+            class="settings-tab-btn active">Overview</button>
+          <button onclick="switchSettingsTab('channels')" id="tabBtn-channels"
+            class="settings-tab-btn">Channels</button>
+          <button onclick="switchSettingsTab('invites')" id="tabBtn-invites" class="settings-tab-btn">Invites</button>
+          <div class="mt-4 pt-4 border-t border-discord-gray-800">
+            <button onclick="deleteGroup()"
+              class="w-full text-left px-2 py-1.5 rounded text-red-500 hover:bg-red-500/10 transition text-sm font-medium">Delete
+              Server</button>
           </div>
         </div>
 
-        <!-- Name -->
-        <div>
-          <label class="block text-xs font-bold text-discord-gray-400 uppercase tracking-wide mb-2">Group Name</label>
-          <input type="text" id="editGroupName"
-            class="w-full bg-discord-gray-900 border-none rounded p-2 text-white focus:ring-2 focus:ring-discord-blurple">
-        </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-discord-gray-700">
+          <div class="flex justify-between items-center p-4 border-b border-discord-gray-900">
+            <h3 id="settingsTabTitle" class="text-white font-bold">Server Overview</h3>
+            <button onclick="closeGroupSettings()" class="text-discord-gray-400 hover:text-white transition">
+              <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+          </div>
 
-        <!-- Description -->
-        <div>
-          <label class="block text-xs font-bold text-discord-gray-400 uppercase tracking-wide mb-2">Description</label>
-          <textarea id="editGroupDesc" rows="3"
-            class="w-full bg-discord-gray-900 border-none rounded p-2 text-white focus:ring-2 focus:ring-discord-blurple resize-none"></textarea>
-        </div>
-      </div>
+          <div class="flex-1 overflow-y-auto p-6">
+            <!-- Overview Section -->
+            <div id="settings-overview" class="settings-section space-y-6">
+              <div class="flex items-center gap-4">
+                <div class="relative w-24 h-24 group cursor-pointer"
+                  onclick="document.getElementById('editGroupIconInput').click()">
+                  <div id="editGroupIconPreview"
+                    class="w-full h-full rounded-full bg-discord-gray-600 flex items-center justify-center overflow-hidden border-2 border-transparent hover:border-discord-blurple transition">
+                    <span class="text-white text-2xl font-bold" id="editGroupIconInitial">G</span>
+                  </div>
+                  <div
+                    class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-full transition">
+                    <span class="text-white text-[10px] font-bold">CHANGE ICON</span>
+                  </div>
+                  <input type="file" id="editGroupIconInput" class="hidden" accept="image/*"
+                    onchange="previewEditGroupIcon(event)">
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs text-discord-gray-400 mb-2">We recommend an image of at least 512x512 for the
+                    server.</p>
+                </div>
+              </div>
 
-      <!-- Footer -->
-      <div class="p-6 bg-discord-gray-800 rounded-b-lg flex justify-between items-center">
-        <button onclick="deleteGroup()" class="text-red-500 hover:underline font-medium text-sm">Delete Group</button>
-        <button onclick="saveGroupSettings()"
-          class="bg-discord-blurple hover:bg-discord-blurple/80 text-white px-6 py-2 rounded font-medium transition">Save
-          Changes</button>
+              <div>
+                <label class="block text-xs font-bold text-discord-gray-400 uppercase mb-2">Server Name</label>
+                <input type="text" id="editGroupName"
+                  class="w-full bg-discord-gray-900 border-none rounded p-2 text-white focus:ring-1 focus:ring-discord-blurple">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-discord-gray-400 uppercase mb-2">Description</label>
+                <textarea id="editGroupDesc" rows="3"
+                  class="w-full bg-discord-gray-900 border-none rounded p-2 text-white focus:ring-1 focus:ring-discord-blurple resize-none"></textarea>
+              </div>
+            </div>
+
+            <!-- Channels Section -->
+            <div id="settings-channels" class="settings-section hidden space-y-4">
+              <div class="flex justify-between items-center">
+                <h4 class="text-sm font-bold text-white uppercase">Server Channels</h4>
+                <button onclick="showCreateChannelInput()"
+                  class="text-xs bg-discord-blurple hover:bg-opacity-80 text-white px-2 py-1 rounded transition">Create
+                  Channel</button>
+              </div>
+
+              <div id="createChannelInputArea" class="hidden p-3 bg-discord-gray-900 rounded-lg space-y-3">
+                <input type="text" id="newChannelName" placeholder="new-channel"
+                  class="w-full bg-discord-gray-700 border-none rounded text-sm p-2 text-white">
+                <div class="flex gap-2">
+                  <button onclick="confirmCreateChannel('text')"
+                    class="flex-1 bg-discord-blurple py-1.5 rounded text-xs text-white"># Text</button>
+                  <button onclick="confirmCreateChannel('voice')"
+                    class="flex-1 bg-discord-gray-600 py-1.5 rounded text-xs text-white">🔊 Voice</button>
+                  <button onclick="hideCreateChannelInput()"
+                    class="px-3 bg-discord-gray-800 rounded text-xs text-white">Cancel</button>
+                </div>
+              </div>
+
+              <div id="settingsChannelList" class="space-y-1">
+                <!-- Channels here -->
+              </div>
+            </div>
+
+            <!-- Invites Section -->
+            <div id="settings-invites" class="settings-section hidden space-y-6">
+              <div class="p-4 bg-discord-gray-900 rounded-lg border border-discord-gray-600/30">
+                <label class="block text-xs font-bold text-discord-gray-400 uppercase mb-2">Invite Code</label>
+                <div class="flex gap-2">
+                  <input type="text" id="inviteCodeInput" readonly
+                    class="flex-1 bg-discord-gray-700 border-none rounded p-2 text-white font-mono text-sm">
+                  <button onclick="copyInviteCode()"
+                    class="bg-discord-blurple hover:bg-opacity-80 text-white px-4 py-2 rounded text-sm font-medium transition">Copy</button>
+                </div>
+                <p class="text-[11px] text-discord-gray-400 mt-2">Share this code with your friends to let them join
+                  your server!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Footer -->
+          <div id="settingsModalFooter" class="p-4 bg-discord-gray-900 flex justify-end">
+            <button onclick="saveGroupSettings()"
+              class="bg-discord-blurple hover:bg-opacity-90 text-white px-8 py-2 rounded font-medium shadow-lg transition">Save
+              Changes</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1425,6 +1680,8 @@
       avatar.alt = `${data.username || data.from}'s avatar`;
       avatar.className = "w-10 h-10 rounded-full object-cover cursor-pointer"; // Added cursor-pointer
       avatar.onerror = function () { this.onerror = null; this.src = fallbackAvatar; };
+      const tUname = data.username || data.from;
+      avatar.onclick = () => showUserProfile(tUname);
       msgWrapper.appendChild(avatar);
 
       const contentWrapper = document.createElement("div");
@@ -1433,7 +1690,8 @@
       header.className = "flex items-baseline gap-2";
       const userSpan = document.createElement("span");
       userSpan.className = "text-white font-semibold cursor-pointer hover:underline";
-      userSpan.textContent = data.username || data.from;
+      userSpan.textContent = tUname;
+      userSpan.onclick = () => showUserProfile(tUname);
       const timeSpan = document.createElement("span");
       timeSpan.className = "text-discord-gray-400 text-xs";
       timeSpan.textContent = new Date(data.ts ? data.ts * 1000 : Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1482,6 +1740,77 @@
 
       msgWrapper.appendChild(contentWrapper);
       return msgWrapper;
+    }
+
+    // === USER PROFILE VIEW MODAL LOGIC ===
+    async function showUserProfile(targetUsername) {
+      if (!targetUsername || targetUsername === 'N/A') return;
+      const overlay = document.getElementById('userViewModalOverlay');
+      const modal = document.getElementById('userViewModal');
+
+      // Initial Loading State
+      document.getElementById('uvUsername').textContent = targetUsername;
+      document.getElementById('uvUsertag').textContent = 'Loading...';
+      document.getElementById('uvAvatar').src = '/images/default_avatar.png';
+      document.getElementById('uvBanner').src = '/images/default_banner.png';
+      document.getElementById('uvBio').textContent = 'Searching for user bio...';
+
+      overlay.classList.remove('hidden');
+      modal.classList.remove('hidden');
+      feather.replace();
+
+      if (targetUsername === 'AI') {
+        document.getElementById('uvUsername').textContent = 'Zylo AI';
+        document.getElementById('uvUsertag').textContent = '@AI';
+        document.getElementById('uvAvatar').src = '/images/Zylo_icon.ico';
+        document.getElementById('uvBio').textContent = 'Your friendly AI assistant within Zylo. I am here to help you brainstorm, answer questions, and explore ideas.';
+        document.getElementById('uvMessageBtn').classList.add('hidden');
+        document.getElementById('uvProfileBtn').classList.add('hidden');
+        return;
+      } else {
+        document.getElementById('uvMessageBtn').classList.remove('hidden');
+        document.getElementById('uvProfileBtn').classList.remove('hidden');
+      }
+
+      try {
+        const res = await fetch(`/api/get-user?identifier=${encodeURIComponent(targetUsername)}`);
+        const data = await res.json();
+        if (data.success && data.user) {
+          const u = data.user;
+          document.getElementById('uvUsername').textContent = u.username;
+          document.getElementById('uvUsertag').textContent = (u.usertag || '@user0000');
+          if (u.avatar) document.getElementById('uvAvatar').src = u.avatar;
+          if (u.banner) document.getElementById('uvBanner').src = u.banner;
+          document.getElementById('uvBio').textContent = u.about || u.aboutMe || 'No bio shared.';
+
+          // Set Up Message Button
+          const msgBtn = document.getElementById('uvMessageBtn');
+          msgBtn.onclick = () => {
+            closeUserViewModal();
+            openDMFromProfile(u.username);
+          };
+
+          // Set Up Profile Card Button
+          const profBtn = document.getElementById('uvProfileBtn');
+          profBtn.onclick = () => {
+            closeUserViewModal();
+            // If it's the current user, go to profile. If not, just viewing them is enough
+            if (u.username === localStorage.getItem('username')) {
+              switchTab('profile');
+            }
+          };
+        } else {
+          document.getElementById('uvBio').textContent = 'User details are currently unavailable.';
+        }
+      } catch (error) {
+        console.error('Failed to load user profile modal:', error);
+        document.getElementById('uvBio').textContent = 'Error loading user data.';
+      }
+    }
+
+    function closeUserViewModal() {
+      document.getElementById('userViewModalOverlay').classList.add('hidden');
+      document.getElementById('userViewModal').classList.add('hidden');
     }
 
     async function appendCommunityMessage(data) {
@@ -2956,16 +3285,20 @@
         };
 
         // Short bio
-        const shortBioEl = document.getElementById("settingsProfileBio")
-          || document.getElementById("settingsProfileBioDisplay")
-          || document.getElementById("profileBio");
-        let shortBioRaw = readText(shortBioEl);
+        const shortBioInput = document.getElementById("settingsProfileBio") ||
+          (document.getElementById("profileBio")?.tagName === 'INPUT' ? document.getElementById("profileBio") : null);
+        const shortBioDisplay = document.getElementById("settingsProfileBioDisplay") || document.getElementById("profileBio");
+
+        let shortBioRaw = (shortBioInput?.value || shortBioDisplay?.textContent || "").trim();
         if (shortBioRaw === PLACEHOLDER_BIO || shortBioRaw === PLACEHOLDER_ABOUT) shortBioRaw = "";
         const shortBio = shortBioRaw;
 
         // Long bio
-        const aboutEl = document.getElementById("settingsAboutMe") || document.getElementById("aboutMe");
-        const aboutMeValue = readText(aboutEl);
+        const aboutInput = document.getElementById("settingsAboutMe") || document.getElementById("aboutMe");
+        const aboutDisplay = document.getElementById("settingsAboutMeDisplay") || document.getElementById("profileAboutBio");
+
+        let aboutMeValue = (aboutInput?.tagName === 'TEXTAREA' || aboutInput?.tagName === 'INPUT' ? aboutInput.value : aboutDisplay?.textContent || "").trim();
+        if (aboutMeValue === PLACEHOLDER_ABOUT) aboutMeValue = "";
 
         console.log('Saving profile - shortBio:', shortBio, 'aboutMe:', aboutMeValue);
 
@@ -3021,6 +3354,11 @@
         const inLong = document.getElementById("settingsAboutMe");
         if (inShort) inShort.value = returnedShort;
         if (inLong) inLong.value = returnedLong;
+
+        const dispShort = document.getElementById("settingsProfileBioDisplay");
+        const dispLong = document.getElementById("settingsAboutMeDisplay");
+        if (dispShort) dispShort.textContent = returnedShort || PLACEHOLDER_BIO;
+        if (dispLong) dispLong.textContent = returnedLong || PLACEHOLDER_ABOUT;
 
         const editorAbout = document.getElementById("aboutMe");
         if (editorAbout) {
@@ -3335,38 +3673,56 @@
 
     function renderDownloads() {
       const container = document.getElementById('downloads');
+      if (!container) return;
+      container.innerHTML = '';
+      renderFilesReworked('downloads');
+    }
+
+    function renderFilesReworked(containerId = 'filesListContainer') {
+      const container = document.getElementById(containerId);
+      if (!container) return;
       container.innerHTML = '';
 
+      if (files.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-discord-gray-500">
+            <i data-feather="folder" class="w-12 h-12 mx-auto mb-3 opacity-20"></i>
+            <p>No files found.</p>
+          </div>
+        `;
+        feather.replace();
+        return;
+      }
+
       files.forEach(file => {
-        const html = `
-          <div class="p-4 border rounded-lg shadow-sm 
-                      bg-gray-50/90 dark:bg-gray-800/80 
-                      border-gray-200 dark:border-gray-700 
-                      text-gray-800 dark:text-gray-100">
-            
-            <h2 class="text-xl font-semibold">${file.name}</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-300">${file.sizeMB} MB</p>
-            <p id="time-${file.filename}" class="text-sm text-blue-600 dark:text-blue-400 mt-1">
-              ⏱️ Estimated time: not calculated
-            </p>
+        const card = document.createElement('div');
+        card.className = 'bg-discord-gray-800 rounded-lg p-4 border border-discord-gray-900 hover:border-discord-blurple transition-all group relative overflow-hidden';
 
-            <div class="w-full bg-gray-300 dark:bg-gray-700 rounded h-3 mt-2 overflow-hidden">
-              <div id="progress-${file.filename}" 
-                  class="bg-blue-500 h-full w-0 transition-all duration-500 ease-in-out">
-              </div>
+        card.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="p-3 rounded-lg bg-discord-gray-900 text-discord-blurple group-hover:bg-discord-blurple group-hover:text-white transition-colors">
+              <i data-feather="package" class="w-6 h-6"></i>
             </div>
-
-            <button onclick="startDownload('${file.filename}')"
-                    class="mt-3 px-4 py-2 bg-green-600 text-white rounded 
-                          hover:bg-green-700 
-                          dark:bg-green-500 dark:hover:bg-green-400">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-semibold truncate" title="${file.name}">${file.name}</h3>
+              <p class="text-discord-gray-400 text-xs">${file.sizeMB} MB • zip</p>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button onclick="startDownload('${file.filename}')" class="flex-1 py-1.5 rounded bg-discord-gray-700 hover:bg-discord-gray-600 text-white text-xs font-medium transition">
               Download
+            </button>
+            <button class="p-1.5 rounded bg-discord-gray-700 hover:bg-red-500/20 hover:text-red-500 text-discord-gray-400 transition" title="Info">
+              <i data-feather="info" class="w-4 h-4"></i>
             </button>
           </div>
         `;
-        container.insertAdjacentHTML('beforeend', html);
+        container.appendChild(card);
       });
+      feather.replace();
     }
+
+    window.refreshFilesList = () => renderFilesReworked('filesListContainer');
 
     renderDownloads();
 
@@ -4667,10 +5023,12 @@
       const iconInput = document.getElementById('editGroupIconInput');
       const iconPreview = document.getElementById('editGroupIconPreview');
       const initialSpan = document.getElementById('editGroupIconInitial');
+      const inviteInput = document.getElementById('inviteCodeInput');
 
       if (modal && nameInput && descInput) {
         nameInput.value = group.name || '';
         descInput.value = group.description || '';
+        if (inviteInput) inviteInput.value = group.id;
 
         // Reset icon input
         if (iconInput) iconInput.value = '';
@@ -4687,7 +5045,119 @@
           if (initialSpan) initialSpan.textContent = getGroupInitial(group.name);
         }
 
+        switchSettingsTab('overview');
+        renderSettingsChannels(group);
         modal.classList.remove('hidden');
+      }
+    }
+
+    function switchSettingsTab(tab) {
+      document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
+
+      const section = document.getElementById(`settings-${tab}`);
+      const btn = document.getElementById(`tabBtn-${tab}`);
+      const title = document.getElementById('settingsTabTitle');
+      const footer = document.getElementById('settingsModalFooter');
+
+      if (section) section.classList.remove('hidden');
+      if (btn) btn.classList.add('active');
+      if (title) {
+        if (tab === 'overview') title.textContent = 'Server Overview';
+        if (tab === 'channels') title.textContent = 'Channel Management';
+        if (tab === 'invites') title.textContent = 'Invites';
+      }
+
+      // Hide save button on non-overview tabs for now unless needed
+      if (footer) {
+        if (tab === 'overview') footer.classList.remove('hidden');
+        else footer.classList.add('hidden');
+      }
+    }
+
+    function renderSettingsChannels(group) {
+      const container = document.getElementById('settingsChannelList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const channels = group.channels || [];
+      channels.forEach(ch => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-2 rounded hover:bg-discord-gray-600 transition group';
+        const isVoice = ch.type === 'voice';
+        const icon = isVoice ? 'volume-2' : 'hash';
+
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i data-feather="${icon}" class="w-4 h-4 text-discord-gray-400"></i>
+            <span class="text-white text-sm">${ch.name}</span>
+          </div>
+          ${ch.id !== 'general' ? `
+            <button onclick="deleteChannel('${group.id}', '${ch.id}')" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition">
+              <i data-feather="trash-2" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
+        `;
+        container.appendChild(div);
+      });
+      feather.replace();
+    }
+
+    function showCreateChannelInput() {
+      document.getElementById('createChannelInputArea').classList.remove('hidden');
+    }
+    function hideCreateChannelInput() {
+      document.getElementById('createChannelInputArea').classList.add('hidden');
+    }
+
+    async function confirmCreateChannel(type) {
+      const name = document.getElementById('newChannelName').value.trim();
+      const username = localStorage.getItem('savedUsername');
+      if (!name || !currentGroupId) return;
+
+      try {
+        const res = await fetch('/api/groups/channels/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ groupId: currentGroupId, username, channelName: name, type })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('newChannelName').value = '';
+          hideCreateChannelInput();
+          await loadGroups();
+          const updated = groupsData.find(g => g.id === currentGroupId);
+          if (updated) renderSettingsChannels(updated);
+        } else {
+          alert(data.error);
+        }
+      } catch (e) { }
+    }
+
+    async function deleteChannel(groupId, channelId) {
+      if (!confirm('Are you sure you want to delete this channel?')) return;
+      const username = localStorage.getItem('savedUsername');
+      try {
+        const res = await fetch('/api/groups/channels/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ groupId, username, channelId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          await loadGroups();
+          const updated = groupsData.find(g => g.id === groupId);
+          if (updated) renderSettingsChannels(updated);
+        }
+      } catch (e) { }
+    }
+
+    function copyInviteCode() {
+      const input = document.getElementById('inviteCodeInput');
+      if (input) {
+        input.select();
+        document.execCommand('copy');
+        alert('Invite code copied to clipboard!');
       }
     }
 
@@ -4962,7 +5432,7 @@
       feather.replace();
     }
 
-    function loadGroupChannels(group) {
+    function loadGroupChannels(group, activeChannelId = 'general') {
       const container = document.getElementById('groupChannelsList');
       if (!container) return;
 
@@ -4973,12 +5443,15 @@
 
       channels.forEach(channel => {
         const item = document.createElement('div');
-        item.className = 'channel-item active';
+        item.className = `channel-item ${channel.id === activeChannelId ? 'active' : ''}`;
         item.innerHTML = `
           <span class="channel-icon">#</span>
-            <span>${channel.name}</span>
+          <span>${channel.name}</span>
         `;
-        item.onclick = () => switchGroupChannel(group, channel.id);
+        item.onclick = (e) => {
+          // Switch and handle active state
+          switchGroupChannel(group, channel.id);
+        };
         container.appendChild(item);
       });
     }
@@ -5011,8 +5484,15 @@
 
       container.innerHTML = '';
 
-      // Update channel name
-      document.getElementById('groupChatChannelName').textContent = channelId;
+      // Update channel name and placeholder
+      const channel = (group.channels || []).find(c => c.id === channelId) || { name: channelId };
+      const displayTitle = channel.name;
+
+      const titleEl = document.getElementById('groupChatChannelName');
+      if (titleEl) titleEl.textContent = displayTitle;
+
+      const input = document.getElementById('groupChatInput');
+      if (input) input.placeholder = `Message #${displayTitle}`;
 
       try {
         const res = await fetch(`/api/groups/${group.id}/messages?channel=${channelId}`);
@@ -5085,11 +5565,8 @@
     }
 
     function switchGroupChannel(group, channelId) {
-      // Update active channel
-      document.querySelectorAll('#groupChannelsList .channel-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      event.target.closest('.channel-item')?.classList.add('active');
+      // Re-render channel list to update active states
+      loadGroupChannels(group, channelId);
 
       // Load messages for this channel
       loadGroupMessages(group, channelId);
@@ -5196,6 +5673,7 @@
         const targetEl = targetId ? document.getElementById(targetId) : null;
         if (targetEl) targetEl.classList.remove("hidden");
         if (targetId === 'aboutSettings') { try { populateAboutInfo(); } catch (e_) { } }
+        if (targetId === 'filesSettings') { try { renderFilesReworked('filesListContainer'); } catch (e_) { } }
         this.classList.add("active");
 
         // Update main title to match setting

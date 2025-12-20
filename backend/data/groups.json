@@ -4,14 +4,20 @@
     "name": "Zylo's Support (Official)",
     "description": "The official support server for Zylo!",
     "owner": "Daniel",
-    "icon": "/uploads/groups/explore_953400484_653019.png",
+    "icon": "/uploads/groups/explore_50669481_523754.png",
     "members": [
-      "Daniel"
+      "Daniel",
+      "Dan"
     ],
     "channels": [
       {
         "id": "general",
         "name": "general"
+      },
+      {
+        "id": "2839",
+        "name": "questions",
+        "type": "text"
       }
     ],
     "messages": [],

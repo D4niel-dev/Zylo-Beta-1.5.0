@@ -1553,6 +1553,68 @@ def delete_group_api():
     return jsonify({"success": False, "error": "Group not found"}), 404
 
 
+@app.route('/api/groups/channels/create', methods=['POST'])
+def create_group_channel():
+    data = request.json or {}
+    group_id = data.get('groupId', '').strip()
+    username = data.get('username', '').strip()
+    channel_name = data.get('channelName', '').strip()
+    channel_type = data.get('type', 'text').strip() # 'text' or 'voice'
+
+    if not group_id or not username or not channel_name:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+    all_groups = load_groups()
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            if g.get('owner') != username:
+                return jsonify({"success": False, "error": "Not authorized"}), 403
+            
+            channels = g.get('channels', [])
+            # Check for duplicate names
+            if any(c.get('name') == channel_name for c in channels):
+                return jsonify({"success": False, "error": "Channel already exists"}), 400
+            
+            new_channel = {
+                "id": str(random.randint(1000, 9999)), # Simplified channel ID
+                "name": channel_name,
+                "type": channel_type
+            }
+            channels.append(new_channel)
+            all_groups[idx]['channels'] = channels
+            save_groups(all_groups)
+            return jsonify({"success": True, "channel": new_channel})
+    
+    return jsonify({"success": False, "error": "Group not found"}), 404
+
+
+@app.route('/api/groups/channels/delete', methods=['POST'])
+def delete_group_channel():
+    data = request.json or {}
+    group_id = data.get('groupId', '').strip()
+    username = data.get('username', '').strip()
+    channel_id = data.get('channelId', '').strip()
+
+    if not group_id or not username or not channel_id:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+    if channel_id == 'general':
+        return jsonify({"success": False, "error": "Cannot delete #general"}), 400
+
+    all_groups = load_groups()
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            if g.get('owner') != username:
+                return jsonify({"success": False, "error": "Not authorized"}), 403
+            
+            channels = [c for c in g.get('channels', []) if c.get('id') != channel_id]
+            all_groups[idx]['channels'] = channels
+            save_groups(all_groups)
+            return jsonify({"success": True})
+            
+    return jsonify({"success": False, "error": "Group not found"}), 404
+
+
 @app.route('/api/groups/message', methods=['POST'])
 def send_group_message_api():
     """Send a message to a group channel."""

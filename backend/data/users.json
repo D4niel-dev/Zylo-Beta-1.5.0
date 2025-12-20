@@ -51,9 +51,11 @@
     },
     "settings": {
       "profileEffect": "pulse",
-      "bannerEffect": "blur-overlay"
+      "bannerEffect": "blur-overlay",
+      "startupPage": "friends",
+      "compactMode": false
     },
-    "about": "",
-    "aboutMe": ""
+    "about": "Developer of Zylo - Alt",
+    "aboutMe": "Dan's alt :p"
   }
 ]
