@@ -4,32 +4,24 @@
     "email": "khacduytvt123@gmail.com",
     "password": "123456",
     "usertag": "@d4niel_1f",
-    "dob": "2006-07-13",
-    "gender": "male",
+    "dob": "2000-06-29",
+    "gender": "",
     "phone": "",
-    "avatar": "http://192.168.1.181:5000/uploads/Dan/explore_750077111_761195.png",
-    "banner": "http://192.168.1.181:5000/uploads/Dan/explore_203767740_162728.png",
-    "about": "Developer of Zylo - Head of the Zylo Project!",
-    "aboutMe": "The main account of the Zylo Developer!\n\nReport any bugs or feedback to this account, will get answers in at least 1~3 hours after it was sended.",
-    "settings": {
-      "profileEffect": "pulse",
-      "bannerEffect": "vignette",
-      "compactMode": true,
-      "enableMusic": true,
-      "startupPage": "profile",
-      "language": "en",
-      "enableSound": true,
-      "soundProfile": "default",
-      "soundVolume": "57",
-      "musicVolume": "18",
-      "muteAll": true
-    },
+    "avatar": "http://192.168.1.181:5000/uploads/Dan/explore_158826267_539882.png",
+    "banner": "http://192.168.1.181:5000/uploads/Dan/explore_124654978_839551.png",
     "friends": [
       "Daniel"
     ],
     "friendRequests": {
       "incoming": [],
       "outgoing": []
+    },
+    "about": "Developer of Zylo - Head of the Zylo Project!",
+    "aboutMe": "Any reports, feedbacks and bugs will be send to this account!\nWill get respond in at least 1~3 hours after send.",
+    "settings": {
+      "profileEffect": "pulse",
+      "bannerEffect": "vignette",
+      "startupPage": "chats"
     }
   },
   {
@@ -37,25 +29,23 @@
     "email": "nguyenkhacduy1372@gmail.com",
     "password": "123456",
     "usertag": "@d4niel_17",
-    "dob": "2000-06-29",
-    "gender": "",
+    "dob": "2008-06-29",
+    "gender": "female",
     "phone": "",
-    "avatar": "http://192.168.1.181:5000/uploads/Daniel/explore_830545609_782025.png",
-    "banner": "http://192.168.1.181:5000/uploads/Daniel/explore_639702130_315091.png",
+    "avatar": "http://192.168.1.181:5000/uploads/Daniel/explore_879424019_399515.png",
+    "banner": "http://192.168.1.181:5000/uploads/Daniel/explore_35570761_740698.png",
+    "about": "Developer of Zylo - Alt",
+    "aboutMe": "Any feedback go to this account will be send to @d4niel_1f.",
+    "settings": {
+      "profileEffect": "pulse",
+      "bannerEffect": "vignette"
+    },
     "friends": [
       "Dan"
     ],
     "friendRequests": {
       "incoming": [],
       "outgoing": []
-    },
-    "settings": {
-      "profileEffect": "pulse",
-      "bannerEffect": "blur-overlay",
-      "startupPage": "friends",
-      "compactMode": false
-    },
-    "about": "Developer of Zylo - Alt",
-    "aboutMe": "Dan's alt :p"
+    }
   }
 ]

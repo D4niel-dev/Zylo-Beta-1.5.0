@@ -425,6 +425,59 @@ def reset_password():
 def get_messages():
     return jsonify(messages)
 
+# Direct Message (DM) endpoint
+@app.route("/api/dm", methods=["POST", "GET"])
+def dm_messages():
+    """Send or retrieve direct messages."""
+    global dms
+    
+    if request.method == "GET":
+        # Get DMs between two users
+        from_user = request.args.get('from', '').strip()
+        to_user = request.args.get('to', '').strip()
+        if not from_user or not to_user:
+            return jsonify({"success": False, "error": "Missing from/to params"})
+        
+        # Filter DMs between these users
+        relevant = [m for m in dms if 
+            (m.get('from') == from_user and m.get('to') == to_user) or
+            (m.get('from') == to_user and m.get('to') == from_user)
+        ]
+        return jsonify({"success": True, "messages": relevant})
+    
+    # POST - send a new DM
+    data = request.get_json(silent=True) or {}
+    from_user = (data.get('from') or '').strip()
+    to_user = (data.get('to') or '').strip()
+    message = data.get('message', '')
+    msg_type = data.get('type', 'text')
+    sticker_src = data.get('sticker_src')
+    
+    if not from_user or not to_user:
+        return jsonify({"success": False, "error": "Missing from/to"}), 400
+    
+    dm_entry = {
+        'from': from_user,
+        'to': to_user,
+        'message': message,
+        'type': msg_type,
+        'ts': __import__('time').time()
+    }
+    if sticker_src:
+        dm_entry['sticker_src'] = sticker_src
+    
+    dms.append(dm_entry)
+    save_dms(dms)
+    
+    # Emit via socket for real-time delivery
+    try:
+        socketio.emit('receive_dm', dm_entry, room=f"dm:{to_user}")
+        socketio.emit('receive_dm', dm_entry, room=f"dm:{from_user}")
+    except:
+        pass
+    
+    return jsonify({"success": True, "message": dm_entry})
+
 @socketio.on("send_message")
 def handle_send_message(data):
     username = data.get("username")
@@ -603,6 +656,72 @@ def get_stats():
         "rooms": room_count
     })
 
+# Link preview endpoint - fetches OpenGraph metadata
+import re as _re
+@app.route('/api/link-preview', methods=['GET'])
+def link_preview():
+    """Fetch OpenGraph metadata from a URL for rich link embeds."""
+    url = request.args.get('url', '').strip()
+    if not url:
+        return jsonify({"success": False, "error": "Missing URL"})
+    
+    # Security: only allow http/https URLs
+    if not url.startswith(('http://', 'https://')):
+        return jsonify({"success": False, "error": "Invalid URL scheme"})
+    
+    try:
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
+        with urllib.request.urlopen(req, timeout=5, context=ctx) as response:
+            html = response.read(50000).decode('utf-8', errors='ignore')  # Read first 50KB only
+        
+        # Extract OpenGraph tags using regex
+        def get_og_content(tag_name):
+            pattern = rf'<meta[^>]*property=["\']og:{tag_name}["\'][^>]*content=["\']([^"\']*)["\']'
+            match = _re.search(pattern, html, _re.IGNORECASE)
+            if not match:
+                # Try alternate format: content before property
+                pattern = rf'<meta[^>]*content=["\']([^"\']*)["\'][^>]*property=["\']og:{tag_name}["\']'
+                match = _re.search(pattern, html, _re.IGNORECASE)
+            return match.group(1) if match else None
+        
+        title = get_og_content('title')
+        description = get_og_content('description')
+        image = get_og_content('image')
+        site_name = get_og_content('site_name')
+        
+        # Fallback to regular title if no og:title
+        if not title:
+            title_match = _re.search(r'<title[^>]*>([^<]*)</title>', html, _re.IGNORECASE)
+            if title_match:
+                title = title_match.group(1).strip()
+        
+        # Extract hostname as fallback site_name
+        if not site_name:
+            try:
+                from urllib.parse import urlparse
+                site_name = urlparse(url).hostname
+            except:
+                pass
+        
+        return jsonify({
+            "success": True,
+            "url": url,
+            "title": title,
+            "description": description,
+            "image": image,
+            "site_name": site_name
+        })
+        
+    except Exception as e:
+        print(f"Link preview failed for {url}: {e}")
+        return jsonify({"success": False, "error": str(e)})
+
 # AI models from Ollama and for exceptions
 @app.route('/api/ai/models', methods=['GET'])
 def ai_models():
@@ -766,7 +885,7 @@ def ai_memory():
 
 @app.route('/api/explore/posts', methods=['GET', 'POST'])
 def explore_posts():
-    """List or create Explore posts."""
+    """List or create Explore/Moments posts."""
     if request.method == 'GET':
         posts = load_explore()
         posts_sorted = sorted(posts, key=lambda p: p.get('createdAt', 0), reverse=True)
@@ -791,11 +910,177 @@ def explore_posts():
         'fileName': file_name,
         'url': url,
         'createdAt': int(__import__('time').time()),
+        'reactions': [],
+        'comments': []
     }
     posts = load_explore()
     posts.append(post)
     save_explore(posts)
     return jsonify({"success": True, "post": post})
+
+
+@app.route('/api/moments/react', methods=['POST'])
+def moments_react():
+    """Toggle reaction (like) on a Moments post."""
+    data = request.json or {}
+    post_id = (data.get('postId') or '').strip()
+    username = (data.get('username') or '').strip()
+    
+    if not post_id or not username:
+        return jsonify({"success": False, "error": "Missing postId/username"}), 400
+    
+    posts = load_explore()
+    for idx, p in enumerate(posts):
+        if p.get('id') == post_id:
+            reactions = p.get('reactions', [])
+            if username in reactions:
+                # Remove reaction (unlike)
+                reactions = [r for r in reactions if r != username]
+                user_reacted = False
+            else:
+                # Add reaction (like)
+                reactions.append(username)
+                user_reacted = True
+            posts[idx]['reactions'] = reactions
+            save_explore(posts)
+            return jsonify({
+                "success": True,
+                "reactCount": len(reactions),
+                "userReacted": user_reacted
+            })
+    
+    return jsonify({"success": False, "error": "Post not found"}), 404
+
+
+@app.route('/api/moments/comment', methods=['POST'])
+def moments_comment():
+    """Add a comment to a Moments post."""
+    data = request.json or {}
+    post_id = (data.get('postId') or '').strip()
+    username = (data.get('username') or '').strip()
+    comment_text = (data.get('comment') or '').strip()
+    
+    if not post_id or not username or not comment_text:
+        return jsonify({"success": False, "error": "Missing postId/username/comment"}), 400
+    
+    posts = load_explore()
+    for idx, p in enumerate(posts):
+        if p.get('id') == post_id:
+            comments = p.get('comments', [])
+            new_comment = {
+                'id': f"c{random.randint(100000,999999)}",
+                'username': username,
+                'text': comment_text,
+                'createdAt': int(__import__('time').time())
+            }
+            comments.append(new_comment)
+            posts[idx]['comments'] = comments
+            save_explore(posts)
+            return jsonify({
+                "success": True,
+                "comments": comments
+            })
+    
+    return jsonify({"success": False, "error": "Post not found"}), 404
+
+
+# ============ Cloud Storage (My Cloud) ============
+
+CLOUD_FILE = os.path.join(DATA_DIR, 'cloud.json')
+
+def load_cloud():
+    if not os.path.exists(CLOUD_FILE):
+        with open(CLOUD_FILE, 'w', encoding='utf-8') as f:
+            json.dump([], f)
+        return []
+    try:
+        with open(CLOUD_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_cloud(files):
+    with open(CLOUD_FILE, 'w', encoding='utf-8') as f:
+        json.dump(files, f, indent=2)
+
+
+@app.route('/api/cloud/files', methods=['GET'])
+def cloud_files():
+    """Get user's personal cloud files."""
+    username = (request.args.get('username') or '').strip()
+    if not username:
+        return jsonify({"success": False, "error": "Missing username"}), 400
+    
+    all_files = load_cloud()
+    user_files = [f for f in all_files if f.get('username') == username]
+    user_files.sort(key=lambda x: x.get('createdAt', 0), reverse=True)
+    return jsonify({"success": True, "files": user_files})
+
+
+@app.route('/api/cloud/upload', methods=['POST'])
+def cloud_upload():
+    """Upload file to personal cloud storage."""
+    data = request.json or {}
+    username = (data.get('username') or '').strip()
+    file_name = data.get('fileName')
+    file_data = data.get('fileData')
+    file_type = data.get('fileType', '')
+    
+    if not username or not file_data:
+        return jsonify({"success": False, "error": "Missing username/fileData"}), 400
+    
+    url = _save_data_url_for_user(username, file_data, file_name)
+    if not url:
+        return jsonify({"success": False, "error": "Failed to save file"}), 500
+    
+    try:
+        size_bytes = int(len(file_data.split(',')[-1]) * 3 / 4)
+    except:
+        size_bytes = 0
+    
+    cloud_entry = {
+        'id': f"cf{random.randint(100000, 999999)}",
+        'username': username,
+        'fileName': file_name,
+        'fileType': file_type,
+        'url': url,
+        'size': size_bytes,
+        'createdAt': int(__import__('time').time())
+    }
+    
+    all_files = load_cloud()
+    all_files.append(cloud_entry)
+    save_cloud(all_files)
+    
+    return jsonify({"success": True, "file": cloud_entry})
+
+
+@app.route('/api/cloud/delete', methods=['POST'])
+def cloud_delete():
+    """Delete file from personal cloud storage."""
+    data = request.json or {}
+    username = (data.get('username') or '').strip()
+    file_id = (data.get('fileId') or '').strip()
+    
+    if not username or not file_id:
+        return jsonify({"success": False, "error": "Missing username/fileId"}), 400
+    
+    all_files = load_cloud()
+    file_to_delete = None
+    
+    for f in all_files:
+        if f.get('id') == file_id and f.get('username') == username:
+            file_to_delete = f
+            break
+    
+    if not file_to_delete:
+        return jsonify({"success": False, "error": "File not found"}), 404
+    
+    all_files = [f for f in all_files if not (f.get('id') == file_id and f.get('username') == username)]
+    save_cloud(all_files)
+    
+    return jsonify({"success": True})
+
 
 @app.route('/api/get-user')
 def get_user():
@@ -1350,7 +1635,7 @@ def dm_history():
     for m in (load_dms() or []):
         if (m.get('from') == user_a and m.get('to') == user_b) or (m.get('from') == user_b and m.get('to') == user_a):
             conv.append(m)
-    return jsonify(conv)
+    return jsonify({"success": True, "messages": conv})
 
 @app.route('/api/dm/send', methods=['POST'])
 def dm_send():
@@ -1635,7 +1920,12 @@ def send_group_message_api():
                 'username': username,
                 'message': message,
                 'channel': channel,
-                'timestamp': int(__import__('time').time())
+                'timestamp': int(__import__('time').time()),
+                'type': data.get('type', 'text'),
+                'sticker_src': data.get('sticker_src'),
+                'fileData': data.get('fileData'),
+                'fileName': data.get('fileName'),
+                'fileType': data.get('fileType')
             }
             messages = group.get('messages', [])
             messages.append(msg_entry)
@@ -1645,6 +1935,115 @@ def send_group_message_api():
     
     return jsonify({"success": False, "error": "Group not found"}), 404
 
+
+@app.route('/api/groups/message/edit', methods=['POST'])
+def edit_group_message_api():
+    """Edit a message in a group channel."""
+    data = request.json or {}
+    group_id = data.get('groupId', '').strip()
+    channel = data.get('channel', 'general').strip()
+    username = data.get('username', '').strip()
+    message_timestamp = data.get('timestamp')
+    new_message = data.get('newMessage', '').strip()
+    
+    if not group_id or not username or not new_message or not message_timestamp:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+    
+    all_groups = load_groups()
+    
+    for idx, group in enumerate(all_groups):
+        if group.get('id') == group_id:
+            messages = group.get('messages', [])
+            for msg_idx, msg in enumerate(messages):
+                if msg.get('timestamp') == message_timestamp and msg.get('username') == username and msg.get('channel') == channel:
+                    messages[msg_idx]['message'] = new_message
+                    messages[msg_idx]['edited'] = True
+                    messages[msg_idx]['editedAt'] = int(__import__('time').time())
+                    all_groups[idx]['messages'] = messages
+                    save_groups(all_groups)
+                    return jsonify({"success": True, "message": messages[msg_idx]})
+            return jsonify({"success": False, "error": "Message not found"}), 404
+    
+    return jsonify({"success": False, "error": "Group not found"}), 404
+
+
+@app.route('/api/groups/message/react', methods=['POST'])
+def react_group_message_api():
+    """Add or remove a reaction to a message in a group channel."""
+    data = request.json or {}
+    group_id = data.get('groupId', '').strip()
+    channel = data.get('channel', 'general').strip()
+    username = data.get('username', '').strip()
+    message_timestamp = data.get('timestamp')
+    emoji = data.get('emoji', '').strip()
+    action = data.get('action', 'add')  # 'add' or 'remove'
+    
+    if not group_id or not username or not emoji or not message_timestamp:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+    
+    all_groups = load_groups()
+    
+    for idx, group in enumerate(all_groups):
+        if group.get('id') == group_id:
+            messages = group.get('messages', [])
+            for msg_idx, msg in enumerate(messages):
+                if msg.get('timestamp') == message_timestamp and msg.get('channel') == channel:
+                    # Initialize reactions dict if not present
+                    if 'reactions' not in messages[msg_idx]:
+                        messages[msg_idx]['reactions'] = {}
+                    
+                    reactions = messages[msg_idx]['reactions']
+                    
+                    if emoji not in reactions:
+                        reactions[emoji] = []
+                    
+                    if action == 'add':
+                        if username not in reactions[emoji]:
+                            reactions[emoji].append(username)
+                    else:  # remove
+                        if username in reactions[emoji]:
+                            reactions[emoji].remove(username)
+                        if len(reactions[emoji]) == 0:
+                            del reactions[emoji]
+                    
+                    messages[msg_idx]['reactions'] = reactions
+                    all_groups[idx]['messages'] = messages
+                    save_groups(all_groups)
+                    return jsonify({"success": True, "reactions": reactions})
+            return jsonify({"success": False, "error": "Message not found"}), 404
+    
+    return jsonify({"success": False, "error": "Group not found"}), 404
+
+
+@app.route('/api/groups/message/delete', methods=['POST'])
+def delete_group_message_api():
+    """Delete a message from a group channel."""
+    data = request.json or {}
+    group_id = data.get('groupId', '').strip()
+    channel = data.get('channel', 'general').strip()
+    username = data.get('username', '').strip()
+    message_timestamp = data.get('timestamp')
+    
+    if not group_id or not username or not message_timestamp:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+    
+    all_groups = load_groups()
+    
+    for idx, group in enumerate(all_groups):
+        if group.get('id') == group_id:
+            messages = group.get('messages', [])
+            for msg_idx, msg in enumerate(messages):
+                if msg.get('timestamp') == message_timestamp and msg.get('channel') == channel:
+                    if msg.get('username') != username:
+                        return jsonify({"success": False, "error": "Unauthorized"}), 403
+                        
+                    messages.pop(msg_idx)
+                    all_groups[idx]['messages'] = messages
+                    save_groups(all_groups)
+                    return jsonify({"success": True})
+            return jsonify({"success": False, "error": "Message not found"}), 404
+    
+    return jsonify({"success": False, "error": "Group not found"}), 404
 
 @app.route('/api/groups/<group_id>/messages', methods=['GET'])
 def group_messages_get(group_id):

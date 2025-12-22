@@ -2,11 +2,18 @@
   {
     "from": "Dan",
     "to": "Daniel",
-    "message": "test",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1762504013
+    "message": "[sticker:cat_laughing]",
+    "type": "sticker",
+    "ts": 1766392657.3768227,
+    "sticker_src": "/files/stickers/cat_laughing.png"
+  },
+  {
+    "from": "Dan",
+    "to": "Daniel",
+    "message": "[sticker:bear_laughing]",
+    "type": "sticker",
+    "ts": 1766392939.127123,
+    "sticker_src": "/files/stickers/bear_laughing.png"
   },
   {
     "from": "Dan",
@@ -15,78 +22,68 @@
     "fileName": null,
     "fileType": null,
     "fileData": null,
-    "createdAt": 1762504013
+    "createdAt": 1766394574
   },
   {
     "from": "Dan",
     "to": "Daniel",
+    "message": "test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766396291
+  },
+  {
+    "from": "Dan",
+    "to": "Daniel",
+    "message": "test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766399036
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
     "message": "hi",
     "fileName": null,
     "fileType": null,
     "fileData": null,
-    "createdAt": 1762593282
+    "createdAt": 1766399369
   },
   {
-    "from": "Dan",
-    "to": "Daniel",
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "[sticker:happy_cat]",
+    "type": "sticker",
+    "ts": 1766399928.3848634,
+    "sticker_src": "/files/stickers/happy_cat.png"
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "hmm",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766401073
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
     "message": "hi",
     "fileName": null,
     "fileType": null,
     "fileData": null,
-    "createdAt": 1762593282
-  },
-  {
-    "from": "Dan",
-    "to": "Daniel",
-    "message": "yo",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1766211322
-  },
-  {
-    "from": "Dan",
-    "to": "Daniel",
-    "message": "yo",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1766211322
+    "createdAt": 1766401513
   },
   {
     "from": "Daniel",
     "to": "Dan",
-    "message": "yooo",
+    "message": "hi",
     "fileName": null,
     "fileType": null,
     "fileData": null,
-    "createdAt": 1766211464
-  },
-  {
-    "from": "Daniel",
-    "to": "Dan",
-    "message": "yooo",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1766211464
-  },
-  {
-    "from": "Daniel",
-    "to": "Dan",
-    "message": "yo",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1766212377
-  },
-  {
-    "from": "Daniel",
-    "to": "Dan",
-    "message": "test",
-    "fileName": null,
-    "fileType": null,
-    "fileData": null,
-    "createdAt": 1766213028
+    "createdAt": 1766401796
   }
 ]

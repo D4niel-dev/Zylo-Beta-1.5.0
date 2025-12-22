@@ -474,7 +474,7 @@ body.dark main {
 /* Main chat messages area */
 .chat-messages {
     flex: 1;
-    padding: 0.5rem 1rem;
+    padding: 2.5rem 1rem 1rem 1rem;
     border-radius: 0.5rem;
     overflow-y: auto;
     display: flex;
