@@ -1,8 +1,9 @@
 # Zylo App — Update, Bug Fix, and Improvement Plan (v1.2.1)
 
 ## Objective
-This document defines concrete improvements, confirmed bugs, and technical fixes for Zylo v1.2.1 based on direct inspection of the current frontend and backend codebase.  
+This document defines concrete improvements, confirmed bugs, and technical fixes for `Zylo v1.2.1` based on direct inspection of the current frontend and backend codebase.  
 This file is the **authoritative update specification**.
+Any other improvements will be move to `Zylo v1.3.0`.
 
 ---
 
