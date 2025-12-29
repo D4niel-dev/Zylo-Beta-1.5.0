@@ -174,6 +174,21 @@ This applies to the **second sidebar column**
 
 ---
 
+### 2.5 Mobile UI Update
+
+**Cureent Issue**
+- There is only one sidebar for mobile users can get to `Settings` or their `Profile`
+- Some UI's may break if ran on mobile
+
+**Planned Changes**
+- Add a seperate sidebar for mobile users (like how discrod and zalo did)
+- The layout should be like this how discord did the sidebar :
+            | DMs/Home | Cloud | Profile |
+*(if Home is disable then only the DMs)*
+*(the Settings tab should be in the Profile tab - a gear icon on the top left of the Profile card)*
+
+---
+
 ## 3. Confirmed Bugs
 
 ### 3.1 "Where to Start" Settings Bug (Critical)
@@ -706,7 +721,7 @@ function isDuplicateMessage(msgId) {
 **For v1.3.0**
 - **Medium**: 6.6, 6.11, 6.15, 6.16 (Feature Enhancements)
 - **Low**: 6.18, 6.21, 6.22, 6.23 (Polish & Nice-to-haves)
-- **Planned**: 2.1 ~ 2.4 (2.4 - 1 ~ 2.4 - 3) (UI Enhancements)
+- **Planned**: 2.1 ~ 2.5 (UI Enhancements)
 
 ---
 

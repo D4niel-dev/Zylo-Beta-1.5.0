@@ -79,5 +79,14 @@
     "url": "/uploads/Dan/explore_166259038_180656.jpg",
     "size": 65313,
     "createdAt": 1766393415
+  },
+  {
+    "id": "cf217098",
+    "username": "Daniel",
+    "fileName": "download (5).jpg",
+    "fileType": "image/jpeg",
+    "url": "/uploads/Daniel/explore_345397310_964893.jpg",
+    "size": 15513,
+    "createdAt": 1766992703
   }
 ]

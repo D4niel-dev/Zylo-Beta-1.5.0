@@ -67,7 +67,8 @@
   <nav
     class="hidden md:flex flex-shrink-0 w-18 md:w-20 h-full flex flex-col items-center py-3 space-y-3 overflow-y-auto scrollbar-hide">
 
-    <a id="homeTab" href="#" data-tab="home" onclick="switchTab('home');" class="sidebar-tab active group" title="Home">
+    <a id="homeTab" href="#" data-tab="home" onclick="navigateTo('home');" class="sidebar-tab active group"
+      title="Home">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="home" class="w-6 h-6"></i>
@@ -86,7 +87,7 @@
       <i data-feather="plus" class="w-6 h-6"></i>
     </button>
 
-    <a id="messagesTab" href="#" data-tab="messages" onclick="switchTab('messages');" class="sidebar-tab group"
+    <a id="messagesTab" href="#" data-tab="messages" onclick="navigateTo('messages');" class="sidebar-tab group"
       title="Messages">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
@@ -95,14 +96,14 @@
     </a>
 
 
-    <a href="#" data-tab="moments" onclick="switchTab('moments');" class="sidebar-tab group" title="Moments">
+    <a href="#" data-tab="moments" onclick="navigateTo('moments');" class="sidebar-tab group" title="Moments">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="book-open" class="w-6 h-6"></i>
       </div>
     </a>
 
-    <a href="#" data-tab="cloud" onclick="switchTab('cloud');" class="sidebar-tab group" title="My Cloud">
+    <a href="#" data-tab="cloud" onclick="navigateTo('cloud');" class="sidebar-tab group" title="My Cloud">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="cloud" class="w-6 h-6"></i>
@@ -127,14 +128,14 @@
 
       <div id="sub-panel-home" class="sub-panel-content hidden">
         <h3 class="sub-panel-header">Home</h3>
-        <a href="#" onclick="switchTab('home');" class="sub-panel-item active">
+        <a href="#" onclick="navigateTo('home');" class="sub-panel-item active">
           <i data-feather="home" class="w-5 h-5 mr-2"></i> Welcome
         </a>
       </div>
 
       <div id="sub-panel-profile" class="sub-panel-content hidden">
         <h3 class="sub-panel-header">Profile</h3>
-        <a href="#" onclick="switchTab('profile');" class="sub-panel-item">
+        <a href="#" onclick="navigateTo('profile');" class="sub-panel-item">
           <i data-feather="user" class="w-5 h-5 mr-2"></i> My Profile
         </a>
       </div>
@@ -255,7 +256,7 @@
     <div class="flex-shrink-0 h-14 bg-discord-gray-500/30 flex items-center justify-between px-3">
       <div
         class="flex items-center gap-2 min-w-0 cursor-pointer hover:bg-discord-gray-600/50 transition-colors rounded-lg px-2 py-1 -ml-1 flex-1"
-        onclick="switchTab('profile')" title="My Profile">
+        onclick="navigateTo('profile')" title="My Profile">
         <img id="userPanelAvatar" src="/images/default_avatar.png" alt="Avatar" class="w-8 h-8 rounded-full">
         <div class="flex flex-col min-w-0">
           <span id="userPanelUsername" class="text-white text-sm font-semibold truncate">ZyloUser</span>
@@ -263,7 +264,7 @@
         </div>
       </div>
       <div class="flex items-center">
-        <button data-tab="settings" onclick="switchTab('settings')"
+        <button data-tab="settings" onclick="navigateTo('settings')"
           class="p-1 text-discord-gray-400 hover:text-white hover:bg-discord-gray-600/50 rounded" title="Settings">
           <i data-feather="settings" class="w-5 h-5"></i>
         </button>
@@ -284,6 +285,22 @@
           <i id="mobileMenuIcon" data-feather="menu" class="w-6 h-6"></i>
         </button>
         <h1 id="main-content-title" class="text-white text-lg font-semibold truncate">Home</h1>
+      </div>
+
+      <!-- 6.14 Message Search UI -->
+      <div class="flex items-center gap-2">
+        <div id="chatSearchBar" class="hidden flex items-center bg-discord-gray-900 rounded px-2 py-1">
+          <input type="text" id="chatSearchInput" placeholder="Search messages..."
+            class="bg-transparent border-none text-white text-sm focus:ring-0 w-32 md:w-48 placeholder-discord-gray-400"
+            onkeyup="if(event.key === 'Enter') searchMessages(this.value)">
+          <button onclick="searchMessages(document.getElementById('chatSearchInput').value)"
+            class="text-discord-gray-400 hover:text-white">
+            <i data-feather="search" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <button onclick="toggleSearchBar()" class="text-discord-gray-300 hover:text-white p-1" title="Search Messages">
+          <i data-feather="search" class="w-5 h-5"></i>
+        </button>
       </div>
     </header>
 
@@ -337,6 +354,13 @@
       <div id="tab-messages" class="tab-content chat-area flex flex-col h-full">
         <div id="chatMessagesCommunity" class="chat-messages"></div>
         <div id="chatMessagesAI" class="chat-messages hidden"></div>
+
+        <!-- New Messages Indicator -->
+        <button id="newMessagesIndicatorCommunity"
+          class="hidden absolute bottom-20 left-1/2 -translate-x-1/2 bg-discord-blurple hover:bg-discord-blurple/80 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg z-20 transition-all animate-slideIn"
+          onclick="scrollToBottomCommunity()">
+          ↓ New Messages
+        </button>
 
         <div id="typingIndicator" class="typing-indicator"></div>
 
@@ -802,7 +826,7 @@
               <select id="startupPage" class="w-full p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
                 <option value="home">Home</option>
                 <option value="profile">Profile</option>
-                <option value="chats">Messages</option>
+                <option value="messages">Community</option>
                 <option value="friends">Friends</option>
                 <option value="moments">Moments</option>
                 <option value="settings">Settings</option>
@@ -2016,6 +2040,25 @@
         const replyContainer = document.createElement("div");
         replyContainer.className = "flex items-start gap-2 mb-1 ml-12 text-xs cursor-pointer hover:opacity-80";
 
+        // Click to scroll to original message
+        replyContainer.onclick = () => {
+          const targetId = data.replyTo.id;
+          if (targetId) {
+            // Find the original message by data-msg-id
+            const targetMsg = document.querySelector(`[data-msg-id="${targetId}"]`);
+            if (targetMsg) {
+              // Scroll into view
+              targetMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+              // Add highlight effect
+              targetMsg.classList.add('bg-discord-blurple/30', 'transition-all');
+              setTimeout(() => {
+                targetMsg.classList.remove('bg-discord-blurple/30');
+              }, 1500);
+            }
+          }
+        };
+
         // Connecting line
         const replyLine = document.createElement("div");
         replyLine.className = "flex items-center gap-1 text-discord-gray-400";
@@ -2586,21 +2629,66 @@
       }
     }
 
-    // sendMessage function (Kept as is, logic is sound)
+    // Rate Limiting State (6.9)
+    const rateLimit = {
+      count: 5,
+      window: 10000, // 10 seconds
+      history: []
+    };
+
+    // sendMessage function
     async function sendMessage() {
+      // Security: Rate Limiting Check
+      const now = Date.now();
+      rateLimit.history = rateLimit.history.filter(ts => now - ts < rateLimit.window);
+      if (rateLimit.history.length >= rateLimit.count) {
+        const resetTime = Math.ceil((rateLimit.history[0] + rateLimit.window - now) / 1000);
+        // Using a temporary notification instead of alert for better UX
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-bounce';
+        notification.textContent = `Slow down! Please wait ${resetTime} seconds.`;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
+        return;
+      }
+      rateLimit.history.push(now);
+
       const message = chatInput.value.trim();
       if (!message) return;
 
       if (currentChatRoom === 'community') {
+        const tempId = generateUUID();
         const payload = {
+          id: tempId,
           username,
           message,
-          replyTo: replyContext ? { id: replyContext.id, username: replyContext.username } : null
+          replyTo: replyContext ? { id: replyContext.id, username: replyContext.username, content: replyContext.content } : null,
+          ts: Date.now() / 1000
         };
-        socket.emit("send_message", payload);
+
+        // Optimistic Render
+        if (chatMessagesCommunity) {
+          createDiscordMessage(payload).then(el => {
+            el.setAttribute('data-msg-id', tempId);
+            chatMessagesCommunity.appendChild(el);
+            chatMessagesCommunity.scrollTop = chatMessagesCommunity.scrollHeight;
+          });
+        }
+
         chatInput.value = "";
         chatInput.style.height = "auto";
         cancelReply();
+
+        // Send to backend via REST (more robust + ID support)
+        try {
+          await fetch('/api/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (e) {
+          console.error('Failed to send message:', e);
+        }
         return;
       }
       // AI chat path
@@ -2662,6 +2750,14 @@
     function sendFile(event) {
       const file = event.target.files[0];
       if (!file) return;
+
+      // Security: 10MB File Size Limit
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      if (file.size > MAX_SIZE) {
+        alert("File is too large! Maximum file size is 10MB.");
+        event.target.value = ""; // Clear input
+        return;
+      }
       const reader = new FileReader();
       reader.onload = function (e) {
         const fileData = e.target.result;
@@ -3021,7 +3117,7 @@
           item.innerHTML = `
             <div class="dm-avatar-wrapper">
               <img src="${avatar}" alt="${f}'s avatar" class="rounded-full w-8 h-8 object-cover">
-              <span class="status-indicator online"></span>
+              <span class="status-indicator w-3 h-3 rounded-full border-2 border-discord-gray-800 bg-gray-500 absolute bottom-0 right-0" data-user-status="${f}"></span>
             </div>
             <div class="group-info">
               <span class="group-name text-sm opacity-80">${f}</span>
@@ -3376,6 +3472,15 @@
     function sendGroupFile(event) {
       const file = event.target.files?.[0];
       if (!file || !groupsState.activeId) return;
+
+      // Security: 10MB File Size Limit
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      if (file.size > MAX_SIZE) {
+        alert("File is too large! Maximum file size is 10MB.");
+        event.target.value = "";
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = function (e) {
         const payload = { groupId: groupsState.activeId, username: localStorage.getItem('username'), fileName: file.name, fileType: file.type, fileData: e.target.result };
@@ -3399,7 +3504,151 @@
       });
     }
 
+    // Centralized Navigation Logic
+    // Centralized Navigation Logic
+    // Centralized Navigation Logic
+    window.navigateTo = function (viewName) {
+      // Legacy fix: map 'chats' to 'messages'
+      if (viewName === 'chats') viewName = 'messages';
+
+      // 1. Update localStorage
+      localStorage.setItem('lastView', viewName);
+
+      // 2. Hide all tab contents (Force display:none to avoid class conflicts)
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(t => {
+        t.classList.add('hidden');
+        t.style.display = 'none';
+        t.classList.remove('animate-fadeIn');
+      });
+
+      // 3. Show target tab
+      // Special handling: 'friends' view is actually displayed via the 'friends' tab, 
+      // but shares the 'messages' sub-panel.
+      let targetId = `tab-${viewName}`;
+
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.classList.remove('hidden');
+        target.style.display = ''; // Allow CSS classes (flex/block) to take over
+
+        // Slight delay for animation if needed
+        setTimeout(() => target.classList.add('animate-fadeIn'), 10);
+
+        // Update Header Title
+        const titleEl = document.getElementById('main-content-title');
+        if (titleEl) {
+          switch (viewName) {
+            case 'home': titleEl.textContent = 'Home'; break;
+            case 'profile': titleEl.textContent = 'My Profile'; break;
+            case 'settings': titleEl.textContent = 'User Settings'; break;
+            case 'moments': titleEl.textContent = 'Moments'; break;
+            case 'cloud': titleEl.textContent = 'My Cloud'; break;
+            case 'messages':
+              // Only reset if it doesn't look like a specific channel/DM
+              if (!titleEl.textContent.trim().startsWith('#') && !titleEl.textContent.trim().startsWith('@')) {
+                titleEl.textContent = 'Messages';
+              }
+              // Ensure community view is active in sidebar
+              switchMessagesView('community');
+              break;
+            case 'friends':
+              titleEl.textContent = 'Friends';
+              // Ensure friends view is active in sidebar
+              switchMessagesView('friends');
+              break;
+            default: break;
+          }
+        }
+      }
+
+      // 4. Update Sidebar Active State
+      document.querySelectorAll('.sidebar-tab').forEach(b => {
+        b.classList.remove('active');
+        if (b.getAttribute('data-tab') === viewName) {
+          b.classList.add('active');
+        }
+      });
+
+      // 5. Update Sub-panels
+      document.querySelectorAll('.sub-panel-content').forEach(p => p.classList.add('hidden'));
+
+      // Map 'friends' to 'messages' sub-panel because they share the same sidebar area
+      let subPanelName = viewName;
+      if (viewName === 'friends') subPanelName = 'messages';
+
+      const subPanel = document.getElementById(`sub-panel-${subPanelName}`);
+      if (subPanel) subPanel.classList.remove('hidden');
+    };
+
+    // Helper to toggle between Community and Friends views in the Messages sub-panel
+    window.switchMessagesView = function (view) {
+      const btnCommunity = document.getElementById('btnMessagesTabCommunity');
+      const btnFriends = document.getElementById('btnMessagesTabFriends');
+      const viewCommunity = document.getElementById('messagesViewCommunity');
+      const viewFriends = document.getElementById('messagesViewFriends');
+
+      if (view === 'community') {
+        // UI State
+        btnCommunity?.classList.add('text-white', 'border-b-2', 'border-discord-blurple', 'bg-discord-gray-600/50');
+        btnCommunity?.classList.remove('text-discord-gray-400');
+        btnFriends?.classList.remove('text-white', 'border-b-2', 'border-discord-blurple', 'bg-discord-gray-600/50');
+        btnFriends?.classList.add('text-discord-gray-400');
+
+        // Visibility
+        viewCommunity?.classList.remove('hidden');
+        viewFriends?.classList.add('hidden');
+
+        // If we are already on the messages/friends tab, ensure we show the right main content
+        // But navigateTo handles main tab switching. This just handles sidebar state.
+        // However, if user clicks "Community" in sidebar, we might want to switch main tab to messages?
+        // Let's assume this just toggles sidebar for now, OR if it's a direct click, maybe we should navigate?
+        // For safety: if this is called manually, we might want to ensure 'messages' tab is active for community
+        // and 'friends' tab is active for friends.
+        // BUT, navigateTo calls this function. So we shouldn't call navigateTo back to avoid loops.
+        // We'll trust navigateTo to handle the main tab, and this function to handle the sidebar bits.
+
+      } else { // friends
+        // UI State
+        btnFriends?.classList.add('text-white', 'border-b-2', 'border-discord-blurple', 'bg-discord-gray-600/50');
+        btnFriends?.classList.remove('text-discord-gray-400');
+        btnCommunity?.classList.remove('text-white', 'border-b-2', 'border-discord-blurple', 'bg-discord-gray-600/50');
+        btnCommunity?.classList.add('text-discord-gray-400');
+
+        // Visibility
+        viewFriends?.classList.remove('hidden');
+        viewCommunity?.classList.add('hidden');
+
+        // If we are actually navigating via specific click (not just navigateTo calling this),
+        // we effectively want the main view to be 'friends' too. 
+        // But if we do navigateTo('friends') here, we might loop. 
+        // Since this is typically an onclick for the sub-panel tabs, we SHOULD update the main view.
+        // Detection: check if the 'friends' tab is currently hidden.
+        const friendsTab = document.getElementById('tab-friends');
+        if (friendsTab && friendsTab.style.display === 'none' && view === 'friends') {
+          // This means we were elsewhere (e.g. community chat) and user clicked "Friends" TAB in sidebar.
+          // We should switch main view to friends.
+          // We can call navigateTo safely IF we are sure we aren't already there.
+          window.navigateTo('friends');
+        } else if (view === 'community') {
+          // Vice versa
+          const messagesTab = document.getElementById('tab-messages');
+          if (messagesTab && messagesTab.style.display === 'none') {
+            window.navigateTo('messages');
+          }
+        }
+      }
+    };
+
+    // Backward compatibility for old inline calls if any missed
+    window.switchTab = window.navigateTo;
+
     window.addEventListener("DOMContentLoaded", async () => {
+      // Initialize Navigation
+      const savedPage = localStorage.getItem('startupPage') || localStorage.getItem('lastView') || 'home';
+      navigateTo(savedPage);
+
+
       const username = localStorage.getItem("username");
       if (!username) {
         document.getElementById("profileUsername").textContent = "N/A";
@@ -3479,6 +3728,57 @@
       }
 
       input.value = '';
+    }
+
+    function sendFriendFile(event) {
+      const file = event.target.files?.[0];
+      if (!file || !activeFriendChat) return;
+
+      // Security: 10MB File Size Limit
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      if (file.size > MAX_SIZE) {
+        alert("File is too large! Maximum file size is 10MB.");
+        event.target.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        // Determine payload based on chat type (DM or Group) - similar to sendFriendMessage logic
+        const me = localStorage.getItem('savedUsername') || 'User';
+
+        if (typeof activeFriendChat === 'string') {
+          // DM
+          const payload = { from: me, to: activeFriendChat, fileName: file.name, fileType: file.type, fileData: e.target.result, ts: Date.now() / 1000 };
+          if (navigator.onLine) {
+            socket.emit('send_file', payload); // Note: server likely expects 'send_file' or 'send_dm_file'? 
+            // Wait, backend socket logic for DM file? 
+            // Checking 'send_file' in app.py would be wise, but assuming 'send_file' works for DM or 'send_dm' with fileData?
+            // Existing sendFile uses 'send_file'. Let's reuse that or check.
+            // Actually, sendFile (global) uses 'send_file'. sendGroupFile uses 'send_group_file'.
+            // Let's assume 'send_file' is for DMs? 
+            // But wait, sendFriendMessage uses 'send_dm' for text.
+            // Let's check backend if possible, or assume 'send_file' handles username/to?
+            // The 'sendFile' function (line 2750) emits 'send_file' with { username, fileName, fileType, fileData }. It doesn't seem to have 'to'. 
+            // It seems 'sendFile' is for PUBLIC chat or Community?
+            // If I want DM file, I might need 'send_dm' with check for fileData?
+            // Looking at sendFriendMessage (line 3705): socket.emit('send_dm', payload). payload = {from, to, message...}
+            // If I attach fileData to 'send_dm', maybe backend handles it?
+
+            // Let's try emitting 'send_dm' with fileData added.
+            socket.emit('send_dm', { ...payload, message: 'Sent a file' }); // Fallback message
+          } else {
+            // Offline
+            // (async () => { await createDiscordMessage({...payload, message: file.name, username: me }); })(); 
+          }
+        } else {
+          // Group via Friends view (unlikely but possible if activeFriendChat is object)
+          const payload = { groupId: activeFriendChat.id, username: me, fileName: file.name, fileType: file.type, fileData: e.target.result };
+          if (navigator.onLine) socket.emit('send_group_file', payload);
+        }
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
     }
 
     async function openDM(peerUsername) {
@@ -4860,7 +5160,287 @@
       { id: "confirmExitToggle", key: "confirmBeforeExit" }
     ];
 
+    // Socket.IO Logic Extension
+    function initSocket() {
+      if (typeof socket === 'undefined' || !socket) {
+        console.warn("Socket not initialized yet");
+        return;
+      }
+
+      // Join default community room
+      socket.emit('join', { room: 'community' });
+
+      // Listeners
+      socket.on('message', (data) => {
+        const container = document.getElementById('chatMessagesCommunity');
+        if (container && data.room === 'community') {
+          // Deduplication check
+          if (data.id && document.querySelector(`[data-msg-id="${data.id}"]`)) {
+            console.log('Duplicate message ignored:', data.id);
+            return;
+          }
+
+          // Check if user is near bottom (within 150px)
+          const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+
+          createDiscordMessage(data).then(el => {
+            if (data.id) el.setAttribute('data-msg-id', data.id);
+            container.appendChild(el);
+
+            if (isNearBottom) {
+              container.scrollTop = container.scrollHeight;
+            } else {
+              showNewMessagesIndicator('community');
+            }
+          });
+        }
+      });
+
+      socket.on('group_message', (data) => {
+        if (typeof currentGroupId !== 'undefined' && currentGroupId === data.groupId) {
+          const currentChannel = document.getElementById('groupChatChannelName')?.textContent || 'general';
+          if (data.channel === currentChannel) {
+            const container = document.getElementById('groupChatMessages');
+            if (container) {
+              createDiscordMessage(data.message).then(el => {
+                container.appendChild(el);
+                container.scrollTop = container.scrollHeight;
+              });
+            }
+          }
+        }
+      });
+
+      socket.on('receive_dm', (data) => {
+        if (typeof activeFriendChat !== 'undefined' && activeFriendChat && (data.from === activeFriendChat || data.to === activeFriendChat)) {
+          const container = document.getElementById('friendsChatMessages');
+          if (container) {
+            createDiscordMessage({ ...data, username: data.from }).then(el => {
+              container.appendChild(el);
+              container.scrollTop = container.scrollHeight;
+            });
+          }
+        }
+      });
+
+      // User status tracking
+      socket.on('user_status_change', (data) => {
+        updateUserStatusIndicator(data.username, data.status);
+      });
+
+      // Register current user's status on connect
+      const currentUser = localStorage.getItem('savedUsername');
+      if (currentUser) {
+        socket.emit('register_status', { username: currentUser });
+      }
+
+      // 6.1 WebSocket Connection Management
+      let wasDisconnected = false;
+
+      socket.on('disconnect', () => {
+        console.log('Socket disconnected');
+        wasDisconnected = true;
+        showConnectionStatus('disconnected');
+      });
+
+      socket.on('connect', () => {
+        if (wasDisconnected) {
+          console.log('Socket reconnected');
+          showConnectionStatus('connected');
+          // Rejoin active rooms
+          socket.emit('join', { room: 'community' });
+          const user = localStorage.getItem('savedUsername');
+          if (user) {
+            socket.emit('register_status', { username: user });
+            socket.emit('join_user', { username: user });
+          }
+        }
+      });
+
+      console.log("Socket listeners attached.");
+    }
+
+    // Connection status indicator (6.1)
+    function showConnectionStatus(status) {
+      let indicator = document.getElementById('connectionStatus');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'connectionStatus';
+        indicator.className = 'fixed bottom-4 right-4 px-3 py-1 rounded-full text-xs font-medium z-50 transition-all shadow-lg';
+        document.body.appendChild(indicator);
+      }
+      if (status === 'disconnected') {
+        indicator.className = 'fixed bottom-4 right-4 px-3 py-1 rounded-full text-xs font-medium z-50 transition-all shadow-lg bg-red-500 text-white';
+        indicator.textContent = '⚠ Disconnected';
+        indicator.style.display = 'block';
+      } else {
+        indicator.className = 'fixed bottom-4 right-4 px-3 py-1 rounded-full text-xs font-medium z-50 transition-all shadow-lg bg-green-500 text-white';
+        indicator.textContent = '● Connected';
+        indicator.style.display = 'block';
+        setTimeout(() => {
+          if (indicator) indicator.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    // Update status indicator for a user in friends list / DM list
+    function updateUserStatusIndicator(username, status) {
+      const statusDot = document.querySelector(`[data-user-status="${username}"]`);
+      if (statusDot) {
+        if (status === 'online') {
+          statusDot.classList.remove('bg-gray-500');
+          statusDot.classList.add('bg-green-500');
+        } else {
+          statusDot.classList.remove('bg-green-500');
+          statusDot.classList.add('bg-gray-500');
+        }
+      }
+    }
+
+    // 6.14 Message Search Logic
+    function toggleSearchBar() {
+      const searchBar = document.getElementById('chatSearchBar');
+      if (searchBar) {
+        searchBar.classList.toggle('hidden');
+        if (!searchBar.classList.contains('hidden')) {
+          document.getElementById('chatSearchInput')?.focus();
+        }
+      }
+    }
+
+    function searchMessages(query) {
+      // Determine active container
+      let container = document.getElementById('chatMessagesCommunity');
+      if (currentChatRoom === 'friends') container = document.getElementById('friendsChatMessages');
+      else if (currentChatRoom === 'group') container = document.getElementById('groupChatMessages');
+
+      if (!container) return;
+
+      const messages = container.querySelectorAll('[data-msg-id]');
+
+      // Clear previous highlights
+      container.querySelectorAll('.search-highlight').forEach(el => {
+        el.classList.remove('search-highlight', 'bg-yellow-500/30');
+      });
+
+      if (!query || !query.trim()) return;
+
+      const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); // Escape special chars
+      let found = 0;
+
+      messages.forEach(msg => {
+        // Search in message text
+        const textEl = msg.querySelector('.text-gray-100') || msg.querySelector('.msg-body-text');
+        // Note: msg-body-text might not exist on all messages depending on structure, fallback to text-gray-100
+
+        if (textEl && regex.test(textEl.textContent)) {
+          msg.classList.add('search-highlight', 'bg-yellow-500/30', 'transition-colors', 'duration-500');
+          found++;
+          if (found === 1) {
+            msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
+
+      if (found === 0) {
+        // Optional: clear input or show toast "No results"
+        const searchInput = document.getElementById('chatSearchInput');
+        if (searchInput) {
+          searchInput.classList.add('border-red-500');
+          setTimeout(() => searchInput.classList.remove('border-red-500'), 1000);
+        }
+      }
+    }
+
+    // Fetch initial online users from API and set indicators
+    async function fetchOnlineUsers() {
+      try {
+        const res = await fetch('/api/users/online');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.online)) {
+          data.online.forEach(username => {
+            updateUserStatusIndicator(username, 'online');
+          });
+        }
+      } catch (e) {
+        console.error('Failed to fetch online users:', e);
+      }
+    }
+
+    // Sidebar Toggle with Persistence
+    function toggleSidebar() {
+      const panel = document.getElementById('subPanelContainer');
+      const overlay = document.getElementById('overlay');
+      if (!panel) return;
+
+      const isOpen = !panel.classList.contains('-translate-x-full');
+
+      if (isOpen) {
+        panel.classList.add('-translate-x-full');
+        overlay?.classList.add('hidden');
+        localStorage.setItem('sidebarState', 'closed');
+      } else {
+        panel.classList.remove('-translate-x-full');
+        overlay?.classList.remove('hidden');
+        localStorage.setItem('sidebarState', 'open');
+      }
+    }
+
+    function restoreSidebarState() {
+      const panel = document.getElementById('subPanelContainer');
+      const overlay = document.getElementById('overlay');
+      if (!panel) return;
+
+      const savedState = localStorage.getItem('sidebarState');
+      const isMobile = window.innerWidth < 768;
+
+      // Default: mobile = closed, desktop = open (unless explicitly saved otherwise)
+      let shouldBeOpen = !isMobile;
+      if (savedState === 'open') shouldBeOpen = true;
+      if (savedState === 'closed') shouldBeOpen = false;
+
+      if (shouldBeOpen) {
+        panel.classList.remove('-translate-x-full');
+        if (isMobile) overlay?.classList.remove('hidden');
+      } else {
+        panel.classList.add('-translate-x-full');
+        overlay?.classList.add('hidden');
+      }
+    }
+
+    // New Messages Indicator Helpers
+    function showNewMessagesIndicator(chatType) {
+      const indicatorId = chatType === 'community' ? 'newMessagesIndicatorCommunity' : 'newMessagesIndicatorGroup';
+      const indicator = document.getElementById(indicatorId);
+      if (indicator) indicator.classList.remove('hidden');
+    }
+
+    function scrollToBottomCommunity() {
+      const container = document.getElementById('chatMessagesCommunity');
+      const indicator = document.getElementById('newMessagesIndicatorCommunity');
+      if (container) container.scrollTop = container.scrollHeight;
+      if (indicator) indicator.classList.add('hidden');
+    }
+
+    // Hide indicator when user manually scrolls to bottom
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('chatMessagesCommunity');
+      const indicator = document.getElementById('newMessagesIndicatorCommunity');
+      if (container && indicator) {
+        container.addEventListener('scroll', () => {
+          const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+          if (isNearBottom) indicator.classList.add('hidden');
+        });
+      }
+    });
+
     window.addEventListener("DOMContentLoaded", async () => {
+      // Restore sidebar state first
+      restoreSidebarState();
+      // Delay slightly to ensure socket global is ready if it depends on script order
+      setTimeout(initSocket, 500);
+      // Fetch initial online users after socket init
+      setTimeout(fetchOnlineUsers, 600);
       await hydrateSettingsFromBackend();
       settingsMap.forEach(({ id, key }) => {
         const el = document.getElementById(id);
@@ -5020,6 +5600,17 @@
       applySettingsLocale();
       persistSettings({ language: this.value });
     });
+
+    // Startup Page Setting
+    const startupPageSelect = document.getElementById("startupPage");
+    if (startupPageSelect) {
+      const savedStartup = localStorage.getItem("startupPage");
+      if (savedStartup) startupPageSelect.value = savedStartup;
+
+      startupPageSelect.addEventListener("change", function () {
+        localStorage.setItem("startupPage", this.value);
+      });
+    }
 
     // Sound settings
     (function initSoundSettings() {
@@ -6592,6 +7183,11 @@
 
 
     function selectGroup(groupId) {
+      // Leave previous group room if connected
+      if (typeof socket !== 'undefined' && socket && currentGroupId && currentGroupId !== groupId) {
+        socket.emit('leave', { room: currentGroupId });
+      }
+
       currentGroupId = groupId;
       const group = groupsData.find(g => g.id === groupId);
       if (!group) return;
@@ -6621,8 +7217,8 @@
       if (titleEl) titleEl.textContent = `# ${group.name}`;
 
       // Handle Socket join
-      if (navigator.onLine && socket) {
-        socket.emit('join_group', { groupId: group.id, username: localStorage.getItem('username') });
+      if (typeof socket !== 'undefined' && socket) {
+        socket.emit('join', { room: group.id });
       }
 
       // Load specific group data
@@ -8024,11 +8620,21 @@
       }
     }
 
+    // Helper for unique IDs
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
     // Send sticker to community chat
     async function sendCommunitySticker(stickerId, stickerSrc) {
       const username = localStorage.getItem('username') || 'Anonymous';
+      const tempId = generateUUID();
 
       const payload = {
+        id: tempId,
         username,
         message: `[sticker:${stickerId}]`,
         type: 'sticker',
@@ -8041,6 +8647,7 @@
       const container = document.getElementById('chatMessagesCommunity');
       if (container) {
         const el = await createDiscordMessage(payload);
+        el.setAttribute('data-msg-id', tempId);
         container.appendChild(el);
         container.scrollTop = container.scrollHeight;
       }

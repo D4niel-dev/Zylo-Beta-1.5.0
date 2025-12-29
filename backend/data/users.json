@@ -35,10 +35,11 @@
     "avatar": "http://192.168.1.181:5000/uploads/Daniel/explore_879424019_399515.png",
     "banner": "http://192.168.1.181:5000/uploads/Daniel/explore_35570761_740698.png",
     "about": "Developer of Zylo - Alt",
-    "aboutMe": "Any feedback go to this account will be send to @d4niel_1f.",
+    "aboutMe": "Any feedback or reports in this account will be send to @d4niel_1f",
     "settings": {
       "profileEffect": "pulse",
-      "bannerEffect": "vignette"
+      "bannerEffect": "vignette",
+      "startupPage": "settings"
     },
     "friends": [
       "Dan"

@@ -1,0 +1,29 @@
+[
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "hm",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766993605
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766998332
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1766998796
+  }
+]

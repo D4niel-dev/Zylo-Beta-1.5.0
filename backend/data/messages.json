@@ -1,0 +1,62 @@
+[
+  {
+    "username": "Daniel",
+    "message": "hi"
+  },
+  {
+    "username": "Daniel",
+    "message": "[sticker:cat_celebrate]",
+    "type": "sticker",
+    "sticker_src": "/files/stickers/cat_celebrate.png",
+    "timestamp": 1766995656,
+    "room": "community"
+  },
+  {
+    "username": "Daniel",
+    "message": "[sticker:boy_excited]",
+    "type": "sticker",
+    "sticker_src": "/files/stickers/boy_excited.png",
+    "timestamp": 1766995664,
+    "room": "community"
+  },
+  {
+    "id": "b80fd065-d514-4a55-8768-d0a563897ff1",
+    "username": "Dan",
+    "message": "t",
+    "replyTo": null,
+    "type": "text",
+    "sticker_src": null,
+    "timestamp": 1767000854,
+    "room": "community"
+  },
+  {
+    "id": "07734056-e585-4d07-a65a-110f1e92d10e",
+    "username": "Dan",
+    "message": "t",
+    "replyTo": null,
+    "type": "text",
+    "sticker_src": null,
+    "timestamp": 1767000854,
+    "room": "community"
+  },
+  {
+    "id": "1a0635a5-472d-4e36-96f0-b28f808a9ff3",
+    "username": "Dan",
+    "message": "t",
+    "replyTo": null,
+    "type": "text",
+    "sticker_src": null,
+    "timestamp": 1767000855,
+    "room": "community"
+  },
+  {
+    "id": "ed05f1a1-c223-4f4c-8437-c51a8f4a0eef",
+    "username": "Dan",
+    "message": "t",
+    "replyTo": null,
+    "type": "text",
+    "sticker_src": null,
+    "timestamp": 1767000855,
+    "room": "community"
+  }
+]

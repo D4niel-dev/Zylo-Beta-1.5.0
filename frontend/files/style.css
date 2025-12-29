@@ -162,26 +162,21 @@ body:not(.dark) main {
 
 /* Dark theme background */
 body.dark {
-    background: #36393f;
-    /* discord-gray-700 */
-    color: #dcddde;
-    /* discord-gray-300 */
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 /* Dark theme - specific UI elements */
 body.dark nav {
-    background-color: #202225;
-    /* discord-gray-900 */
+    background-color: var(--bg-tertiary);
 }
 
 body.dark aside {
-    background-color: #2f3136;
-    /* discord-gray-800 */
+    background-color: var(--bg-secondary);
 }
 
 body.dark main {
-    background-color: #36393f;
-    /* discord-gray-700 */
+    background-color: var(--bg-primary);
 }
 
 .fade-out {
@@ -200,8 +195,7 @@ body.dark main {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #202225;
-    /* discord-gray-900 */
+    background: var(--scrollbar-thumb);
     border-radius: 4px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -257,26 +251,22 @@ body.dark main {
     width: 100%;
     height: 100%;
     border-radius: 9999px;
-    background-color: #2f3136;
-    color: #dcddde;
+    background-color: var(--discord-gray-800);
+    color: var(--text-primary);
     transition: all 0.2s ease;
 }
 
 .sidebar-tab.active .sidebar-icon,
 .sidebar-tab.group:hover .sidebar-icon {
     border-radius: 1rem;
-    /* 16px */
-    background-color: #5865F2;
-    /* discord-blurple */
+    background-color: var(--discord-blurple);
     color: white;
 }
 
 /* === Column 2: Sub-Panel === */
 .sub-panel-header {
-    color: #b9bbbe;
-    /* discord-gray-400 */
+    color: var(--text-secondary);
     font-size: 0.75rem;
-    /* 12px */
     font-weight: 600;
     text-transform: uppercase;
     padding: 0.5rem 0.25rem;
@@ -288,55 +278,45 @@ body.dark main {
     align-items: center;
     padding: 0.5rem 0.75rem;
     border-radius: 0.25rem;
-    /* 4px */
-    color: #b9bbbe;
-    /* discord-gray-400 */
+    color: var(--text-secondary);
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .sub-panel-item:hover {
-    background-color: #40444b;
-    /* discord-gray-600 */
-    color: #dcddde;
-    /* discord-gray-300 */
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .sub-panel-item.active {
-    background-color: #4f545c;
-    /* discord-gray-500 */
+    background-color: var(--bg-active);
     color: white;
 }
 
 /* Input field styles */
 .zylo-input {
-    border: 1px solid #202225;
-    /* discord-gray-900 */
+    border: 1px solid var(--border-primary);
     background-color: transparent;
-    color: #dcddde;
+    color: var(--text-primary);
     border-radius: 0.25rem;
-    /* 4px */
     transition: all 0.3s ease;
 }
 
 .zylo-input::placeholder {
-    color: #72767d;
+    color: var(--text-muted);
 }
 
 .zylo-input:focus {
-    border-color: #5865F2;
-    /* discord-blurple */
+    border-color: var(--discord-blurple);
     box-shadow: none;
 }
 
-/* === Discord-Style Group/DM Items === */
 /* Section separator for DMs vs Groups */
 .dm-list-section {
     padding: 0.75rem 0.5rem 0.25rem;
     text-transform: uppercase;
     font-size: 0.6875rem;
-    /* 11px */
     font-weight: 600;
-    color: #96989d;
+    color: var(--status-offline);
     letter-spacing: 0.02em;
 }
 
@@ -348,14 +328,14 @@ body.dark main {
     padding: 0.375rem 0.5rem;
     margin: 0.0625rem 0.5rem;
     border-radius: 0.25rem;
-    color: #b9bbbe;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s ease;
 }
 
 .group-item:hover {
-    background-color: #36393f;
-    color: #dcddde;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .group-item.active {
@@ -411,18 +391,17 @@ body.dark main {
     bottom: -0.125rem;
     right: -0.125rem;
     width: 0.625rem;
-    /* 10px */
     height: 0.625rem;
     border-radius: 50%;
-    border: 2px solid #2f3136;
+    border: 2px solid var(--discord-gray-800);
 }
 
 .status-indicator.online {
-    background-color: #23a55a;
+    background-color: var(--status-online);
 }
 
 .status-indicator.offline {
-    background-color: #80848e;
+    background-color: var(--status-offline);
 }
 
 /* Group/Channel name and info */
@@ -446,18 +425,16 @@ body.dark main {
 
 /* Channel indicator (# symbol) */
 .channel-indicator {
-    color: #80848e;
+    color: var(--status-offline);
     font-weight: 400;
     font-size: 1.125rem;
-    /* 18px */
     line-height: 1;
 }
 
 /* Member count badge */
 .member-count {
     font-size: 0.6875rem;
-    /* 11px */
-    color: #80848e;
+    color: var(--status-offline);
     font-weight: 500;
 }
 
@@ -522,7 +499,7 @@ body.dark main {
 
 /* === Friends Dashboard UI === */
 .friend-toolbar-btn {
-    color: #b9bbbe;
+    color: var(--text-secondary);
     font-weight: 500;
     padding: 2px 8px;
     border-radius: 4px;
@@ -537,8 +514,7 @@ body.dark main {
 
 .friend-toolbar-btn.add-friend {
     color: #fff;
-    background-color: #2f855a;
-    /* Green */
+    background-color: var(--accent-success);
 }
 
 .friend-toolbar-btn.add-friend.active {
@@ -551,21 +527,21 @@ body.dark main {
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
-    border-top: 1px solid #2f3136;
+    border-top: 1px solid var(--discord-gray-800);
     cursor: pointer;
 }
 
 .friend-row:hover {
-    background-color: #40444b;
+    background-color: var(--bg-hover);
     border-radius: 4px;
     border-top-color: transparent;
 }
 
 .action-icon-btn {
-    background-color: #2f3136;
+    background-color: var(--discord-gray-800);
     padding: 8px;
     border-radius: 50%;
-    color: #b9bbbe;
+    color: var(--text-secondary);
     transition: 0.2s;
 }
 
@@ -1654,9 +1630,54 @@ body.dark .stat-label {
 /* === Custom Theme Variables and Overrides === */
 /* These variables are applied when body has .theme-custom. */
 :root {
+    /* === Discord Color Palette === */
+    --discord-gray-900: #202225;
+    --discord-gray-800: #2f3136;
+    --discord-gray-700: #36393f;
+    --discord-gray-600: #40444b;
+    --discord-gray-500: #4f545c;
+    --discord-gray-400: #b9bbbe;
+    --discord-gray-300: #dcddde;
+    --discord-blurple: #5865F2;
+
+    /* === Status Colors === */
+    --status-online: #23a55a;
+    --status-offline: #80848e;
+    --status-busy: #ef4444;
+    --status-away: #facc15;
+
+    /* === Semantic Background Colors === */
+    --bg-primary: var(--discord-gray-700);
+    --bg-secondary: var(--discord-gray-800);
+    --bg-tertiary: var(--discord-gray-900);
+    --bg-input: var(--discord-gray-600);
+    --bg-hover: var(--discord-gray-600);
+    --bg-active: var(--discord-gray-500);
+
+    /* === Semantic Text Colors === */
+    --text-primary: var(--discord-gray-300);
+    --text-secondary: var(--discord-gray-400);
+    --text-muted: #72767d;
+    --text-heading: #ffffff;
+
+    /* === Border Colors === */
+    --border-primary: var(--discord-gray-900);
+    --border-secondary: var(--discord-gray-700);
+
+    /* === Accent Colors === */
+    --accent-primary: var(--discord-blurple);
+    --accent-success: #2f855a;
+    --accent-danger: #ef4444;
+
+    /* === Scrollbar Colors === */
+    --scrollbar-thumb: var(--discord-gray-900);
+    --scrollbar-track: transparent;
+
+    /* === Custom Theme Overrides (for theme-custom) === */
     --navbar-bg: initial;
     --sidebar-bg: initial;
     --panel-bg: initial;
+    --main-bg: initial;
     --text-color: initial;
     --accent-color: #3b82f6;
 }

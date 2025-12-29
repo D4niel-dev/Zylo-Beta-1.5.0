@@ -21,6 +21,50 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 host_ip = socket.gethostbyname(socket.gethostname())
 
+@socketio.on('connect')
+def handle_connect():
+    print(f"Client connected: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"Client disconnected: {request.sid}")
+    # Find and remove user from online_users
+    username_to_remove = None
+    for uname, sid in online_users.items():
+        if sid == request.sid:
+            username_to_remove = uname
+            break
+    if username_to_remove:
+        del online_users[username_to_remove]
+        # Broadcast offline status
+        socketio.emit('user_status_change', {'username': username_to_remove, 'status': 'offline'})
+
+# In-memory online users: { username: sid }
+online_users = {}
+
+@socketio.on('register_status')
+def on_register_status(data):
+    username = (data or {}).get('username')
+    if username:
+        online_users[username] = request.sid
+        join_room(f"user_{username}")
+        socketio.emit('user_status_change', {'username': username, 'status': 'online'})
+        print(f"User {username} is now online")
+
+@socketio.on('join')
+def on_join(data):
+    room = data.get('room')
+    if room:
+        join_room(room)
+        print(f"Client {request.sid} joined room: {room}")
+
+@socketio.on('leave')
+def on_leave(data):
+    room = data.get('room')
+    if room:
+        leave_room(room)
+        print(f"Client {request.sid} left room: {room}")
+
 # File paths and user data
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -421,9 +465,42 @@ def reset_password():
     else:
         return jsonify({"success": False, "error": "Username not found"}), 404
     
-@app.route("/api/messages", methods=["GET"])
-def get_messages():
-    return jsonify(messages)
+@app.route("/api/messages", methods=["GET", "POST"])
+def messages_api():
+    if request.method == 'GET':
+        return jsonify(messages)
+    
+    # POST - Send community message
+    data = request.json or {}
+    username = (data.get('username') or '').strip()
+    message = data.get('message')
+    
+    if not username or not message:
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+        
+    msg_entry = {
+        "id": data.get('id'),
+        "username": username,
+        "message": message,
+        "replyTo": data.get('replyTo'),
+        "type": data.get('type', 'text'),
+        "sticker_src": data.get('sticker_src'),
+        "timestamp": int(__import__('time').time()),
+        "room": "community"
+    }
+    
+    messages.append(msg_entry)
+    save_messages(messages)
+    
+    # Emit to 'community' room
+    socketio.emit('message', msg_entry, room='community')
+    
+    return jsonify({"success": True, "message": msg_entry})
+
+# Get list of currently online users
+@app.route("/api/users/online", methods=["GET"])
+def users_online():
+    return jsonify({"success": True, "online": list(online_users.keys())})
 
 # Direct Message (DM) endpoint
 @app.route("/api/dm", methods=["POST", "GET"])
@@ -1931,6 +2008,14 @@ def send_group_message_api():
             messages.append(msg_entry)
             all_groups[idx]['messages'] = messages
             save_groups(all_groups)
+            
+            # Emit to group room
+            socketio.emit('group_message', {
+                'groupId': group_id,
+                'channel': channel,
+                'message': msg_entry
+            }, room=group_id)
+            
             return jsonify({"success": True, "message": msg_entry})
     
     return jsonify({"success": False, "error": "Group not found"}), 404

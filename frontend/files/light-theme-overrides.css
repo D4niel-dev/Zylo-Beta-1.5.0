@@ -2,6 +2,40 @@
    THEME SYSTEM - Light Mode Overrides
    ======================================== */
 
+/* === CSS Variable Overrides for Light Theme === */
+/* These override the :root variables, automatically adapting all components */
+body:not(.dark) {
+    /* Discord color palette - inverted for light theme */
+    --discord-gray-900: #e5e7eb;
+    --discord-gray-800: #f3f4f6;
+    --discord-gray-700: #f9fafb;
+    --discord-gray-600: #e5e7eb;
+    --discord-gray-500: #d1d5db;
+    --discord-gray-400: #6b7280;
+    --discord-gray-300: #374151;
+
+    /* Semantic background colors - light versions */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-tertiary: #e5e7eb;
+    --bg-input: #ffffff;
+    --bg-hover: #e5e7eb;
+    --bg-active: #dbeafe;
+
+    /* Semantic text colors - dark for light background */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --text-heading: #111827;
+
+    /* Border colors */
+    --border-primary: #d1d5db;
+    --border-secondary: #e5e7eb;
+
+    /* Scrollbar */
+    --scrollbar-thumb: #d1d5db;
+}
+
 /* Override all discord-gray backgrounds for light theme */
 body:not(.dark) .bg-discord-gray-900,
 body:not(.dark) [class*="bg-discord-gray-900"] {
