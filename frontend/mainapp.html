@@ -15,6 +15,10 @@
   <link href="/files/vendor/cropper.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/files/vendor/emoji-mart.css" />
   <script src="/files/vendor/emoji-mart.js"></script>
+  <!-- Highlight.js for code syntax highlighting -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -117,10 +121,19 @@
     class="fixed md:static inset-y-0 left-0 z-40 w-64 h-full flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
 
     <header class="flex-shrink-0 h-12 shadow-md flex items-center justify-between px-4">
-      <h2 id="subPanelTitle" class="text-white font-semibold text-sm truncate">Zylo (Beta)</h2>
-      <button onclick="toggleSidebar()" class="md:hidden text-discord-gray-400 hover:text-white">
-        <i data-feather="x" class="w-5 h-5"></i>
-      </button>
+      <h2 id="subPanelTitle" class="text-white font-semibold text-sm truncate sidebar-title">Zylo (Beta)</h2>
+      <div class="flex items-center gap-2">
+        <!-- Desktop collapse toggle -->
+        <button id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()"
+          class="hidden md:flex text-discord-gray-400 hover:text-white p-1 rounded hover:bg-discord-gray-700 transition"
+          title="Toggle sidebar">
+          <i data-feather="chevron-left" class="w-4 h-4"></i>
+        </button>
+        <!-- Mobile close button -->
+        <button onclick="toggleSidebar()" class="md:hidden text-discord-gray-400 hover:text-white">
+          <i data-feather="x" class="w-5 h-5"></i>
+        </button>
+      </div>
     </header>
 
     <div
@@ -224,6 +237,25 @@
 
       <div id="sub-panel-profile" class="sub-panel-content hidden">
         <h3 class="sub-panel-header">Profile</h3>
+        <a href="#" onclick="navigateTo('profile');" class="sub-panel-item">
+          <i data-feather="user" class="w-5 h-5 mr-2"></i> <span>My Profile</span>
+        </a>
+        <a href="#" onclick="navigateTo('cloud');" class="sub-panel-item">
+          <i data-feather="cloud" class="w-5 h-5 mr-2"></i> <span>My Cloud</span>
+        </a>
+        <a href="#" onclick="navigateTo('settings');" class="sub-panel-item">
+          <i data-feather="settings" class="w-5 h-5 mr-2"></i> <span>Settings</span>
+        </a>
+
+        <h3 class="sub-panel-header mt-4">Quick Actions</h3>
+        <button onclick="document.getElementById('profileAvatarUpload')?.click();"
+          class="sub-panel-item w-full text-left">
+          <i data-feather="camera" class="w-5 h-5 mr-2"></i> <span>Change Avatar</span>
+        </button>
+        <button onclick="document.getElementById('profileBannerUpload')?.click();"
+          class="sub-panel-item w-full text-left">
+          <i data-feather="image" class="w-5 h-5 mr-2"></i> <span>Change Banner</span>
+        </button>
       </div>
 
       <div id="sub-panel-moments" class="sub-panel-content hidden">
@@ -236,19 +268,23 @@
         <h3 class="sub-panel-header">User Settings</h3>
         <button type="button" id="tabBtnGeneral" class="settings-tab sub-panel-item w-full text-left"
           data-target="generalSettings">
-          General
+          <i data-feather="settings" class="w-5 h-5 mr-2"></i> <span>General</span>
+        </button>
+        <button type="button" id="tabBtnAppearance" class="settings-tab sub-panel-item w-full text-left"
+          data-target="appearanceSettings">
+          <i data-feather="layout" class="w-5 h-5 mr-2"></i> <span>Appearance</span>
         </button>
         <button type="button" id="tabBtnSounds" class="settings-tab sub-panel-item w-full text-left"
           data-target="soundSettings">
-          Sounds
+          <i data-feather="volume-2" class="w-5 h-5 mr-2"></i> <span>Sounds</span>
         </button>
         <button type="button" id="tabBtnAccount" class="settings-tab sub-panel-item w-full text-left"
           data-target="accountSettings">
-          My Account
+          <i data-feather="shield" class="w-5 h-5 mr-2"></i> <span>My Account</span>
         </button>
         <button type="button" id="tabBtnAbout" class="settings-tab sub-panel-item w-full text-left"
           data-target="aboutSettings">
-          About Us
+          <i data-feather="help-circle" class="w-5 h-5 mr-2"></i> <span>About Us</span>
         </button>
       </div>
 
@@ -2481,6 +2517,12 @@
       chatMessagesCommunity.appendChild(msgElement);
       chatMessagesCommunity.scrollTop = chatMessagesCommunity.scrollHeight;
       feather.replace();
+      // Apply syntax highlighting to code blocks
+      if (typeof hljs !== 'undefined') {
+        msgElement.querySelectorAll('pre code.hljs').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      }
     }
 
     async function appendAiBubble(role, content) {
@@ -2515,6 +2557,12 @@
 
       chatMessagesAI.appendChild(msgElement);
       chatMessagesAI.scrollTop = chatMessagesAI.scrollHeight;
+      // Apply syntax highlighting to code blocks in AI chat
+      if (typeof hljs !== 'undefined') {
+        msgElement.querySelectorAll('pre code.hljs').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      }
     }
 
     // Reply Context
@@ -5520,10 +5568,11 @@
 
       const byId = (id) => document.getElementById(id);
       if (byId('settingsTitle') && dict.settingsTitle) byId('settingsTitle').textContent = dict.settingsTitle;
-      if (byId('tabBtnGeneral') && dict.general) byId('tabBtnGeneral').textContent = dict.general;
-      if (byId('tabBtnSounds') && dict.sounds) byId('tabBtnSounds').textContent = dict.sounds;
-      if (byId('tabBtnAccount') && dict.account) byId('tabBtnAccount').textContent = dict.account;
-      if (byId('tabBtnAbout') && dict.about) byId('tabBtnAbout').textContent = dict.about;
+      if (byId('tabBtnGeneral')?.querySelector('span') && dict.general) byId('tabBtnGeneral').querySelector('span').textContent = dict.general;
+      if (byId('tabBtnAppearance')?.querySelector('span') && dict.appearance) byId('tabBtnAppearance').querySelector('span').textContent = dict.appearance;
+      if (byId('tabBtnSounds')?.querySelector('span') && dict.sounds) byId('tabBtnSounds').querySelector('span').textContent = dict.sounds;
+      if (byId('tabBtnAccount')?.querySelector('span') && dict.account) byId('tabBtnAccount').querySelector('span').textContent = dict.account;
+      if (byId('tabBtnAbout')?.querySelector('span') && dict.about) byId('tabBtnAbout').querySelector('span').textContent = dict.about;
       if (byId('labelEnableAnimations') && dict.enableAnimations) byId('labelEnableAnimations').textContent = dict.enableAnimations;
       if (byId('labelCompactMode') && dict.compactMode) byId('labelCompactMode').textContent = dict.compactMode;
       if (byId('labelShowTooltips') && dict.showTooltips) byId('labelShowTooltips').textContent = dict.showTooltips;
@@ -7205,7 +7254,10 @@
       const gPanel = document.getElementById('sub-panel-group');
       const gTab = document.getElementById('tab-group');
       if (gPanel) gPanel.classList.remove('hidden');
-      if (gTab) gTab.classList.remove('hidden');
+      if (gTab) {
+        gTab.classList.remove('hidden');
+        gTab.style.display = ''; // Force remove inline display:none from navigateTo()
+      }
 
       // Update basic info
       const nameEl = document.getElementById('groupPanelName');
@@ -8397,7 +8449,266 @@
       border-radius: 8px;
       background: transparent;
     }
+
+    /* Code Block Syntax Highlighting Styles */
+    .code-block-wrapper {
+      position: relative;
+      margin: 8px 0;
+    }
+
+    .code-block-wrapper .hljs-pre {
+      margin: 0;
+      background: #282c34;
+      border-radius: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .code-block-wrapper .hljs-pre code {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: transparent;
+      padding: 0;
+    }
+
+    .code-lang-label {
+      position: absolute;
+      top: 4px;
+      left: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #7d8590;
+      background: #21262d;
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 1;
+    }
+
+    .copy-code-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #373e47;
+      border: none;
+      border-radius: 4px;
+      padding: 6px;
+      cursor: pointer;
+      color: #8b949e;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s, color 0.2s;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .code-block-wrapper:hover .copy-code-btn {
+      opacity: 1;
+    }
+
+    .copy-code-btn:hover {
+      background: #484f58;
+      color: #fff;
+    }
+
+    .copy-code-btn.copied {
+      background: #238636;
+      color: #fff;
+    }
+
+    /* Collapsible Secondary Sidebar Styles */
+    #subPanelContainer {
+      transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+    }
+
+    #subPanelContainer.collapsed {
+      width: 56px !important;
+      min-width: 56px !important;
+      overflow: hidden;
+    }
+
+    /* Hide sidebar title when collapsed */
+    #subPanelContainer.collapsed>header .sidebar-title {
+      display: none;
+    }
+
+    /* Hide ALL sub-panel content blocks when collapsed EXCEPT settings */
+    #subPanelContainer.collapsed .sub-panel-content:not(#sub-panel-settings) {
+      display: none !important;
+    }
+
+    /* Hide sub-panel headers (like "User Settings" text) when collapsed */
+    #subPanelContainer.collapsed .sub-panel-header {
+      display: none;
+    }
+
+    /* Settings tabs: Hide text, show only icons */
+    #subPanelContainer.collapsed .settings-tab {
+      font-size: 0 !important;
+      justify-content: center;
+      padding: 12px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Settings tab icons - ensure visible and centered */
+    #subPanelContainer.collapsed .settings-tab i,
+    #subPanelContainer.collapsed .settings-tab svg {
+      font-size: 1.25rem;
+      width: 20px;
+      height: 20px;
+      margin: 0 !important;
+      display: inline-block;
+      visibility: visible;
+    }
+
+    /* Hide text spans in settings tabs */
+    #subPanelContainer.collapsed .settings-tab span {
+      display: none !important;
+    }
+
+    /* User Panel Footer - when sidebar is collapsed */
+    /* The footer is: div.flex-shrink-0.h-14.bg-discord-gray-500/30.flex.items-center.justify-between.px-3 */
+    /* It has 2 children: 1) avatar+name div (flex-1), 2) icons div */
+
+    /* Hide the avatar and username section when collapsed */
+    #subPanelContainer.collapsed .flex-shrink-0.h-14>div.flex-1 {
+      display: none !important;
+    }
+
+    /* Make the footer center its content when collapsed */
+    #subPanelContainer.collapsed .flex-shrink-0.h-14 {
+      justify-content: center !important;
+      padding: 8px 0 !important;
+    }
+
+    /* Center the icon buttons container when collapsed */
+    #subPanelContainer.collapsed .flex-shrink-0.h-14>div.flex.items-center:not(.flex-1) {
+      display: flex !important;
+      justify-content: center !important;
+      width: 100% !important;
+      margin: 0 !important;
+    }
+
+    /* Hide logout button when collapsed */
+    #subPanelContainer.collapsed .flex-shrink-0.h-14 a[href="/login.html"] {
+      display: none !important;
+    }
+
+    /* Reduce padding on footer buttons when collapsed */
+    #subPanelContainer.collapsed .flex-shrink-0.h-14 button {
+      padding: 2px !important;
+    }
+
+    /* Rotate chevron when collapsed */
+    #subPanelContainer.collapsed #sidebarCollapseBtn i {
+      transform: rotate(180deg);
+    }
+
+    #sidebarCollapseBtn i {
+      transition: transform 0.2s ease-in-out;
+    }
   </style>
+
+  <!-- Robust Auto-Fix & Cleanup Script -->
+  <script>
+    (function () {
+      // 1. Remove any "ghost" text nodes that might have leaked into body/head
+      // This defends against browser caching of the malformed HTML state
+      function cleanGhostText() {
+        const patterns = ['Rotate chevron', 'subPanelContainer', 'margin-right: 0'];
+        [document.body, document.head].forEach(root => {
+          if (!root) return;
+          Array.from(root.childNodes).forEach(node => {
+            if (node.nodeType === 3) { // Text node
+              const text = node.textContent;
+              if (patterns.some(p => text.includes(p))) {
+                node.remove();
+              }
+            }
+          });
+        });
+      }
+
+      // Run cleanup immediately and on load
+      cleanGhostText();
+      document.addEventListener('DOMContentLoaded', cleanGhostText);
+
+      // 2. One-time Sidebar Reset to ensure clean state
+      if (!sessionStorage.getItem('fix_sidebar_v2')) {
+        localStorage.removeItem('sidebarCollapsed');
+        sessionStorage.setItem('fix_sidebar_v2', 'true');
+        document.addEventListener('DOMContentLoaded', () => {
+          const sidebar = document.getElementById('subPanelContainer');
+          if (sidebar) sidebar.classList.remove('collapsed');
+        });
+      }
+
+      // 3. Force Icon Refresh to ensure settings icons etc are visible
+      document.addEventListener('DOMContentLoaded', () => {
+        // Force re-render of feather icons if they exist
+        if (window.feather) {
+          setTimeout(() => window.feather.replace(), 100);
+          setTimeout(() => window.feather.replace(), 500); // Double tap for safety
+        }
+      });
+    })();
+  </script>
+
+  <!-- Code Block Copy Function -->
+  <script>
+    function copyCodeBlock(blockId) {
+      const codeEl = document.getElementById(blockId);
+      if (!codeEl) return;
+
+      const code = codeEl.textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        // Find the copy button in the parent wrapper
+        const wrapper = codeEl.closest('.code-block-wrapper');
+        const btn = wrapper?.querySelector('.copy-code-btn');
+        if (btn) {
+          btn.classList.add('copied');
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Failed to copy code:', err);
+      });
+    }
+  </script>
+
+  <!-- Collapsible Sidebar Function -->
+  <script>
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById('subPanelContainer');
+      if (!sidebar) return;
+
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
+
+      // Update button icon
+      const btn = document.getElementById('sidebarCollapseBtn');
+      if (btn) {
+        feather.replace();
+      }
+    }
+
+    // Initialize sidebar state on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedState = localStorage.getItem('sidebarCollapsed');
+      if (savedState === 'true') {
+        const sidebar = document.getElementById('subPanelContainer');
+        if (sidebar) {
+          sidebar.classList.add('collapsed');
+        }
+      }
+    });
+  </script>
 
   <!-- Sticker Picker JavaScript -->
   <script>

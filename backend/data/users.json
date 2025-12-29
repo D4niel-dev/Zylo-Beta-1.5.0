@@ -39,7 +39,10 @@
     "settings": {
       "profileEffect": "pulse",
       "bannerEffect": "vignette",
-      "startupPage": "settings"
+      "startupPage": "settings",
+      "enableMusic": false,
+      "soundProfile": "soft",
+      "duckMusic": true
     },
     "friends": [
       "Dan"

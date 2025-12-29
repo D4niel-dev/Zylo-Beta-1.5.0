@@ -25,5 +25,50 @@
     "fileType": null,
     "fileData": null,
     "createdAt": 1766998796
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "*test*",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1767005367
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "**test**",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1767005374
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "# test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1767005379
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "`\ntest\n`",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1767005408
+  },
+  {
+    "from": "Daniel",
+    "to": "Dan",
+    "message": "test",
+    "fileName": null,
+    "fileType": null,
+    "fileData": null,
+    "createdAt": 1767007234
   }
 ]
