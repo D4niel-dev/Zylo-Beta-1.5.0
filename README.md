@@ -1,10 +1,29 @@
 <div align="center">
-  <img src="frontend/images/Zylo_icon.png" width="100" />
-  <h1>Zylo</h1>
-  <p>The Ultimate Community Workspace</p>
+  <img src="frontend/images/Zylo_icon.png" 
+    width="140"
+    style="border-radius: 24px;"/>
+  <h1 style="margin-top: 12px;">Zylo</h1>
+  <p><strong>The Ultimate Community Workspace</strong></p>
+  <p>
+    A modern, high-performance platform for communication, collaboration,<br>
+    and personal productivity — built with Python & Flask.
+  </p>
+</div>
+<div align="center">
+  
+![Status](https://img.shields.io/badge/status-beta-blue)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Web-lightgrey)
+  
 </div>
 
-Zylo is a modern, high-performance community platform designed for seamless communication, collaboration, and personal productivity. Built with a Discord-inspired aesthetic and powered by a robust Python-Flask backend, Zylo offers a rich feature set that goes beyond simple messaging.
+Zylo is a modern, high-performance community platform designed for seamless
+communication, collaboration, and personal productivity.
+
+Inspired by Discord’s usability and powered by a robust Python–Flask backend,
+Zylo goes beyond messaging — combining social interaction, cloud storage,
+utilities, and AI assistance into a single unified workspace.
 
 ## ✨ Core Features
 
@@ -81,4 +100,6 @@ Privacy is a top priority for Zylo.
 > [!IMPORTANT]
 > Any feedback or reports should be sent to **@d4niel_1f**.
 
-Developed with ❤️ by **Daniel**
+<p align="center">
+  Developed with ❤️ by <strong>Daniel</strong>
+</p>
