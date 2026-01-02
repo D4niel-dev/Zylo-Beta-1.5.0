@@ -1,6 +1,6 @@
 # Zylo — The Ultimate Community Workspace
 
-![Zylo Banner](https://raw.githubusercontent.com/D4niel-dev/Zylo-Beta/main/assets/banner.png)
+![Zylo Banner](frontend/images/Zylo_icon.png)
 
 Zylo is a modern, high-performance community platform designed for seamless communication, collaboration, and personal productivity. Built with a Discord-inspired aesthetic and powered by a robust Python-Flask backend, Zylo offers a rich feature set that goes beyond simple messaging.
 
