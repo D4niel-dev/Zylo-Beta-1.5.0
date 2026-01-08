@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/images/Zylo_banner_3.png" 
+  <img src="frontend/images/Zylo_banner_2.png" 
     width="100%"
     height="100%"/>
   <p><strong>The Ultimate Community Workspace</strong></p>
