@@ -82,7 +82,7 @@
 
 ---
 
-## **Zylo-Beta-v1.3.0** *(Latest)*
+## **Zylo-Beta-v1.3.0**
 
 ### NEW:
 - **Integrated Content**: Home page now directly includes QnA and What's New sections for immediate access.
@@ -100,4 +100,23 @@
 - **Profile Navigation**: Fixed a bug where profile sub-items would reload the entire view unnecessarily.
 - **UI Consistency**: Corrected various typos and improved alignment in mobile view.
 - **Button Highlighting**: Fixed "ghost focus" in the profile sidebar where multiple items appeared active simultaneously.
+
+---
+
+## **Zylo-Beta-v1.3.1** *(Latest)*
+
+### NEW:
+- **Multi-step Signup Wizard**: Completely overhauled registration flow into 4 steps (Account, Profile, Personal, Confirm) for better UX.
+- **Social Login Integration**: Added OAuth support for Google, GitHub, Discord, and Microsoft.
+- **Two-Factor Authentication (2FA)**: Implemented 2FA security layer with verification codes.
+- **Email Verification**: Added email verification flow during signup (simulated).
+- **Settings I18n**: Added internationalization support for all Settings panels (Appearance, Sound, About, Security).
+- **Session Management**: Enhanced session handling and security.
+
+### IMPROVEMENT:
+- **Form Validation**: Added real-time username/email availability checking and visual password strength meter.
+- **Visual Polish**: Applied glassmorphism and animated backgrounds to auth pages as per Phase 2 plan.
+
+### FIX:
+- **Backend Startup**: Switched startup script to use standard `python` executable for better stability.
 

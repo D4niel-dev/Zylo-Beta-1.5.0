@@ -1,125 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zylo | Loading</title>
     <link rel="icon" href="/images/Zylo_icon.ico" type="image/x-icon" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#0b1020" />
     <script src="/files/vendor/tailwindcss.js"></script>
-    <link rel="stylesheet" href="/files/style.css">
-</head>
-<body class="text-white h-screen flex items-center justify-center flex-col gap-6">
+    <link rel="stylesheet" href="/files/style.css" />
+    <style>
+      /* Loading specific styles */
+      .animated-bg {
+        background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e3a8a);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+      }
 
-    <!-- Logo -->
-    <img src="/images/Zylo_icon.png" alt="Zylo Logo" class="app-icon w-20 h-20">
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
 
-    <!-- Welcome -->
-    <h2 id="welcomeMsg" class="zylo-heading text-xl font-semibold text-gray-200"></h2>
+      .logo-container {
+        position: relative;
+        margin-bottom: 2rem;
+      }
 
-    <!-- Loading Text -->
-    <p id="loadingText" class="zylo-heading text-lg font-medium">
-        <span id="taskText"></span>
-        <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
-    </p>
+      .logo-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(59, 130, 246, 0.4) 0%,
+          rgba(59, 130, 246, 0) 70%
+        );
+        animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        z-index: 0;
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          transform: translate(-50%, -50%) scale(0.5);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1.5);
+          opacity: 0;
+        }
+      }
+
+      .app-icon {
+        position: relative;
+        z-index: 10;
+        filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .progress-wrapper {
+        width: 300px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 9999px;
+        overflow: hidden;
+        position: relative;
+        margin: 1.5rem 0 0.5rem 0;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        background-size: 200% 100%;
+        animation: gradientMove 2s linear infinite;
+        border-radius: 9999px;
+        transition: width 0.3s ease-out;
+      }
+
+      @keyframes gradientMove {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
+
+      .loading-tip {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 1rem;
+        min-height: 1.5em;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+
+      .loading-tip.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #percentage {
+        font-family: monospace;
+        color: #60a5fa;
+        font-weight: bold;
+      }
+
+      .skip-btn {
+        margin-top: 2rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.5);
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .skip-btn.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .skip-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body
+    class="text-white h-screen flex items-center justify-center flex-col animated-bg overflow-hidden select-none"
+  >
+    <!-- Logo Section -->
+    <div class="logo-container">
+      <div class="logo-pulse"></div>
+      <img
+        src="/images/Zylo_icon.png"
+        alt="Zylo Logo"
+        class="app-icon w-24 h-24"
+      />
+    </div>
+
+    <!-- Welcome Message -->
+    <h2
+      id="welcomeMsg"
+      class="text-2xl font-bold tracking-wide mb-2 opacity-90"
+    ></h2>
+
+    <!-- Loading Status -->
+    <div class="flex flex-col items-center gap-1">
+      <p class="text-lg font-medium text-gray-200 flex items-center gap-2">
+        <span id="taskText">Initializing...</span>
+      </p>
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <span id="percentage">0%</span>
+        <span>•</span>
+        <span id="timeRemaining">Calculating...</span>
+      </div>
+    </div>
 
     <!-- Progress Bar -->
     <div class="progress-wrapper">
-        <div id="progressBar" class="progress-bar"></div>
+      <div id="progressBar" class="progress-bar"></div>
     </div>
 
+    <!-- Tips Section -->
+    <p id="tipText" class="loading-tip show">
+      Tip: You can customize your profile in Settings.
+    </p>
+
+    <!-- Skip Button -->
+    <button id="skipBtn" class="skip-btn" onclick="skipLoading()">
+      Skip Loading
+    </button>
+
     <script>
-        const tasks = [
-          { key: 'init', label: 'Initializing Zylo', run: async () => { await new Promise(r => setTimeout(r, 300)); } },
-          { key: 'user', label: 'Fetching user data', run: async () => {
-              const u = localStorage.getItem('username');
-              if (!u) return;
-              try { await fetch(`/api/get-user?identifier=${encodeURIComponent(u)}`); } catch {}
-          } },
-          { key: 'messages', label: 'Loading chats', run: async () => {
-              try { await fetch('/api/messages', { method: 'GET' }); } catch {}
-          } },
-          { key: 'groups', label: 'Syncing groups', run: async () => {
-              const u = localStorage.getItem('username');
-              if (!u) return;
-              try { await fetch(`/api/groups?username=${encodeURIComponent(u)}`); } catch {}
-          } },
-          { key: 'explore', label: 'Fetching explore feed', run: async () => {
-              try { await fetch('/api/explore/posts'); } catch {}
-          } },
-          { key: 'cache', label: 'Priming offline cache', run: async () => { try { await caches.open('runtime-v1-zylo'); } catch {} } },
-        ];
+      const tasks = [
+        {
+          key: "init",
+          label: "Initializing Zylo engine...",
+          weight: 10,
+          duration: 400,
+        },
+        {
+          key: "verify",
+          label: "Verifying session...",
+          weight: 15,
+          duration: 600,
+        },
+        {
+          key: "user",
+          label: "Fetching user profile...",
+          weight: 20,
+          duration: 800,
+          action: async () => {
+            const u = localStorage.getItem("username");
+            if (u) {
+              try {
+                await fetch(
+                  `/api/get-user?identifier=${encodeURIComponent(u)}`
+                );
+              } catch {}
+            }
+          },
+        },
+        {
+          key: "theme",
+          label: "Applying visual preferences...",
+          weight: 10,
+          duration: 300,
+        },
+        {
+          key: "messages",
+          label: "Decrypting messages...",
+          weight: 25,
+          duration: 1000,
+          action: async () => {
+            try {
+              await fetch("/api/messages");
+            } catch {}
+          },
+        },
+        {
+          key: "groups",
+          label: "Syncing group channels...",
+          weight: 15,
+          duration: 700,
+          action: async () => {
+            const u = localStorage.getItem("username");
+            if (u) {
+              try {
+                await fetch(`/api/groups?username=${encodeURIComponent(u)}`);
+              } catch {}
+            }
+          },
+        },
+        { key: "final", label: "Finishing up...", weight: 5, duration: 400 },
+      ];
 
-        let index = 0;
-        const textEl = document.getElementById("taskText");
-        const progressBar = document.getElementById("progressBar");
-        const welcomeEl = document.getElementById("welcomeMsg");
+      const tips = [
+        "Tip: You can customize your profile in Settings.",
+        "Tip: Join groups to meet new people!",
+        "Tip: Use markdown to format your messages.",
+        "Tip: Drag and drop files to share them quickly.",
+        "Tip: Right-click messages for more options.",
+        "Tip: Check the Explore page for public communities.",
+      ];
 
-        // Show welcome with stored username
-        const username = localStorage.getItem("username");
-        if (username) {
-            welcomeEl.textContent = `Welcome back, ${username}!`;
+      const textEl = document.getElementById("taskText");
+      const progressBar = document.getElementById("progressBar");
+      const percentageEl = document.getElementById("percentage");
+      const timeEl = document.getElementById("timeRemaining");
+      const welcomeEl = document.getElementById("welcomeMsg");
+      const tipEl = document.getElementById("tipText");
+      const skipBtn = document.getElementById("skipBtn");
+
+      let currentProgress = 0;
+      let targetProgress = 0;
+      let taskIndex = 0;
+      let startTime = Date.now();
+      let skipped = false;
+
+      // Personalize welcome
+      const username = localStorage.getItem("username");
+      welcomeEl.textContent = username
+        ? `Welcome back, ${username}!`
+        : "Welcome to Zylo";
+
+      // Theme check
+      if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+      }
+
+      // Tip cycler
+      let tipInterval = setInterval(() => {
+        tipEl.classList.remove("show");
+        setTimeout(() => {
+          tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
+          tipEl.classList.add("show");
+        }, 500);
+      }, 4000);
+
+      // Show skip button after 3 seconds
+      setTimeout(() => {
+        skipBtn.classList.add("visible");
+      }, 3000);
+
+      function updateProgress() {
+        if (skipped) return;
+
+        // Smooth interpolation
+        if (currentProgress < targetProgress) {
+          currentProgress += (targetProgress - currentProgress) * 0.1;
+          if (Math.abs(targetProgress - currentProgress) < 0.1)
+            currentProgress = targetProgress;
         }
 
-        async function runNext() {
-          if (index >= tasks.length) return;
-          const task = tasks[index];
+        progressBar.style.width = `${currentProgress}%`;
+        percentageEl.textContent = `${Math.round(currentProgress)}%`;
+
+        // Estimate time layout
+        const elapsedTime = Date.now() - startTime;
+        if (currentProgress > 0 && currentProgress < 100) {
+          const totalEstimatedTime = (elapsedTime / currentProgress) * 100;
+          const remaining = Math.max(
+            0,
+            Math.ceil((totalEstimatedTime - elapsedTime) / 1000)
+          );
+          timeEl.textContent = `${remaining}s remaining`;
+        } else if (currentProgress >= 100) {
+          timeEl.textContent = "Ready!";
+        }
+
+        requestAnimationFrame(updateProgress);
+      }
+
+      async function processTasks() {
+        let totalWeight = tasks.reduce((a, b) => a + b.weight, 0);
+        let accumulatedWeight = 0;
+
+        for (const task of tasks) {
+          if (skipped) break;
+
           textEl.textContent = task.label;
-          try { await task.run(); } catch {}
-          index++;
-          progressBar.style.width = `${(index/tasks.length) * 100}%`;
-          if (index < tasks.length) {
-            setTimeout(runNext, 250);
-          } else {
-            done();
+
+          // Start task async action
+          const start = Date.now();
+          if (task.action) {
+            try {
+              await task.action();
+            } catch (e) {
+              console.error(e);
+            }
           }
+
+          // Ensure minimum duration for visual effect
+          const elapsed = Date.now() - start;
+          const remaining = Math.max(0, task.duration - elapsed);
+          if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
+
+          accumulatedWeight += task.weight;
+          targetProgress = (accumulatedWeight / totalWeight) * 100;
         }
 
-        function goToPage(href) { 
-            document.body.classList.add("fade-out"); 
-            setTimeout(() => { 
-                window.location.href = href; 
-            }, 1000); 
-        }
+        if (!skipped) completeLoading();
+      }
 
-        function done(){
-          textEl.textContent = "Done!";
-          document.querySelector(".loading-dots").style.display = "none";
-          progressBar.style.width = "100%";
+      function completeLoading() {
+        targetProgress = 100;
+        currentProgress = 100;
+        progressBar.style.width = "100%";
+        percentageEl.textContent = "100%";
+        textEl.textContent = "Welcome!";
+        timeEl.textContent = "Launching...";
+
+        clearInterval(tipInterval);
+
+        setTimeout(() => {
+          document.body.style.transition = "opacity 0.8s ease";
+          document.body.style.opacity = "0";
           setTimeout(() => {
-            document.body.style.animation = "fadeOut 1s forwards";
-            setTimeout(() => { goToPage("mainapp.html"); }, 900);
-          }, 500);
+            window.location.href = "mainapp.html";
+          }, 800);
+        }, 500);
+      }
+
+      function skipLoading() {
+        skipped = true;
+        completeLoading();
+      }
+
+      // Start
+      requestAnimationFrame(updateProgress);
+      window.addEventListener("load", processTasks);
+
+      // Link transition handler
+      document.addEventListener("click", (e) => {
+        const link = e.target.closest("a");
+        if (link && link.hostname === window.location.hostname) {
+          e.preventDefault();
+          document.body.style.opacity = "0";
+          setTimeout(() => (window.location.href = link.href), 500);
         }
-
-        window.addEventListener('load', () => {
-          runNext();
-        });
-
-        // Fade-out transition on link clicks
-        document.querySelectorAll("a").forEach(link => {
-        if (link.hostname === window.location.hostname) {
-            link.addEventListener("click", function (e) {
-            e.preventDefault();
-            const href = this.getAttribute("href");
-            document.body.classList.add("fade-out");
-            setTimeout(() => {
-                goToPage(href);
-            }, 1000);
-            });
-        }
-        });
-
-        // Apply saved theme (from localStorage)
-        const savedTheme = localStorage.getItem('theme');
-
-        if (savedTheme === 'dark') {
-            document.body.classList.add("dark");
-        } else if (savedTheme === 'light') {
-            document.body.classList.remove("dark");
-        }
+      });
     </script>
     <script src="/files/sw-register.js"></script>
-</body>
+  </body>
 </html>

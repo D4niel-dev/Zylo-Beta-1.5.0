@@ -70,6 +70,48 @@ def handle_update_status(data):
 # In-memory online users: { username: sid }
 online_users = {}
 
+# Session management: { token: { username, created_at, expires_at } }
+active_sessions = {}
+SESSION_EXPIRY_HOURS = 24
+
+import time as _time
+
+def create_session(username):
+    """Create a new session token for a user."""
+    token = str(uuid.uuid4())
+    now = int(_time.time())
+    active_sessions[token] = {
+        "username": username,
+        "created_at": now,
+        "expires_at": now + (SESSION_EXPIRY_HOURS * 3600)
+    }
+    return token
+
+def validate_session(token):
+    """Validate a session token. Returns username if valid, None otherwise."""
+    if not token or token not in active_sessions:
+        return None
+    session = active_sessions[token]
+    if int(_time.time()) > session["expires_at"]:
+        # Session expired, remove it
+        del active_sessions[token]
+        return None
+    return session["username"]
+
+def invalidate_session(token):
+    """Invalidate/logout a session."""
+    if token in active_sessions:
+        del active_sessions[token]
+        return True
+    return False
+
+def cleanup_expired_sessions():
+    """Remove all expired sessions."""
+    now = int(_time.time())
+    expired = [t for t, s in active_sessions.items() if now > s["expires_at"]]
+    for t in expired:
+        del active_sessions[t]
+
 @socketio.on('register_status')
 def on_register_status(data):
     username = (data or {}).get('username')
@@ -421,6 +463,9 @@ def signup():
         if not banner_url:
             banner_url = "/images/default_banner.png"
 
+    # Generate email verification code
+    verification_code = str(random.randint(100000, 999999))
+    
     new_user = {
         "username": username,
         "email": email,
@@ -430,7 +475,9 @@ def signup():
         "gender": gender,
         "phone": phone,
         "avatar": avatar_url,
-        "banner": banner_url
+        "banner": banner_url,
+        "email_verified": False,
+        "verification_code": verification_code
     }
 
     users.append(new_user)
@@ -438,9 +485,75 @@ def signup():
     with open(USER_DATA_FILE, "w") as f:
         json.dump(users, f, indent=2)
 
-    return jsonify({"success": True})
+    # Return verification code for simulated mode (in production, send via email)
+    return jsonify({
+        "success": True, 
+        "verification_code": verification_code,
+        "message": "Account created! Please verify your email."
+    })
 
+@app.route("/api/auth/social", methods=["POST"])
+def social_login():
+    data = request.json or {}
+    provider = data.get("provider")
     
+    if not provider:
+        return jsonify({"success": False, "error": "Provider required"}), 400
+        
+    # Simulate network delay
+    import time
+    time.sleep(1.2)
+    
+    # Generate a consistent fake user for development
+    # In a real app, we'd validate the OAuth token here
+    base_name = f"{provider}User"
+    demo_email = f"{base_name.lower()}@example.com"
+    
+    users = load_users()
+    target_user = None
+    
+    # Check if this social user already exists
+    for u in users:
+        if u.get("email") == demo_email:
+            target_user = u
+            break
+            
+    if not target_user:
+        # Create new social user
+        new_username = f"{base_name}_{random.randint(100, 999)}"
+        avatar_map = {
+            "Google": "/images/devicons/google-original.svg",
+            "GitHub": "/images/devicons/github-original.svg",
+            "Discord": "/images/devicons/discordjs-original.svg",
+            "Microsoft": "/images/devicons/windows8-original.svg"
+        }
+        
+        target_user = {
+            "username": new_username,
+            "email": demo_email,
+            "password": f"social_login_{uuid.uuid4()}", # Random complex password
+            "usertag": f"@{new_username}",
+            "avatar": avatar_map.get(provider, "/images/default_avatar.png"),
+            "banner": "/images/default_banner.png",
+            "provider": provider
+        }
+        users.append(target_user)
+        try:
+            with open(USER_DATA_FILE, "w") as f:
+                json.dump(users, f, indent=2)
+        except Exception as e:
+            return jsonify({"success": False, "error": "Database error"}), 500
+            
+    # Create session token for social login
+    token = create_session(target_user["username"])
+    return jsonify({
+        "success": True, 
+        "username": target_user["username"], 
+        "usertag": target_user.get("usertag", ""),
+        "session_token": token,
+        "message": f"Successfully logged in with {provider}"
+    })
+
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.json
@@ -449,8 +562,190 @@ def login():
     users = load_users()
     for user in users:
         if (user["username"] == identifier or user.get("email") == identifier) and user["password"] == password:
-            return jsonify({"success": True, "username": user["username"], "usertag": user.get("usertag", "")})
+            # Check if 2FA is enabled
+            if user.get("twofa_enabled"):
+                return jsonify({
+                    "success": False, 
+                    "requires_2fa": True, 
+                    "username": user["username"],
+                    "message": "2FA verification required"
+                })
+            # Create session token
+            token = create_session(user["username"])
+            return jsonify({
+                "success": True, 
+                "username": user["username"], 
+                "usertag": user.get("usertag", ""),
+                "session_token": token
+            })
     return jsonify({"success": False, "error": "Invalid credentials"}), 401
+
+@app.route("/api/auth/validate-session", methods=["POST"])
+def validate_session_endpoint():
+    data = request.json or {}
+    token = data.get("token")
+    
+    if not token:
+        return jsonify({"valid": False, "error": "Token required"}), 400
+    
+    username = validate_session(token)
+    if username:
+        return jsonify({"valid": True, "username": username})
+    else:
+        return jsonify({"valid": False, "error": "Invalid or expired session"}), 401
+
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    data = request.json or {}
+    token = data.get("token")
+    
+    if not token:
+        return jsonify({"success": False, "error": "Token required"}), 400
+    
+    if invalidate_session(token):
+        return jsonify({"success": True, "message": "Logged out successfully"})
+    else:
+        return jsonify({"success": False, "error": "Session not found"}), 404
+
+@app.route("/api/auth/2fa/enable", methods=["POST"])
+def enable_2fa():
+    data = request.json or {}
+    username = data.get("username")
+    
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+    
+    users = load_users()
+    updated = False
+    
+    for user in users:
+        if user["username"] == username:
+            # Generate a mock secret (in production, use pyotp.random_base32())
+            mock_secret = f"ZYLO{random.randint(100000, 999999)}SECRET"
+            user["twofa_enabled"] = True
+            user["twofa_secret"] = mock_secret
+            updated = True
+            break
+    
+    if updated:
+        save_users(users)
+        return jsonify({
+            "success": True, 
+            "secret": mock_secret,
+            "message": "2FA enabled. Use code 123456 for testing."
+        })
+    
+    return jsonify({"success": False, "error": "User not found"}), 404
+
+@app.route("/api/auth/2fa/disable", methods=["POST"])
+def disable_2fa():
+    data = request.json or {}
+    username = data.get("username")
+    
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+    
+    users = load_users()
+    updated = False
+    
+    for user in users:
+        if user["username"] == username:
+            user["twofa_enabled"] = False
+            user.pop("twofa_secret", None)
+            updated = True
+            break
+    
+    if updated:
+        save_users(users)
+        return jsonify({"success": True, "message": "2FA disabled"})
+    
+    return jsonify({"success": False, "error": "User not found"}), 404
+
+@app.route("/api/auth/2fa/verify", methods=["POST"])
+def verify_2fa():
+    data = request.json or {}
+    username = data.get("username")
+    code = data.get("code", "")
+    
+    if not username or not code:
+        return jsonify({"success": False, "error": "Username and code required"}), 400
+    
+    users = load_users()
+    
+    for user in users:
+        if user["username"] == username:
+            if not user.get("twofa_enabled"):
+                return jsonify({"success": False, "error": "2FA not enabled"}), 400
+            
+            # Simulated verification: accept any 6-digit code or "123456"
+            if len(code) == 6 and code.isdigit():
+                token = create_session(user["username"])
+                return jsonify({
+                    "success": True, 
+                    "username": user["username"], 
+                    "usertag": user.get("usertag", ""),
+                    "session_token": token,
+                    "message": "2FA verified"
+                })
+            else:
+                return jsonify({"success": False, "error": "Invalid code format"}), 400
+    
+    return jsonify({"success": False, "error": "User not found"}), 404
+
+@app.route("/api/auth/verify-email", methods=["POST"])
+def verify_email():
+    data = request.json or {}
+    username = data.get("username")
+    code = data.get("code", "")
+    
+    if not username or not code:
+        return jsonify({"success": False, "error": "Username and code required"}), 400
+    
+    users = load_users()
+    
+    for user in users:
+        if user["username"] == username:
+            if user.get("email_verified"):
+                return jsonify({"success": True, "message": "Email already verified"})
+            
+            if user.get("verification_code") == code:
+                user["email_verified"] = True
+                user.pop("verification_code", None)  # Remove code after verification
+                save_users(users)
+                return jsonify({"success": True, "message": "Email verified successfully!"})
+            else:
+                return jsonify({"success": False, "error": "Invalid verification code"}), 400
+    
+    return jsonify({"success": False, "error": "User not found"}), 404
+
+@app.route("/api/auth/resend-verification", methods=["POST"])
+def resend_verification():
+    data = request.json or {}
+    username = data.get("username")
+    
+    if not username:
+        return jsonify({"success": False, "error": "Username required"}), 400
+    
+    users = load_users()
+    
+    for user in users:
+        if user["username"] == username:
+            if user.get("email_verified"):
+                return jsonify({"success": False, "error": "Email already verified"}), 400
+            
+            # Generate new code
+            new_code = str(random.randint(100000, 999999))
+            user["verification_code"] = new_code
+            save_users(users)
+            
+            # In production, send email here
+            return jsonify({
+                "success": True, 
+                "verification_code": new_code,
+                "message": "Verification code resent"
+            })
+    
+    return jsonify({"success": False, "error": "User not found"}), 404
 
 @app.route("/api/forgot", methods=["POST"])
 def forgot():

@@ -1,0 +1,350 @@
+/**
+ * Global Translations Dictionary & Logic
+ * Supports: English (en), Spanish (es), Vietnamese (vi)
+ */
+
+const translations = {
+    en: {
+        // Auth Common
+        "auth.welcomeBack": "Welcome back!",
+        "auth.createAccount": "Create Your Account!",
+        "auth.forgotPassword": "Forgot Password",
+        "auth.signIn": "Sign In",
+        "auth.signUp": "Sign Up",
+        "auth.signingIn": "Signing in...",
+        "auth.creatingAccount": "Creating account...",
+        "auth.usernameOrEmail": "Username or Email",
+        "auth.password": "Password",
+        "auth.confirmPassword": "Confirm Password",
+        "auth.username": "Username",
+        "auth.email": "Email",
+        "auth.rememberMe": "Remember me",
+        "auth.forgotPassLink": "Forgot your password?",
+        "auth.noAccount": "Don't have an account?",
+        "auth.createOne": "Create one",
+        "auth.haveAccount": "Already have an account?",
+        "auth.loginHere": "Login here",
+        "auth.orSignInWith": "or sign in with",
+        "auth.orSignUpWith": "or sign up with",
+        "auth.privacyPolicy": "Privacy Policy",
+        "auth.termsOfService": "Terms of Service",
+        "auth.backToLogin": "Back to Login",
+        "auth.sendResetLink": "Send Reset Link",
+        "auth.resetInstructions": "Enter your email or username to reset your password.",
+        "auth.step.account": "Account",
+        "auth.step.profile": "Profile",
+        "auth.step.personal": "Personal",
+        "auth.step.review": "Review",
+        "auth.next": "Next",
+        "auth.back": "Back",
+        "auth.usertag": "Usertag (optional)",
+        "auth.phone": "Phone Number (optional)",
+        "auth.dob": "Date of Birth",
+        "auth.gender": "Gender",
+        "auth.gender.male": "Male",
+        "auth.gender.female": "Female",
+        "auth.gender.other": "Other",
+        "auth.agreeTerms": "I agree to the Terms & Privacy Policy",
+        "auth.almostThere": "Almost there!",
+        "auth.verifyEmail": "Verify Your Email",
+        "auth.verify": "Verify",
+        "auth.resendCode": "Resend Code",
+        "auth.skip": "Skip for now",
+        "auth.enterCode": "Enter the 6-digit code sent to your email",
+        
+        // Settings
+        "settings.title": "⚙️ Settings",
+        "settings.general": "General",
+        "settings.sounds": "Sounds",
+        "settings.account": "Account",
+        "settings.about": "About Us",
+        "settings.appearance": "Appearance",
+        "settings.enableAnimations": "Enable Animations",
+        "settings.compactMode": "Compact Mode",
+        "settings.showTooltips": "Show Tooltips",
+        "settings.language": "Language",
+        "settings.startupPage": "Startup Page",
+        "settings.autoSave": "Auto Save Changes",
+        "settings.confirmExit": "Confirm Before Exit",
+        "settings.solidBg": "Solid BG",
+        "settings.resetAll": "Reset All Settings",
+        "settings.logout": "Log Out",
+        "settings.saveChanges": "Save Changes",
+        "settings.changeAvatar": "Change Avatar",
+        "settings.changeBanner": "Change Banner",
+        "settings.enable2FA": "Enable 2FA",
+        "settings.showHomeTab": "Show Home Tab",
+        "settings.readReceipts": "Send Read Receipts",
+        "settings.soundVolume": "Sound Effects Volume",
+        "settings.musicVolume": "Music Volume",
+        "settings.muteAll": "Mute All Sounds",
+        "settings.enableSound": "Enable Sound Effects",
+        "settings.enableMusic": "Enable Background Music",
+        "settings.soundProfile": "Sound Profile",
+        "settings.playEvents": "Play on events",
+        "settings.playSend": "Message sent",
+        "settings.playReceive": "Message received",
+        "settings.playUi": "UI interactions",
+        "settings.duckMusic": "Duck music when playing effects",
+        "settings.doNotDisturb": "Do Not Disturb",
+        "settings.dndDesc": "Suppress all notification sounds (messages, calls).",
+        "settings.themePresets": "Theme Presets",
+        "settings.quickSettings": "Quick Settings",
+        "settings.advancedThemeEditor": "Advanced Theme Editor",
+        "settings.openEditor": "Open Editor",
+        "settings.resetAppearance": "Reset Appearance to Default",
+        "settings.credits": "Credits",
+        "settings.versionDetails": "Version Details",
+        "settings.resources": "Resources",
+        "settings.license": "License",
+        "settings.changePassword": "Change Password",
+        "settings.deleteAccount": "Delete Account",
+        "settings.twoFactorAuth": "Two-Factor Authentication (2FA)",
+        "settings.twoFactorDesc": "Add an extra layer of protection.",
+        "settings.showEmail": "Show Email on Profile"
+    },
+    es: {
+        // Auth Common
+        "auth.welcomeBack": "¡Bienvenido de nuevo!",
+        "auth.createAccount": "¡Crea tu Cuenta!",
+        "auth.forgotPassword": "Olvidé mi contraseña",
+        "auth.signIn": "Iniciar Sesión",
+        "auth.signUp": "Registrarse",
+        "auth.signingIn": "Iniciando sesión...",
+        "auth.creatingAccount": "Creando cuenta...",
+        "auth.usernameOrEmail": "Usuario o Correo",
+        "auth.password": "Contraseña",
+        "auth.confirmPassword": "Confirmar Contraseña",
+        "auth.username": "Usuario",
+        "auth.email": "Correo",
+        "auth.rememberMe": "Recuérdame",
+        "auth.forgotPassLink": "¿Olvidaste tu contraseña?",
+        "auth.noAccount": "¿No tienes cuenta?",
+        "auth.createOne": "Crea una",
+        "auth.haveAccount": "¿Ya tienes cuenta?",
+        "auth.loginHere": "Ingresa aquí",
+        "auth.orSignInWith": "o inicia con",
+        "auth.orSignUpWith": "o regístrate con",
+        "auth.privacyPolicy": "Política de Privacidad",
+        "auth.termsOfService": "Términos de Servicio",
+        "auth.backToLogin": "Volver al Login",
+        "auth.sendResetLink": "Enviar enlace",
+        "auth.resetInstructions": "Ingresa tu correo o usuario para restablecer.",
+        "auth.step.account": "Cuenta",
+        "auth.step.profile": "Perfil",
+        "auth.step.personal": "Personal",
+        "auth.step.review": "Revisar",
+        "auth.next": "Siguiente",
+        "auth.back": "Atrás",
+        "auth.usertag": "Etiqueta (opcional)",
+        "auth.phone": "Teléfono (opcional)",
+        "auth.dob": "Fecha de Nacimiento",
+        "auth.gender": "Género",
+        "auth.gender.male": "Masculino",
+        "auth.gender.female": "Femenino",
+        "auth.gender.other": "Otro",
+        "auth.agreeTerms": "Acepto los Términos y Política",
+        "auth.almostThere": "¡Ya casi!",
+        "auth.verifyEmail": "Verifica tu Correo",
+        "auth.verify": "Verificar",
+        "auth.resendCode": "Reenviar Código",
+        "auth.skip": "Omitir por ahora",
+        "auth.enterCode": "Ingresa el código de 6 dígitos enviado",
+
+        // Settings
+        "settings.title": "⚙️ Ajustes",
+        "settings.general": "General",
+        "settings.sounds": "Sonidos",
+        "settings.account": "Cuenta",
+        "settings.about": "Acerca de",
+        "settings.appearance": "Apariencia",
+        "settings.enableAnimations": "Habilitar animaciones",
+        "settings.compactMode": "Modo compacto",
+        "settings.showTooltips": "Mostrar consejos",
+        "settings.language": "Idioma",
+        "settings.startupPage": "Página de inicio",
+        "settings.autoSave": "Guardar automáticamente",
+        "settings.confirmExit": "Confirmar antes de salir",
+        "settings.solidBg": "Fondo sólido",
+        "settings.resetAll": "Restablecer todo",
+        "settings.logout": "Cerrar Sesión",
+        "settings.saveChanges": "Guardar Cambios",
+        "settings.changeAvatar": "Cambiar Avatar",
+        "settings.changeBanner": "Cambiar Banner",
+        "settings.enable2FA": "Habilitar 2FA",
+        "settings.showHomeTab": "Mostrar pestaña Inicio",
+        "settings.readReceipts": "Enviar confirmaciones de lectura",
+        "settings.soundVolume": "Volumen de efectos",
+        "settings.musicVolume": "Volumen de música",
+        "settings.muteAll": "Silenciar todos los sonidos",
+        "settings.enableSound": "Habilitar efectos de sonido",
+        "settings.enableMusic": "Habilitar música de fondo",
+        "settings.soundProfile": "Perfil de sonido",
+        "settings.playEvents": "Reproducir en eventos",
+        "settings.playSend": "Mensaje enviado",
+        "settings.playReceive": "Mensaje recibido",
+        "settings.playUi": "Interacciones UI",
+        "settings.duckMusic": "Bajar música al reproducir efectos",
+        "settings.doNotDisturb": "No molestar",
+        "settings.dndDesc": "Silenciar todas las notificaciones.",
+        "settings.themePresets": "Preajustes de tema",
+        "settings.quickSettings": "Ajustes rápidos",
+        "settings.advancedThemeEditor": "Editor de temas avanzado",
+        "settings.openEditor": "Abrir editor",
+        "settings.resetAppearance": "Restablecer apariencia",
+        "settings.credits": "Créditos",
+        "settings.versionDetails": "Detalles de la versión",
+        "settings.resources": "Recursos",
+        "settings.license": "Licencia",
+        "settings.changePassword": "Cambiar contraseña",
+        "settings.deleteAccount": "Eliminar cuenta",
+        "settings.twoFactorAuth": "Autenticación de dos pasos (2FA)",
+        "settings.twoFactorDesc": "Añade una capa extra de protección.",
+        "settings.showEmail": "Mostrar correo en perfil"
+    },
+    vi: {
+        // Auth Common
+        "auth.welcomeBack": "Chào mừng trở lại!",
+        "auth.createAccount": "Tạo tài khoản mới!",
+        "auth.forgotPassword": "Quên mật khẩu",
+        "auth.signIn": "Đăng nhập",
+        "auth.signUp": "Đăng ký",
+        "auth.signingIn": "Đang đăng nhập...",
+        "auth.creatingAccount": "Đang tạo tài khoản...",
+        "auth.usernameOrEmail": "Tên người dùng hoặc Email",
+        "auth.password": "Mật khẩu",
+        "auth.confirmPassword": "Xác nhận mật khẩu",
+        "auth.username": "Tên người dùng",
+        "auth.email": "Email",
+        "auth.rememberMe": "Ghi nhớ tôi",
+        "auth.forgotPassLink": "Quên mật khẩu?",
+        "auth.noAccount": "Chưa có tài khoản?",
+        "auth.createOne": "Tạo mới",
+        "auth.haveAccount": "Đã có tài khoản?",
+        "auth.loginHere": "Đăng nhập",
+        "auth.orSignInWith": "hoặc đăng nhập bằng",
+        "auth.orSignUpWith": "hoặc đăng ký bằng",
+        "auth.privacyPolicy": "Chính sách bảo mật",
+        "auth.termsOfService": "Điều khoản dịch vụ",
+        "auth.backToLogin": "Quay lại",
+        "auth.sendResetLink": "Gửi liên kết",
+        "auth.resetInstructions": "Nhập email hoặc tên người dùng để đặt lại.",
+        "auth.step.account": "Tài khoản",
+        "auth.step.profile": "Hồ sơ",
+        "auth.step.personal": "Cá nhân",
+        "auth.step.review": "Xem lại",
+        "auth.next": "Tiếp theo",
+        "auth.back": "Quay lại",
+        "auth.usertag": "Thẻ người dùng (tùy chọn)",
+        "auth.phone": "Số điện thoại (tùy chọn)",
+        "auth.dob": "Ngày sinh",
+        "auth.gender": "Giới tính",
+        "auth.gender.male": "Nam",
+        "auth.gender.female": "Nữ",
+        "auth.gender.other": "Khác",
+        "auth.agreeTerms": "Tôi đồng ý với Điều khoản",
+        "auth.almostThere": "Sắp xong rồi!",
+        "auth.verifyEmail": "Xác minh Email",
+        "auth.verify": "Xác minh",
+        "auth.resendCode": "Gửi lại mã",
+        "auth.skip": "Bỏ qua",
+        "auth.enterCode": "Nhập mã 6 chữ số đã gửi đến email",
+
+        // Settings
+        "settings.title": "⚙️ Cài đặt",
+        "settings.general": "Chung",
+        "settings.sounds": "Âm thanh",
+        "settings.account": "Tài khoản",
+        "settings.about": "Giới thiệu",
+        "settings.appearance": "Giao diện",
+        "settings.enableAnimations": "Bật hiệu ứng",
+        "settings.compactMode": "Chế độ gọn",
+        "settings.showTooltips": "Hiển thị gợi ý",
+        "settings.language": "Ngôn ngữ",
+        "settings.startupPage": "Trang khởi động",
+        "settings.autoSave": "Tự động lưu",
+        "settings.confirmExit": "Xác nhận trước khi thoát",
+        "settings.solidBg": "Nền đồng màu",
+        "settings.resetAll": "Đặt lại tất cả",
+        "settings.logout": "Đăng xuất",
+        "settings.saveChanges": "Lưu thay đổi",
+        "settings.changeAvatar": "Đổi Avatar",
+        "settings.changeBanner": "Đổi Banner",
+        "settings.enable2FA": "Bật 2FA",
+        "settings.showHomeTab": "Hiển thị tab Trang chủ",
+        "settings.readReceipts": "Gửi xác nhận đã đọc",
+        "settings.soundVolume": "Âm lượng hiệu ứng",
+        "settings.musicVolume": "Âm lượng nhạc",
+        "settings.muteAll": "Tắt tất cả âm thanh",
+        "settings.enableSound": "Bật hiệu ứng âm thanh",
+        "settings.enableMusic": "Bật nhạc nền",
+        "settings.soundProfile": "Hồ sơ âm thanh",
+        "settings.playEvents": "Phát khi",
+        "settings.playSend": "Tin nhắn đã gửi",
+        "settings.playReceive": "Tin nhắn nhận được",
+        "settings.playUi": "Tương tác giao diện",
+        "settings.duckMusic": "Giảm nhạc khi có hiệu ứng",
+        "settings.doNotDisturb": "Không làm phiền",
+        "settings.dndDesc": "Tắt tất cả âm báo (tin nhắn, cuộc gọi).",
+        "settings.themePresets": "Bộ chủ đề",
+        "settings.quickSettings": "Cài đặt nhanh",
+        "settings.advancedThemeEditor": "Trình chỉnh sửa chủ đề nâng cao",
+        "settings.openEditor": "Mở trình chỉnh sửa",
+        "settings.resetAppearance": "Đặt lại giao diện",
+        "settings.credits": "Tín dụng",
+        "settings.versionDetails": "Chi tiết phiên bản",
+        "settings.resources": "Tài nguyên",
+        "settings.license": "Giấy phép",
+        "settings.changePassword": "Đổi mật khẩu",
+        "settings.deleteAccount": "Xóa tài khoản",
+        "settings.twoFactorAuth": "Xác thực hai yếu tố (2FA)",
+        "settings.twoFactorDesc": "Thêm một lớp bảo vệ.",
+        "settings.showEmail": "Hiển thị Email trên hồ sơ"
+    }
+};
+
+window.translations = translations;
+
+function applyLanguage(lang) {
+    if (!translations[lang]) lang = 'en';
+    localStorage.setItem('language', lang);
+    
+    // Update simple text elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang][key]) {
+            el.placeholder = translations[lang][key];
+        }
+    });
+
+    // Update Select Dropdowns if they exist (sync UI)
+    const langSelect = document.getElementById('settingsLanguage') || document.getElementById('pageLanguageSelect');
+     if (langSelect && langSelect.value !== lang) {
+        langSelect.value = lang;
+    }
+
+    // Dispatch event for specialized components (like JS alerts or dynamic renders)
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang, dict: translations[lang] } }));
+}
+
+function setLanguage(lang) {
+    applyLanguage(lang);
+}
+
+// Auto-init if DOM ready, otherwise wait
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => applyLanguage(localStorage.getItem('language') || 'en'));
+} else {
+    applyLanguage(localStorage.getItem('language') || 'en');
+}
+
+window.applyLanguage = applyLanguage;
+window.setLanguage = setLanguage;

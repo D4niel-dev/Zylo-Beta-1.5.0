@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#0b1020" />
   <script src="/files/vendor/tailwindcss.js"></script>
   <script src="/files/vendor/feather-icons.js"></script>
+  <script src="/files/js/translations.js"></script>
   <link rel="stylesheet" href="/files/style.css">
   <script>
     tailwind.config = {
@@ -40,18 +41,33 @@
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
     }
   </script>
 </head>
 
-<body class="min-h-screen flex flex-col justify-center items-center px-2 transition-colors duration-500">
+<body class="min-h-screen flex flex-col justify-center items-center px-2 transition-colors duration-500 animated-bg">
+
+  <!-- Language Picker & Theme -->
+  <div class="absolute top-4 right-4 z-50 flex gap-2">
+    <select id="pageLanguageSelect" onchange="window.setLanguage(this.value)" class="bg-white text-gray-800 dark:bg-gray-800 dark:text-white px-2 py-1 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700 text-sm border-none focus:ring-0 cursor-pointer">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="vi">Tiếng Việt</option>
+    </select>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+    <div id="toastContent" class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl border-l-4 border-green-500 flex items-center gap-3">
+        <i id="toastIcon" data-feather="check-circle" class="w-5 h-5 text-green-500"></i>
+        <span id="toastMessage" class="font-medium text-sm">Notification</span>
+    </div>
+  </div>
 
   <div class="w-full text-center mt-8 lg:mt-12 px-4">
-    <h2 class="zylo-heading text-2xl lg:text-3xl font-bold">
+    <h2 class="zylo-heading text-2xl lg:text-3xl font-bold" data-i18n="auth.createAccount">
       Create Your Account!
     </h2>
   </div>
@@ -59,491 +75,686 @@
   <!-- Sign Up Card -->
   <div class="scale-desktop flex items-center justify-center h-full">
     <div
-      class="bg-white/20 backdrop-blur-md dark:bg-gray-800/30 shadow-2xl rounded-xl w-full max-w-md px-6 pt-6 pb-2 space-y-3 animate-fadeIn border border-white/10">
+      class="w-full max-w-lg px-6 pt-6 pb-2 space-y-3 animate-fadeIn glass-card">
 
-      <!-- Avatar & Banner -->
-      <div class="relative -mb-12 z-10">
-
-        <!-- Banner Preview -->
-        <img id="bannerPreview" src="/images/default_banner.png"
-          class="w-full h-32 sm:h-40 object-cover rounded-lg cursor-pointer"
-          onclick="document.getElementById('bannerUpload').click()">
-
-        <input type="file" id="bannerUpload" accept="image/*" class="hidden"
-          onchange="previewImage(event, 'bannerPreview')">
-
-        <!-- Avatar Preview  -->
-        <div class="absolute left-1/2 bottom-[28px] transform -translate-x-1/2">
-          <label for="avatarUpload" class="cursor-pointer">
-            <img id="avatarPreview" src="/images/default_avatar.png"
-              class="w-20 h-20 sm:w-24 sm:h-24 rounded-full shadow-md ring-2 ring-green-400 dark:ring-green-500 object-cover bg-white dark:bg-gray-900 border-4 border-white dark:border-gray-800 animate-ringPulse" />
-          </label>
-          <input type="file" id="avatarUpload" accept="image/*" class="hidden"
-            onchange="previewImage(event, 'avatarPreview')">
+      <!-- Progress Bar (Steps) -->
+      <div class="flex items-start mb-6 px-2 w-full" aria-label="Sign up progress">
+        <div class="flex flex-col items-center step-indicator active" id="ind-1" aria-current="step">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-colors duration-300">1</div>
+          <span class="text-[10px] mt-1 text-gray-500 uppercase font-semibold" data-i18n="auth.step.account">Account</span>
+        </div>
+        <div class="h-1.5 flex-1 bg-gray-300 dark:bg-gray-600 mx-2 rounded-full overflow-hidden mt-[13px] min-w-[2rem]">
+          <div id="bar-1" class="h-full bg-green-500 w-0 transition-all duration-300"></div>
+        </div>
+        <div class="flex flex-col items-center step-indicator" id="ind-2">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-colors duration-300">2</div>
+          <span class="text-[10px] mt-1 text-gray-500 uppercase font-semibold" data-i18n="auth.step.profile">Profile</span>
+        </div>
+        <div class="h-1.5 flex-1 bg-gray-300 dark:bg-gray-600 mx-2 rounded-full overflow-hidden mt-[13px] min-w-[2rem]">
+          <div id="bar-2" class="h-full bg-green-500 w-0 transition-all duration-300"></div>
+        </div>
+        <div class="flex flex-col items-center step-indicator" id="ind-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-colors duration-300">3</div>
+          <span class="text-[10px] mt-1 text-gray-500 uppercase font-semibold" data-i18n="auth.step.personal">Personal</span>
+        </div>
+        <div class="h-1.5 flex-1 bg-gray-300 dark:bg-gray-600 mx-2 rounded-full overflow-hidden mt-[13px] min-w-[2rem]">
+          <div id="bar-3" class="h-full bg-green-500 w-0 transition-all duration-300"></div>
+        </div>
+        <div class="flex flex-col items-center step-indicator" id="ind-4">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold transition-colors duration-300">4</div>
+          <span class="text-[10px] mt-1 text-gray-500 uppercase font-semibold" data-i18n="auth.step.review">Review</span>
         </div>
       </div>
 
-      <!-- Inputs -->
-      <div class="pt-12 space-y-3">
+      <!-- Step 1: Account Creation -->
+      <div id="step-1" class="step-content space-y-3 animate-fadeIn">
+        <div class="w-full">
+            <input id="newUsername" type="text" placeholder="Username" data-i18n-placeholder="auth.username" aria-label="Username"
+              class="zylo-input w-full px-4 py-2 rounded-lg input-focus-effect">
+            <p id="usernameAvail" role="alert" class="text-xs mt-1 hidden"></p>
+        </div>
+        <div class="w-full">
+            <input id="newEmail" type="email" placeholder="Email" data-i18n-placeholder="auth.email" aria-label="Email"
+              class="zylo-input w-full px-4 py-2 rounded-lg input-focus-effect">
+            <p id="emailAvail" role="alert" class="text-xs mt-1 hidden"></p>
+        </div>
+        
+        <div class="relative">
+          <input id="newPassword" type="password" placeholder="Password" data-i18n-placeholder="auth.password" aria-label="Password"
+            class="zylo-input password-field w-full px-4 py-2 pr-10 rounded-lg input-focus-effect"/>
+          <span role="button" tabindex="0" aria-label="Toggle password visibility" class="absolute top-2.5 right-3 text-green-600 dark:text-green-400 cursor-pointer text-sm select-none toggle-eye-wrapper">
+            <i data-feather="eye" class="toggle-eye w-5 h-5"></i>
+          </span>
+          <div class="mt-1 text-xs" id="pwStrength" aria-live="polite"></div>
+        </div>
 
-        <div class="flex gap-3">
-          <div class="w-1/2">
-            <input id="newUsername" type="text" placeholder="Username"
-              class="zylo-input w-full px-4 py-2 rounded-lg">
-            <p id="usernameAvail" class="text-xs mt-1 hidden"></p>
+        <div class="relative">
+          <input id="confirmPassword" type="password" placeholder="Confirm Password" data-i18n-placeholder="auth.confirmPassword" aria-label="Confirm Password"
+            class="zylo-input password-field w-full px-4 py-2 pr-10 rounded-lg input-focus-effect" />
+          <span role="button" tabindex="0" aria-label="Toggle confirmation password visibility" class="absolute top-2.5 right-3 text-green-600 dark:text-green-400 cursor-pointer text-sm select-none toggle-eye-wrapper">
+            <i data-feather="eye" class="toggle-eye w-5 h-5"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Step 2: Profile Setup -->
+      <div id="step-2" class="step-content hidden space-y-4 animate-fadeIn">
+        <div class="relative -mb-4 z-10 text-center">
+            <!-- Banner Preview -->
+            <div role="button" tabindex="0" aria-label="Upload Banner" class="relative group cursor-pointer inline-block w-full" onclick="document.getElementById('bannerUpload').click()" onkeydown="if(event.key==='Enter') document.getElementById('bannerUpload').click()">
+                 <img id="bannerPreview" src="/images/default_banner.png" alt="Banner Preview"
+                  class="w-full h-32 object-cover rounded-lg border-2 border-dashed border-gray-400 dark:border-gray-600 group-hover:border-green-500 transition-colors">
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                     <span class="text-white font-medium text-sm" data-i18n="settings.changeBanner">Change Banner</span>
+                  </div>
+            </div>
+            
+            <input type="file" id="bannerUpload" accept="image/*" class="hidden"
+              onchange="previewImage(event, 'bannerPreview')" aria-label="Upload Banner File">
+    
+            <!-- Avatar Preview  -->
+            <div class="relative -mt-12 inline-block">
+              <label for="avatarUpload" role="button" tabindex="0" aria-label="Upload Avatar" class="cursor-pointer group relative block" onkeydown="if(event.key==='Enter') document.getElementById('avatarUpload').click()">
+                <img id="avatarPreview" src="/images/default_avatar.png" alt="Avatar Preview"
+                  class="w-24 h-24 rounded-full shadow-md ring-4 ring-white dark:ring-gray-800 object-cover bg-white dark:bg-gray-900 group-hover:brightness-75 transition-all" />
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                    <i data-feather="camera" class="text-white w-6 h-6"></i>
+                </div>
+              </label>
+              <input type="file" id="avatarUpload" accept="image/*" class="hidden"
+                onchange="previewImage(event, 'avatarPreview')" aria-label="Upload Avatar File">
+            </div>
+        </div>
+        
+        <input id="usertag" type="text" placeholder="Usertag (optional)" data-i18n-placeholder="auth.usertag" aria-label="Usertag (optional)"
+          class="zylo-input w-full px-4 py-2 rounded-lg input-focus-effect text-center">
+        <p class="text-xs text-gray-500 text-center">Leave empty for a random tag.</p>
+      </div>
+
+      <!-- Step 3: Personal Details -->
+       <div id="step-3" class="step-content hidden space-y-3 animate-fadeIn">
+          <input id="phone" type="text" placeholder="Phone Number (optional)" data-i18n-placeholder="auth.phone" aria-label="Phone Number (optional)"
+            class="zylo-input w-full px-4 py-2 rounded-lg input-focus-effect">
+          
+          <div class="flex gap-3">
+             <input id="dob" type="date" aria-label="Date of Birth"
+              class="zylo-input w-1/2 px-4 py-2 rounded-lg input-focus-effect">
+             <select id="gender" aria-label="Gender"
+              class="zylo-input w-1/2 px-4 py-2 rounded-lg input-focus-effect">
+              <option value="" data-i18n="auth.gender">Gender</option>
+              <option value="male" data-i18n="auth.gender.male">Male</option>
+              <option value="female" data-i18n="auth.gender.female">Female</option>
+              <option value="other" data-i18n="auth.gender.other">Other</option>
+             </select>
           </div>
-          <input id="usertag" type="text" placeholder="Usertag (optional)"
-            class="zylo-input w-1/2 px-4 py-2 rounded-lg">
-        </div>
-
-        <div class="flex gap-3 mt-3">
-          <input id="newEmail" type="email" placeholder="Email"
-            class="zylo-input w-1/2 px-4 py-2 rounded-lg">
-          <input id="phone" type="text" placeholder="Phone Number (optional)"
-            class="zylo-input w-1/2 px-4 py-2 rounded-lg">
-        </div>
-
-        <div class="flex gap-3 mt-3">
-          <input id="dob" type="date"
-            class="zylo-input w-1/2 px-4 py-2 rounded-lg">
-          <select id="gender"
-            class="zylo-input w-1/2 px-4 py-2 rounded-lg">
-            <option value="">Gender (optional)</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <div class="relative">
-          <input id="newPassword" type="password" placeholder="Password"
-            class="zylo-input password-field w-full px-4 py-2 pr-10 rounded-lg"/>
-          <span class="absolute top-2.5 right-3 text-green-600 dark:text-green-400 cursor-pointer text-sm select-none">
-            <i data-feather="eye" class="toggle-eye w-5 h-5"></i>
-          </span>
-          <div class="mt-1 text-xs" id="pwStrength"></div>
-        </div>
-
-        <div class="relative">
-          <input id="confirmPassword" type="password" placeholder="Confirm Password"
-            class="zylo-input password-field w-full px-4 py-2 pr-10 rounded-lg" />
-          <span class="absolute top-2.5 right-3 text-green-600 dark:text-green-400 cursor-pointer text-sm select-none">
-            <i data-feather="eye" class="toggle-eye w-5 h-5"></i>
-          </span>
-        </div>
+          <p class="text-xs text-gray-500 text-center">These details help us personalize your experience but are not required.</p>
       </div>
 
-      <div class="text-xs text-gray-600 dark:text-gray-400 flex items-center space-x-1">
-        <input type="checkbox" id="agreeTerms" class="accent-green-600">
-        <span>I agree to
-          <button type="button" onclick="openModal('pp')"
-            class="text-green-600 dark:text-green-400 hover:underline">Privacy Policy</button> &
-          <button type="button" onclick="openModal('tos')"
-            class="text-green-600 dark:text-green-400 hover:underline">Terms of Service</button>.
-        </span>
+      <!-- Step 4: Review & Terms -->
+       <div id="step-4" class="step-content hidden space-y-4 animate-fadeIn text-center">
+          <h3 class="text-lg font-semibold dark:text-white" data-i18n="auth.almostThere">Almost there!</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Please review the <button onclick="openModal('tos')" class="text-green-600 dark:text-green-400 underline" role="button" data-i18n="auth.termsOfService">Terms of Service</button> and <button onclick="openModal('pp')" class="text-green-600 dark:text-green-400 underline" role="button" data-i18n="auth.privacyPolicy">Privacy Policy</button> before creating your account.</p>
+                  <div class="flex items-center justify-center space-x-2 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+             <input type="checkbox" id="agreeTerms" class="accent-green-600 w-5 h-5" aria-label="I agree to the Terms of Service and Privacy Policy">
+             <span class="text-sm dark:text-gray-200" data-i18n="auth.agreeTerms">I agree to the Terms & Privacy Policy</span>
+          </div>
+         
+         <!-- Final Submit Button -->
+          <button id="signupBtn" onclick="register()" aria-label="Create Account"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed btn-hover-effect">
+            <svg id="signupSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+            <span id="signupBtnText" data-i18n="auth.createAccount">Create Account</span>
+          </button>
       </div>
 
-      <!-- Button -->
-      <button id="signupBtn" onclick="register()"
-        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
-        <svg id="signupSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
-        <span id="signupBtnText">Sign Up</span>
-      </button>
+      <!-- Navigation Buttons (Next / Back) -->
+      <div class="flex gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button id="prevBtn" onclick="changeStep(-1)" aria-label="Go to previous step" class="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium border border-gray-300 dark:border-gray-600 rounded-lg transition-colors hidden text-center" data-i18n="auth.back">Back</button>
+          <button id="nextBtn" onclick="changeStep(1)" aria-label="Go to next step" class="flex-1 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors btn-hover-effect text-center" data-i18n="auth.next">Next</button>
+      </div>
 
       <!-- Error Message -->
-      <p id="signup-error" class="text-red-600 dark:text-red-400 text-sm text-center hidden">Passwords do not match.</p>
+      <p id="signup-error" role="alert" class="text-red-600 dark:text-red-400 text-sm text-center hidden mt-2"></p>
 
-      <!-- Or Divider -->
-      <div class="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mt-2 mb-2">
-        <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
-        <span class="px-2">or sign up with</span>
-        <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
+      <!-- Social login (Only on step 1?) - let's keep it at bottom but only show on step 1 -->
+      <div id="social-login-container" class="mt-4">
+          <div class="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
+            <span class="px-2" data-i18n="auth.orSignUpWith">or sign up with</span>
+            <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
+          </div>
+           <div class="grid grid-cols-4 gap-2"> <!-- Compact social icons -->
+              <button onclick="socialLogin('Google')" aria-label="Sign up with Google" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/google-original.svg" alt="Google" class="w-5 h-5"></button>
+              <button onclick="socialLogin('GitHub')" aria-label="Sign up with GitHub" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/github-original.svg" alt="GitHub" class="w-5 h-5"></button>
+              <button onclick="socialLogin('Discord')" aria-label="Sign up with Discord" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/discordjs-original.svg" alt="Discord" class="w-5 h-5"></button>
+              <button onclick="socialLogin('Microsoft')" aria-label="Sign up with Microsoft" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/windows8-original.svg" alt="Microsoft" class="w-5 h-5"></button>
+           </div>
       </div>
 
-      <!-- Social Sign-Up Buttons -->
-      <div class="grid grid-cols-2 gap-3 mt-2 mb-2">
-        <button onclick="showComingSoon('Google')"
-          class="flex items-center justify-center gap-2 px-4 py-2 border rounded-lg border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200 text-sm font-medium">
-          <img src="/images/devicons/google-original.svg" class="w-5 h-5">
-          <span>Google</span>
-        </button>
-
-        <button onclick="showComingSoon('GitHub')"
-          class="flex items-center justify-center gap-2 px-4 py-2 border rounded-lg border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200 text-sm font-medium">
-          <img src="/images/devicons/github-original.svg" class="w-5 h-5">
-          <span>GitHub</span>
-        </button>
-
-        <button onclick="showComingSoon('Discord')"
-          class="flex items-center justify-center gap-2 px-4 py-2 border rounded-lg border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200 text-sm font-medium">
-          <img src="/images/devicons/discordjs-original.svg"
-            class="w-5 h-5">
-          <span>Discord</span>
-        </button>
-
-        <button onclick="showComingSoon('Microsoft')"
-          class="flex items-center justify-center gap-2 px-4 py-2 border rounded-lg border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200 text-sm font-medium">
-          <img src="/images/devicons/windows8-original.svg" class="w-5 h-5">
-          <span>Microsoft</span>
-        </button>
-      </div>
-
-      <!-- Extra -->
+      <!-- Login Link -->
       <div class="text-center text-sm mt-4 mb-2 space-y-1">
-        <span class="text-gray-600 dark:text-gray-400">Already have an account?</span>
-        <a href="login.html" class="text-green-600 hover:underline dark:text-green-400 ml-1">Login here</a>
+        <span class="text-gray-600 dark:text-gray-400" data-i18n="auth.haveAccount">Already have an account?</span>
+        <a href="login.html" class="text-green-600 hover:underline dark:text-green-400 ml-1" data-i18n="auth.loginHere">Login here</a>
       </div>
     </div>
   </div>
 
-  <div id="modal"
-    class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4">
-    <div class="bg-white dark:bg-gray-800 max-w-2xl w-full p-6 rounded-lg shadow-lg overflow-y-auto max-h-[80vh]">
+  <!-- Email Verification Modal -->
+  <div id="verificationModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4" role="dialog" aria-labelledby="verificationTitle" aria-modal="true">
+    <div class="bg-white dark:bg-gray-800 max-w-md w-full p-6 rounded-xl shadow-lg glass-card animate-fadeIn">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-3">
+          <i data-feather="mail" class="w-8 h-8 text-green-600 dark:text-green-400"></i>
+        </div>
+        <h3 id="verificationTitle" class="text-xl font-bold text-gray-800 dark:text-white">Verify Your Email</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Enter the 6-digit code sent to your email</p>
+        <p id="verificationCodeHint" class="text-xs text-green-600 dark:text-green-400 mt-1 font-mono"></p>
+      </div>
+      <input type="text" id="verificationCodeInput" maxlength="6" placeholder="000000" aria-label="Verification Code"
+        class="w-full text-center text-2xl font-mono tracking-widest py-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-green-500 focus:outline-none"/>
+      <p id="verificationError" role="alert" class="text-red-500 text-sm text-center mt-2 hidden"></p>
+      <button id="verifyCodeBtn" onclick="verifyEmailCode()" aria-label="Verify Email"
+        class="w-full mt-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition btn-hover-effect flex items-center justify-center gap-2">
+        <svg id="verifySpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+        <span id="verifyBtnText">Verify Email</span>
+      </button>
+      <button onclick="resendVerificationCode()" class="w-full mt-2 py-2 text-green-600 dark:text-green-400 hover:underline text-sm">
+        Resend Code
+      </button>
+      <button onclick="skipVerification()" class="w-full mt-1 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs">
+        Skip for now
+      </button>
+    </div>
+  </div>
+
+  <!-- Keep Modals -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
+     <div class="bg-white dark:bg-gray-800 max-w-2xl w-full p-6 rounded-lg shadow-lg overflow-y-auto max-h-[80vh]">
       <h3 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Document</h3>
       <pre id="modalContent" class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap overflow-auto"></pre>
       <div class="flex justify-end mt-4">
-        <button onclick="closeModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          <i data-feather="x" class="w-5 h-5"></i>
-        </button>
+        <button onclick="closeModal()" aria-label="Close Modal" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
     </div>
   </div>
 
   <!-- Coming Soon Modal -->
-  <div id="comingSoonModal"
-    class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4">
+  <div id="comingSoonModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4" aria-modal="true" role="dialog" aria-labelledby="comingSoonTitle">
     <div class="bg-white dark:bg-gray-800 max-w-sm w-full p-6 rounded-lg shadow-xl animate-fadeIn">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">🚧 Coming Soon</h3>
-      <p id="comingSoonText" class="text-gray-700 dark:text-gray-300 text-sm">
-        This feature will be added in the full-release of the app!
-      </p>
+      <h3 id="comingSoonTitle" class="text-lg font-semibold text-gray-900 dark:text-white mb-2">🚧 Coming Soon</h3>
+      <p id="comingSoonText" class="text-gray-700 dark:text-gray-300 text-sm">This feature will be added in the full-release of the app!</p>
       <div class="mt-4 flex justify-end">
-        <button onclick="closeComingSoon()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          <i data-feather="alert-triangle" class="w-5 h-5"></i> Coming Soon...
-        </button>
+        <button onclick="closeComingSoon()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Close</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Password visibility toggle (fixes broken selector and icon update)
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.toggle-eye').forEach(icon => {
-        const clickTarget = icon.parentElement && icon.parentElement.tagName === 'SPAN'
-          ? icon.parentElement
-          : icon;
-
-        clickTarget.addEventListener('click', (e) => {
-          e.preventDefault();
-          const container = icon.closest('.relative') || icon.parentElement;
-          const input = container ? container.querySelector('input.password-field') : null;
-          if (!input) return;
-
-          const willShow = input.type !== 'text';
-          input.type = willShow ? 'text' : 'password';
-          icon.setAttribute('data-feather', willShow ? 'eye-off' : 'eye');
-          if (window.feather) window.feather.replace();
-        });
-      });
-    });
-
-    function previewImage(event, targetId) {
-      const reader = new FileReader();
-      reader.onload = () => document.getElementById(targetId).src = reader.result;
-      reader.readAsDataURL(event.target.files[0]);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-      }
-    });
-
-    async function register() {
-      const username = document.getElementById("newUsername").value.trim();
-      const email = document.getElementById("newEmail").value.trim();
-      const password = document.getElementById("newPassword").value.trim();
-      const confirm = document.getElementById("confirmPassword").value.trim();
-      let usertag = document.getElementById("usertag").value.trim();
-      const dob = document.getElementById("dob").value;
-      const gender = document.getElementById("gender").value;
-      const phone = document.getElementById("phone").value;
-      const agree = document.getElementById("agreeTerms").checked;
-      const error = document.getElementById("signup-error");
-      const signupBtn = document.getElementById('signupBtn');
-      const signupSpinner = document.getElementById('signupSpinner');
-      const signupBtnText = document.getElementById('signupBtnText');
-
-      if (password !== confirm) {
-        error.textContent = "Passwords do not match.";
-        error.classList.remove("hidden");
-        return;
-      }
-
-      if (!agree) {
-        error.textContent = "You must agree to the Privacy Policy and Terms of Service.";
-        error.classList.remove("hidden");
-        return;
-      }
-
-      if (!usertag) {
-        usertag = `${username.toLowerCase()}${Math.floor(1000 + Math.random() * 9000)}`;
-      }
-
-      // Disable UI while registering
-      signupBtn.disabled = true;
-      signupSpinner.classList.remove('hidden');
-      signupBtnText.textContent = 'Creating account…';
-
-      const avatar = await encodeImageToBase64("avatarUpload");
-      const banner = await encodeImageToBase64("bannerUpload");
-
-      const response = await fetch(`${window.location.origin}/api/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username, email, password, usertag, dob, gender, phone, avatar, banner
-        }),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Account created successfully!");
-        localStorage.setItem("username", username);
-        localStorage.setItem("usertag", usertag);
-        try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
-        goToPage("login.html");
-      } else {
-        error.textContent = result.error || "Signup failed.";
-        error.classList.remove("hidden");
-        try { new Audio('/files/audio/error.mp3').play().catch(()=>{}); } catch {}
-        signupBtn.disabled = false;
-        signupSpinner.classList.add('hidden');
-        signupBtnText.textContent = 'Sign Up';
-      }
-    }
-
-    function goToPage(href) { 
-      document.body.classList.add("fade-out"); 
-      setTimeout(() => { 
-        window.location.href = href; 
-      }, 1000); 
-    }
-
-    // Fade-out transition on link clicks
-    document.querySelectorAll("a").forEach(link => {
-      if (link.hostname === window.location.hostname) {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          const href = this.getAttribute("href");
-          document.body.classList.add("fade-out");
-          setTimeout(() => {
-            goToPage(href);
-          }, 1000);
-        });
-      }
-    });
-
-    async function encodeImageToBase64(inputId) {
-      const fileInput = document.getElementById(inputId);
-      if (fileInput.files.length === 0) return null;
-
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(fileInput.files[0]);
-      });
-    }
-
-    function showComingSoon(provider) {
-      const text = `${provider} sign-up will be added in the next update!`;
-      document.getElementById("comingSoonText").textContent = text;
-      document.getElementById("comingSoonModal").classList.remove("hidden");
-      document.body.classList.add("overflow-hidden");
-    }
-
-    function closeComingSoon() {
-      document.getElementById("comingSoonModal").classList.add("hidden");
-      document.body.classList.remove("overflow-hidden");
-    }
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        register();
-      }
-    });
-
-    const zyloPP = `Last Updated: 4:10 PM 7/31/2025
-
-This Privacy Policy explains how Zylo ("we", "us", or "our") collects, uses, and protects your information. By using Zylo, you agree to the collection and use of information in accordance with this policy.
-
-1. Information We Collect
-
-- Account Information : When you create an account, we may collect your name, email address, and login credentials.
-- Usage Data : We may collect information about how you access and use Zylo, including pages visited, features used, and device information.
-- Cookies : We may use cookies to enhance your experience, track usage, and remember your preferences.
-
-2. How We Use Your Information
-
-- To provide, maintain, and improve Zylo.
-- To personalize your experience.
-- To communicate with you, including support and notifications.
-- To enforce our terms and policies and ensure security.
-
-3. Sharing of Information
-
-- We do not sell your personal information.
-- We may share information with third-party services that help us operate Zylo (e.g., analytics, hosting).
-- We may disclose your information to comply with legal obligations or protect our rights.
-
-4. Data Retention
-
-We retain your information as long as necessary to provide services and fulfill our legal obligations.
-
-5. Your Rights and Choices
-
-- You can update or delete your information by contacting support.
-- You can opt out of certain communications.
-- You can disable cookies in your browser settings.
-
-6. Security
-
-We use reasonable measures to protect your data, but no method of transmission is 100% secure.
-
-7. Children's Privacy
-
-Zylo is not intended for use by children under 13. We do not knowingly collect personal information from children.
-
-8. Changes to This Policy
-
-We may update this Privacy Policy from time to time. Changes will be posted on this page.
-
-9. Contact Us
-
-If you have questions or concerns, contact us at zylosupp0rt@gmail.com.
-`;
-
-    const zyloTOS = `Last Updated: 4:07 PM 7/31/2025
-
-Welcome to Zylo! These Terms of Service ("Terms") govern your access to and use of our services, software, and website located at [https://github.com/D4niel-dev].
-
-By accessing or using Zylo, you agree to be bound by these Terms. If you do not agree with any part of the Terms, you must not access or use our Service.
-
-1. Acceptance of Terms
-
-By accessing or using Zylo, you affirm that you are at least 13 years old and that you agree to these Terms.
-
-2. Use of the Service
-
-- You agree to use Zylo only for lawful purposes and in accordance with these Terms.
-- You are responsible for maintaining the confidentiality of your account and password.
-
-3. User Conduct
-
-You agree not to:
-- Violate any applicable laws or regulations.
-- Interfere with or disrupt the Service.
-- Use Zylo to transmit harmful or illegal content.
-
-4. Intellectual Property
-
-All content and materials on Zylo, including trademarks and software, are the property of Zylo or its licensors and are protected by copyright and intellectual property laws.
-
-5. Termination
-
-We may suspend or terminate your access to Zylo if you violate these Terms or for any reason at our discretion.
-
-6. Disclaimers
-
-Zylo is provided "as is" and "as available." We do not guarantee that the Service will be error-free or uninterrupted.
-
-7. Limitation of Liability
-
-To the fullest extent permitted by law, Zylo shall not be liable for any indirect, incidental, or consequential damages resulting from your use of the Service.
-
-8. Changes to the Terms
-
-We reserve the right to modify these Terms at any time. Changes will be posted on this page, and your continued use of Zylo signifies acceptance.
-
-9. Contact Us
-
-If you have any questions about these Terms, contact us at zylosupp0rt@gmail.com.
-`;
-
-
-    function openModal(type) {
-      const title = type === 'pp' ? "Privacy Policy" : "Terms of Service";
-      const content = type === 'pp' ? zyloPP : zyloTOS;
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalContent").textContent = content;
-      document.getElementById("modal").classList.remove("hidden");
-      document.body.classList.add("overflow-hidden");
-    }
-
-    function closeModal() {
-      document.getElementById("modal").classList.add("hidden");
-      document.body.classList.remove("overflow-hidden");
-    }
-  </script>
-
-  <div id="modalOverlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
-  <div id="modalBox"
-    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-2xl max-h-[90vh] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-lg overflow-y-auto hidden">
-    <div class="p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
-      <h3 id="modalTitle" class="text-lg font-semibold">Title</h3>
-      <button onclick="closeModal()" class="text-red-500 hover:text-red-600">✖</button>
-    </div>
-    <div id="modalContent" class="p-4 space-y-2 text-sm whitespace-pre-line overflow-y-auto max-h-[70vh]"></div>
-  </div>
-  <script>
-    feather.replace();
-  </script>
-  <script>
-    // Username availability + password strength
-    const newUsername = document.getElementById('newUsername');
-    const usernameAvail = document.getElementById('usernameAvail');
-    const newPassword = document.getElementById('newPassword');
-    const pwStrength = document.getElementById('pwStrength');
-
-    let checkTimer;
-    newUsername?.addEventListener('input', () => {
-      usernameAvail.classList.add('hidden');
-      clearTimeout(checkTimer);
-      const value = (newUsername.value || '').trim();
-      if (!value) return;
-      checkTimer = setTimeout(async () => {
-        try {
-          const res = await fetch(`/api/check-user?identifier=${encodeURIComponent(value)}`);
-          const data = await res.json();
-          if (data.exists) {
-            usernameAvail.textContent = 'Username already taken';
-            usernameAvail.className = 'text-xs mt-1 text-red-600';
-          } else {
-            usernameAvail.textContent = 'Username available';
-            usernameAvail.className = 'text-xs mt-1 text-green-600';
+      let currentStep = 1;
+
+      // Update UI on load
+      // Update UI on load
+      updateStepUI();
+      if(window.applyLanguage) window.applyLanguage(localStorage.getItem('language') || 'en');
+
+      function changeStep(n) {
+          const nextStep = currentStep + n;
+          // Step validation
+          if (n > 0) {
+              if (currentStep === 1 && !validateStep1()) return;
           }
-          usernameAvail.classList.remove('hidden');
-        } catch {}
-      }, 350);
-    });
+          currentStep = nextStep;
+          updateStepUI();
+      }
 
-    function calcStrength(pw){
-      let score = 0;
-      if (pw.length >= 8) score++;
-      if (/[A-Z]/.test(pw)) score++;
-      if (/[a-z]/.test(pw)) score++;
-      if (/\d/.test(pw)) score++;
-      if (/[^\w\s]/.test(pw)) score++;
-      return score;
-    }
-    newPassword?.addEventListener('input', () => {
-      const pw = newPassword.value || '';
-      const s = calcStrength(pw);
-      const labels = ['Very weak','Weak','Okay','Good','Strong'];
-      pwStrength.textContent = pw ? `Strength: ${labels[Math.max(0, s-1)]}` : '';
-      pwStrength.className = 'mt-1 text-xs ' + (s >= 4 ? 'text-green-600' : s >=2 ? 'text-yellow-600' : 'text-red-600');
-    });
+      function updateStepUI() {
+          // Hide all steps
+          document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+          // Show current step
+          document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+
+          // Update Progress Bar
+          for (let i = 1; i < 4; i++) {
+             const bar = document.getElementById(`bar-${i}`);
+             if (currentStep > i) {
+                 bar.classList.remove('w-0');
+                 bar.classList.add('w-full');
+             } else {
+                 bar.classList.remove('w-full');
+                 bar.classList.add('w-0');
+             }
+          }
+
+          // Update Indicators
+          for (let i = 1; i <= 4; i++) {
+              const indicatorWrapper = document.getElementById(`ind-${i}`);
+              const ind = indicatorWrapper.firstElementChild; // The circle div
+              
+              if (i === currentStep) {
+                  indicatorWrapper.classList.add('active');
+                  indicatorWrapper.setAttribute('aria-current', 'step');
+              } else {
+                  indicatorWrapper.classList.remove('active');
+                  indicatorWrapper.removeAttribute('aria-current');
+              }
+
+              if (i <= currentStep) {
+                  ind.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                  ind.classList.add('bg-green-600', 'text-white');
+              } else {
+                  ind.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                  ind.classList.remove('bg-green-600', 'text-white');
+              }
+          }
+
+          // Buttons visibility
+          const prevBtn = document.getElementById('prevBtn');
+          const nextBtn = document.getElementById('nextBtn');
+          const socialLogin = document.getElementById('social-login-container');
+
+          if (currentStep === 1) {
+              prevBtn.classList.add('hidden');
+              socialLogin.classList.remove('hidden');
+          } else {
+              prevBtn.classList.remove('hidden');
+              socialLogin.classList.add('hidden');
+          }
+
+          if (currentStep === 4) {
+              nextBtn.classList.add('hidden');
+          } else {
+              nextBtn.classList.remove('hidden');
+          }
+      }
+
+      function validateStep1() {
+          const username = document.getElementById('newUsername').value.trim();
+          const email = document.getElementById('newEmail').value.trim();
+          const pw = document.getElementById('newPassword').value;
+          const cpw = document.getElementById('confirmPassword').value;
+
+          if (!username || !email || !pw || !cpw) {
+              showError("Please fill in all required fields.");
+              return false;
+          }
+          if (pw !== cpw) {
+              showError("Passwords do not match.");
+              return false;
+          }
+          if (!email.includes('@')) {
+               showError("Please enter a valid email.");
+               return false;
+          }
+          const availText = document.getElementById('usernameAvail').textContent;
+          if (availText.includes('taken')) {
+              showError("Username is already taken.");
+              return false;
+          }
+          return true;
+      }
+
+      function showError(msg) {
+          const err = document.getElementById("signup-error");
+          err.textContent = msg;
+          err.classList.remove("hidden");
+      }
+
+      function showToast(msg, type='success') {
+        const toast = document.getElementById('toast');
+        const content = document.getElementById('toastContent');
+        const msgEl = document.getElementById('toastMessage');
+        const iconEl = document.getElementById('toastIcon');
+
+        msgEl.textContent = msg;
+        if(type === 'error'){
+            content.classList.remove('border-green-500');
+            content.classList.add('border-red-500');
+            iconEl.setAttribute('data-feather', 'alert-circle');
+            iconEl.classList.remove('text-green-500');
+            iconEl.classList.add('text-red-500');
+        } else {
+            content.classList.remove('border-red-500');
+            content.classList.add('border-green-500');
+            iconEl.setAttribute('data-feather', 'check-circle');
+            iconEl.classList.remove('text-red-500');
+            iconEl.classList.add('text-green-500');
+        }
+        feather.replace();
+
+        toast.classList.remove('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+        }, 3000);
+      }
+
+      // Password visibility toggle
+      document.addEventListener('click', (e) => {
+          if (e.target.closest('.toggle-eye-wrapper')) {
+              e.preventDefault();
+              const container = e.target.closest('.relative');
+              const input = container ? container.querySelector('input.password-field') : null;
+              const icon = container ? container.querySelector('.toggle-eye') : null;
+              if (!input || !icon) return;
+              const willShow = input.type !== 'text';
+              input.type = willShow ? 'text' : 'password';
+              icon.setAttribute('data-feather', willShow ? 'eye-off' : 'eye');
+              feather.replace();
+          }
+      });
+      document.addEventListener('keydown', (e) => {
+           if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('toggle-eye-wrapper')) {
+                e.preventDefault();
+                e.target.click();
+           }
+      });
+      
+      feather.replace();
+
+      // Theme logic for body
+      if (localStorage.getItem('theme') === 'dark') {
+          document.body.classList.add('dark');
+      }
+
+      // Username availability + password strength
+      const newUsername = document.getElementById('newUsername');
+      const usernameAvail = document.getElementById('usernameAvail');
+      const newEmail = document.getElementById('newEmail');
+      const emailAvail = document.getElementById('emailAvail');
+      const newPassword = document.getElementById('newPassword');
+      const pwStrength = document.getElementById('pwStrength');
+
+      let checkTimer;
+      let emailCheckTimer;
+
+      newUsername?.addEventListener('input', () => {
+        usernameAvail.classList.add('hidden');
+        clearTimeout(checkTimer);
+        const value = (newUsername.value || '').trim();
+        if (!value) return;
+        checkTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/check-user?identifier=${encodeURIComponent(value)}`);
+            const data = await res.json();
+            if (data.exists) {
+              usernameAvail.textContent = 'Username already taken';
+              usernameAvail.className = 'text-xs mt-1 text-red-600';
+            } else {
+              usernameAvail.textContent = 'Username available';
+              usernameAvail.className = 'text-xs mt-1 text-green-600';
+            }
+            usernameAvail.classList.remove('hidden');
+          } catch {}
+        }, 350);
+      });
+
+      newEmail?.addEventListener('input', () => {
+        emailAvail.classList.add('hidden');
+        clearTimeout(emailCheckTimer);
+        const value = (newEmail.value || '').trim();
+        if (!value || !value.includes('@')) return;
+        
+        emailCheckTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/check-user?identifier=${encodeURIComponent(value)}`);
+            const data = await res.json();
+            if (data.exists) {
+              emailAvail.textContent = 'Email already registered';
+              emailAvail.className = 'text-xs mt-1 text-red-600';
+            } else {
+              emailAvail.textContent = 'Email available';
+              emailAvail.className = 'text-xs mt-1 text-green-600';
+            }
+            emailAvail.classList.remove('hidden');
+          } catch {}
+        }, 350);
+      });
+
+      function calcStrength(pw){
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[a-z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^\w\s]/.test(pw)) score++;
+        return score;
+      }
+      newPassword?.addEventListener('input', () => {
+        const pw = newPassword.value || '';
+        const s = calcStrength(pw);
+        const labels = ['Very weak','Weak','Okay','Good','Strong'];
+        pwStrength.textContent = pw ? `Strength: ${labels[Math.max(0, s-1)]}` : '';
+        pwStrength.className = 'mt-1 text-xs ' + (s >= 4 ? 'text-green-600' : s >=2 ? 'text-yellow-600' : 'text-red-600');
+      });
+
+      function previewImage(event, targetId) {
+        const reader = new FileReader();
+        reader.onload = () => document.getElementById(targetId).src = reader.result;
+        reader.readAsDataURL(event.target.files[0]);
+      }
+
+      async function encodeImageToBase64(inputId) {
+        const fileInput = document.getElementById(inputId);
+        if (fileInput.files.length === 0) return null;
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(fileInput.files[0]);
+        });
+      }
+
+      function goToPage(href) { 
+        document.body.classList.add("fade-out"); 
+        setTimeout(() => { window.location.href = href; }, 1000); 
+      }
+
+      document.querySelectorAll("a").forEach(link => {
+        if (link.hostname === window.location.hostname && link.getAttribute('href') !== '#') {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const href = this.getAttribute("href");
+            document.body.classList.add("fade-out");
+            setTimeout(() => { goToPage(href); }, 1000);
+          });
+        }
+      });
+
+      function showComingSoon(provider) {
+        const text = `${provider} sign-up will be added in the next update!`;
+        document.getElementById("comingSoonText").textContent = text;
+        document.getElementById("comingSoonModal").classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      }
+      function closeComingSoon() {
+        document.getElementById("comingSoonModal").classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      async function socialLogin(provider) {
+        const error = document.getElementById("signup-error");
+        error.classList.add("hidden");
+        try { new Audio('/files/audio/click.mp3').play().catch(()=>{}); } catch {}
+        document.body.classList.add("cursor-wait");
+
+        try {
+            const res = await fetch('/api/auth/social', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider })
+            });
+            const data = await res.json();
+            if (data.success) {
+                localStorage.setItem("username", data.username);
+                localStorage.setItem("usertag", data.usertag);
+                try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
+                goToPage("index.html");
+            } else {
+                error.textContent = data.error || "Login failed";
+                error.classList.remove("hidden");
+                document.body.classList.remove("cursor-wait");
+            }
+        } catch (e) {
+            error.textContent = "Network error. Try again.";
+            error.classList.remove("hidden");
+            document.body.classList.remove("cursor-wait");
+        }
+      }
+
+      async function register() {
+            const username = document.getElementById("newUsername").value.trim();
+            const email = document.getElementById("newEmail").value.trim();
+            const password = document.getElementById("newPassword").value.trim();
+            const confirm = document.getElementById("confirmPassword").value.trim();
+            let usertag = document.getElementById("usertag").value.trim();
+            const dob = document.getElementById("dob").value;
+            const gender = document.getElementById("gender").value;
+            const phone = document.getElementById("phone").value;
+            const agree = document.getElementById("agreeTerms").checked;
+            const error = document.getElementById("signup-error");
+            const signupBtn = document.getElementById('signupBtn');
+            const signupSpinner = document.getElementById('signupSpinner');
+            const signupBtnText = document.getElementById('signupBtnText');
+
+            if (password !== confirm) {
+                error.textContent = "Passwords do not match.";
+                error.classList.remove("hidden");
+                return;
+            }
+            if (!agree) {
+                error.textContent = "You must agree to the Privacy Policy and Terms of Service.";
+                error.classList.remove("hidden");
+                return;
+            }
+            if (!usertag) {
+                usertag = `${username.toLowerCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+            }
+
+            signupBtn.disabled = true;
+            signupSpinner.classList.remove('hidden');
+            signupBtnText.textContent = 'Creating account…';
+
+            const avatar = await encodeImageToBase64("avatarUpload");
+            const banner = await encodeImageToBase64("bannerUpload");
+
+            const response = await fetch(`${window.location.origin}/api/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                username, email, password, usertag, dob, gender, phone, avatar, banner
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                localStorage.setItem("username", username);
+                localStorage.setItem("usertag", usertag);
+                localStorage.setItem("pendingVerification", "true");
+                
+                document.getElementById("verificationCodeHint").textContent = 
+                    `(Simulated: Your code is ${result.verification_code})`;
+                document.getElementById("verificationModal").classList.remove("hidden");
+                document.getElementById("verificationCodeInput").focus();
+                
+                try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
+                feather.replace();
+                
+                signupBtn.disabled = false;
+                signupSpinner.classList.add('hidden');
+                signupBtnText.textContent = 'Create Account';
+            } else {
+                error.textContent = result.error || "Signup failed.";
+                error.classList.remove("hidden");
+                try { new Audio('/files/audio/error.mp3').play().catch(()=>{}); } catch {}
+                signupBtn.disabled = false;
+                signupSpinner.classList.add('hidden');
+                signupBtnText.textContent = 'Sign Up';
+            }
+        }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          if (currentStep === 4) register();
+          else if (currentStep < 4) changeStep(1);
+        }
+      });
+      
+      setInterval(() => { if (window.feather) feather.replace(); }, 2000);
+
+      // Email verification functions
+      async function verifyEmailCode() {
+        const code = document.getElementById("verificationCodeInput").value.trim();
+        const username = localStorage.getItem("username");
+        const errorEl = document.getElementById("verificationError");
+        const btn = document.getElementById("verifyCodeBtn");
+        const spinner = document.getElementById("verifySpinner");
+        const btnText = document.getElementById("verifyBtnText");
+        
+        if (!code || code.length !== 6) {
+          errorEl.textContent = "Please enter a 6-digit code.";
+          errorEl.classList.remove("hidden");
+          return;
+        }
+        
+        btn.disabled = true;
+        spinner.classList.remove("hidden");
+        btnText.textContent = "Verifying...";
+        errorEl.classList.add("hidden");
+        
+        try {
+          const res = await fetch("/api/auth/verify-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, code })
+          });
+          const data = await res.json();
+          
+          if (data.success) {
+            localStorage.removeItem("pendingVerification");
+            try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
+            showToast("Email verified! Redirecting...", "success");
+            setTimeout(() => { goToPage("login.html"); }, 1500);
+          } else {
+            errorEl.textContent = data.error || "Invalid code.";
+            errorEl.classList.remove("hidden");
+            try { new Audio('/files/audio/error.mp3').play().catch(()=>{}); } catch {}
+          }
+        } catch (e) {
+          errorEl.textContent = "Network error.";
+          errorEl.classList.remove("hidden");
+        }
+        
+        btn.disabled = false;
+        spinner.classList.add("hidden");
+        btnText.textContent = "Verify Email";
+      }
+      
+      async function resendVerificationCode() {
+        const username = localStorage.getItem("username");
+        
+        try {
+          const res = await fetch("/api/auth/resend-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username })
+          });
+          const data = await res.json();
+          
+          if (data.success) {
+            document.getElementById("verificationCodeHint").textContent = 
+              `(Simulated: Your new code is ${data.verification_code})`;
+            showToast("Verification code resent!", "success");
+          } else {
+            showToast(data.error || "Failed to resend code.", "error");
+          }
+        } catch (e) {
+          showToast("Network error.", "error");
+        }
+      }
+      
+      function skipVerification() {
+        document.getElementById("verificationModal").classList.add("hidden");
+        localStorage.removeItem("pendingVerification");
+        goToPage("login.html");
+      }
   </script>
   <script src="/files/sw-register.js"></script>
 </body>

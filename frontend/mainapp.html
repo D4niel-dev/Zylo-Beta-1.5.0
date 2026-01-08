@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
@@ -13,9 +12,9 @@
   <link rel="stylesheet" href="/files/style.css">
   <script src="/files/vendor/feather-icons.js"></script>
   <link href="/files/vendor/cropper.min.css" rel="stylesheet" />
-  <link href="/files/vendor/cropper.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/files/vendor/emoji-mart.css" />
   <script src="/files/vendor/emoji-mart.js"></script>
+  <script src="/files/js/translations.js"></script>
   <!-- Highlight.js for code syntax highlighting -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
@@ -73,7 +72,7 @@
     class="flex flex-shrink-0 w-[4.5rem] md:w-20 h-full flex-col items-center py-3 space-y-3 overflow-y-auto scrollbar-hide z-50 bg-discord-gray-900 transition-transform duration-300 fixed md:static inset-y-0 left-0 -translate-x-full md:translate-x-0 border-r border-discord-gray-900 shadow-xl md:shadow-none">
 
     <a id="homeTab" href="#" data-tab="home" onclick="navigateTo('home');" class="sidebar-tab active group"
-      title="Home">
+      title="Home" aria-label="Home Tab" aria-current="page">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="home" class="w-6 h-6"></i>
@@ -88,12 +87,12 @@
     </div>
 
     <!-- Add Group Button -->
-    <button id="addGroupBtn" onclick="showGroupsModal()" class="add-group-btn" title="Add a Group">
+    <button id="addGroupBtn" onclick="showGroupsModal()" class="add-group-btn" title="Add a Group" aria-label="Add a Group">
       <i data-feather="plus" class="w-6 h-6"></i>
     </button>
 
     <a id="messagesTab" href="#" data-tab="messages" onclick="navigateTo('messages');" class="sidebar-tab group"
-      title="Messages">
+      title="Messages" aria-label="Messages Tab">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="message-circle" class="w-6 h-6"></i>
@@ -101,14 +100,14 @@
     </a>
 
 
-    <a href="#" data-tab="moments" onclick="navigateTo('moments');" class="sidebar-tab group" title="Moments">
+    <a href="#" data-tab="moments" onclick="navigateTo('moments');" class="sidebar-tab group" title="Moments" aria-label="Moments Tab">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="book-open" class="w-6 h-6"></i>
       </div>
     </a>
 
-    <a href="#" data-tab="cloud" onclick="navigateTo('cloud');" class="sidebar-tab group" title="My Cloud">
+    <a href="#" data-tab="cloud" onclick="navigateTo('cloud');" class="sidebar-tab group" title="My Cloud" aria-label="My Cloud Tab">
       <div class="sidebar-pill"></div>
       <div class="sidebar-icon">
         <i data-feather="cloud" class="w-6 h-6"></i>
@@ -127,7 +126,7 @@
         <!-- Desktop collapse toggle -->
         <button id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()"
           class="hidden md:flex text-discord-gray-400 hover:text-white p-1 rounded hover:bg-discord-gray-700 transition"
-          title="Toggle sidebar">
+          title="Toggle sidebar" aria-label="Toggle Sidebar">
           <i data-feather="chevron-left" class="w-4 h-4"></i>
         </button>
         <!-- Mobile close button -->
@@ -159,10 +158,14 @@
         <!-- Group Info -->
         <div
           class="p-3 border-b border-discord-gray-900 group cursor-pointer hover:bg-discord-gray-600/30 transition-colors duration-200"
-          onclick="openGroupSettings()">
+          onclick="openGroupSettings()"
+          role="button"
+          tabindex="0"
+          aria-label="Group Settings"
+          onkeydown="if(event.key==='Enter' || event.key===' ') openGroupSettings()">
           <div class="flex justify-between items-start">
             <h2 id="groupPanelName" class="text-white font-bold text-lg truncate flex-1">Group Name</h2>
-            <button id="groupMuteBtn" class="text-discord-gray-400 hover:text-white p-1" title="Mute Server"
+            <button id="groupMuteBtn" class="text-discord-gray-400 hover:text-white p-1" title="Mute Server" aria-label="Mute Server"
               onclick="event.stopPropagation(); toggleGroupMute()">
               <i data-feather="bell" class="w-4 h-4"></i>
             </button>
@@ -275,26 +278,26 @@
 
 
       <div id="sub-panel-settings" class="sub-panel-content hidden">
-        <h3 class="sub-panel-header">User Settings</h3>
+        <h3 class="sub-panel-header" data-i18n="settings.title">User Settings</h3>
         <button type="button" id="tabBtnGeneral" class="settings-tab sub-panel-item w-full text-left"
           data-target="generalSettings">
-          <i data-feather="settings" class="w-5 h-5 mr-2"></i> <span>General</span>
+          <i data-feather="settings" class="w-5 h-5 mr-2"></i> <span data-i18n="settings.general">General</span>
         </button>
         <button type="button" id="tabBtnAppearance" class="settings-tab sub-panel-item w-full text-left"
           data-target="appearanceSettings">
-          <i data-feather="layout" class="w-5 h-5 mr-2"></i> <span>Appearance</span>
+          <i data-feather="layout" class="w-5 h-5 mr-2"></i> <span data-i18n="settings.appearance">Appearance</span>
         </button>
         <button type="button" id="tabBtnSounds" class="settings-tab sub-panel-item w-full text-left"
           data-target="soundSettings">
-          <i data-feather="bell" class="w-5 h-5 mr-2"></i> <span>Sounds & Notif.</span>
+          <i data-feather="bell" class="w-5 h-5 mr-2"></i> <span data-i18n="settings.sounds">Sounds & Notif.</span>
         </button>
         <button type="button" id="tabBtnAccount" class="settings-tab sub-panel-item w-full text-left"
           data-target="accountSettings">
-          <i data-feather="shield" class="w-5 h-5 mr-2"></i> <span>My Account</span>
+          <i data-feather="shield" class="w-5 h-5 mr-2"></i> <span data-i18n="settings.account">My Account</span>
         </button>
         <button type="button" id="tabBtnAbout" class="settings-tab sub-panel-item w-full text-left"
           data-target="aboutSettings">
-          <i data-feather="help-circle" class="w-5 h-5 mr-2"></i> <span>About Us</span>
+          <i data-feather="help-circle" class="w-5 h-5 mr-2"></i> <span data-i18n="settings.about">About Us</span>
         </button>
       </div>
 
@@ -302,7 +305,8 @@
     <div class="flex-shrink-0 h-14 bg-discord-gray-500/30 flex items-center justify-between px-3">
       <div
         class="flex items-center gap-2 min-w-0 cursor-pointer hover:bg-discord-gray-600/50 transition-colors rounded-lg px-2 py-1 -ml-1 flex-1"
-        onclick="navigateTo('profile')" title="My Profile">
+        onclick="navigateTo('profile')" title="My Profile" aria-label="My Profile" role="button" tabindex="0"
+        onkeydown="if(event.key==='Enter' || event.key===' ') navigateTo('profile')">
         <img id="userPanelAvatar" src="/images/default_avatar.png" alt="Avatar" class="w-8 h-8 rounded-full">
         <div class="flex flex-col min-w-0">
           <div class="flex items-center gap-1">
@@ -314,13 +318,13 @@
       </div>
       <div class="flex items-center">
         <button data-tab="settings" onclick="navigateTo('settings')"
-          class="p-1 text-discord-gray-400 hover:text-white hover:bg-discord-gray-600/50 rounded" title="Settings">
+          class="p-1 text-discord-gray-400 hover:text-white hover:bg-discord-gray-600/50 rounded" title="Settings" aria-label="Settings">
           <i data-feather="settings" class="w-5 h-5"></i>
         </button>
-        <a href="/login.html" class="p-1 text-discord-gray-400 hover:text-red-400 hover:bg-discord-gray-600/50 rounded"
-          title="Logout">
+        <button onclick="doLogout()" class="p-1 text-discord-gray-400 hover:text-red-400 hover:bg-discord-gray-600/50 rounded"
+          title="Logout" aria-label="Logout">
           <i data-feather="log-out" class="w-5 h-5"></i>
-        </a>
+        </button>
       </div>
     </div>
   </aside>
@@ -330,7 +334,7 @@
     <header class="flex-shrink-0 h-12 bg-discord-gray-700 shadow-md flex items-center justify-between px-4">
       <div class="flex items-center">
         <button id="mobileMenuBtn" class="p-1 mr-2 text-discord-gray-300 hover:text-white md:hidden"
-          onclick="toggleSidebar()">
+          onclick="toggleSidebar()" aria-label="Open Mobile Menu">
           <i id="mobileMenuIcon" data-feather="menu" class="w-6 h-6"></i>
         </button>
         <h1 id="main-content-title" class="text-white text-lg font-semibold truncate">Home</h1>
@@ -339,7 +343,7 @@
       <!-- 6.14 Message Search UI -->
       <div class="flex items-center gap-2">
         <div id="chatSearchBar" class="hidden flex items-center bg-discord-gray-900 rounded px-2 py-1 relative">
-          <input type="text" id="chatSearchInput" placeholder="Search Zylo..."
+          <input type="text" id="chatSearchInput" placeholder="Search Zylo..." aria-label="Search Messages"
             class="bg-transparent border-none text-white text-sm focus:ring-0 focus:outline-none w-32 md:w-48 placeholder-discord-gray-400"
             onkeyup="handleSearchInput(this.value, event)">
           <button onclick="handleSearchInput(document.getElementById('chatSearchInput').value, {key:'Enter'})"
@@ -466,10 +470,40 @@
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i data-feather="gift" class="w-5 h-5 text-green-400"></i> What's New
             </h2>
-            <span class="bg-discord-blurple px-3 py-1 rounded-full text-xs font-bold text-white">v1.3.0</span>
+            <span class="bg-discord-blurple px-3 py-1 rounded-full text-xs font-bold text-white">v1.3.1</span>
           </div>
 
           <div class="space-y-4">
+            <!-- v1.3.1 -->
+            <div
+              class="bg-discord-gray-800 p-4 rounded-xl border border-discord-gray-700 shadow-xl overflow-hidden relative">
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-discord-blurple/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none">
+              </div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-white text-lg">v1.3.1 — The Security & I18n Update</h3>
+                <span class="text-xs font-bold text-discord-blurple bg-discord-blurple/10 px-2 py-1 rounded">Jan 08, 2026</span>
+              </div>
+              <ul class="text-sm text-discord-gray-300 space-y-2 list-none">
+                <li class="flex gap-2">
+                  <span class="text-discord-blurple">•</span>
+                  <span><strong>Global I18n</strong>: Full internationalization support for Settings (Appearance, Sound, About, Security).</span>
+                </li>
+                <li class="flex gap-2">
+                   <span class="text-discord-blurple">•</span>
+                   <span><strong>Multi-step Signup</strong>: New 4-step wizard for a smoother onboarding experience.</span>
+                </li>
+                <li class="flex gap-2">
+                   <span class="text-discord-blurple">•</span>
+                   <span><strong>Enhanced Security</strong>: Added 2FA, Email Verification (simulated), and Session Management.</span>
+                </li>
+                 <li class="flex gap-2">
+                   <span class="text-discord-blurple">•</span>
+                   <span><strong>Social Login</strong>: Integrated OAuth support for Google, GitHub, and Discord.</span>
+                </li>
+              </ul>
+            </div>
+
             <!-- v1.3.0 -->
             <div
               class="bg-discord-gray-800 p-4 rounded-xl border border-discord-gray-700 shadow-xl overflow-hidden relative">
@@ -601,7 +635,7 @@
               <span id="replyTargetText">Replying to...</span>
               <button onclick="cancelReply()" class="hover:text-white"><i data-feather="x" class="w-3 h-3"></i></button>
             </div>
-            <textarea id="chatInput" placeholder="Message #community" rows="1"
+            <textarea id="chatInput" placeholder="Message #community" rows="1" aria-label="Message Input"
               class="flex-1 bg-transparent border-none text-white resize-none focus:outline-none"
               onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
             <button class="p-2 rounded-full hover:bg-discord-gray-500/70 transition"
@@ -618,7 +652,7 @@
               title="Hold to record voice message">
               <i data-feather="mic" class="w-5 h-5 text-gray-200"></i>
             </button>
-            <button onclick="sendMessage()" class="text-discord-gray-400 hover:text-white">
+            <button onclick="sendMessage()" class="text-discord-gray-400 hover:text-white" aria-label="Send Message">
               <i data-feather="send" class="w-5 h-5"></i>
             </button>
             <div id="communityEmojiPicker"
@@ -715,7 +749,7 @@
                 <button onclick="cancelReply()" class="hover:text-white"><i data-feather="x"
                     class="w-3 h-3"></i></button>
               </div>
-              <textarea id="friendsChatInput" rows="1"
+              <textarea id="friendsChatInput" rows="1" aria-label="Friend Message Input"
                 class="flex-1 bg-transparent border-none text-white resize-none focus:outline-none"
                 placeholder="Message @User"
                 onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendFriendMessage();}"></textarea>
@@ -727,7 +761,7 @@
                 onclick="toggleEmojiPicker('friendsEmojiPicker', 'friendsChatInput')" title="Pick an emoji">
                 <i data-feather="smile" class="w-5 h-5 text-gray-200"></i>
               </button>
-              <button onclick="sendFriendMessage()" class="text-discord-gray-400 hover:text-white transition">
+              <button onclick="sendFriendMessage()" class="text-discord-gray-400 hover:text-white transition" aria-label="Send Message">
                 <i data-feather="send" class="w-5 h-5"></i>
               </button>
               <div id="friendsEmojiPicker"
@@ -1102,9 +1136,9 @@
         <div class="w-full max-w-4xl mx-auto space-y-8">
 
           <div id="generalSettings" class="settings-content w-full space-y-6">
-            <h2 class="text-2xl font-bold text-white">General Settings</h2>
+            <h2 class="text-2xl font-bold text-white" data-i18n="settings.general">General Settings</h2>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelEnableAnimations">Enable Animations</span>
+              <span id="labelEnableAnimations" data-i18n="settings.enableAnimations">Enable Animations</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="animationsToggle" class="sr-only peer">
                 <div
@@ -1113,7 +1147,7 @@
               </label>
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelCompactMode">Compact Mode</span>
+              <span id="labelCompactMode" data-i18n="settings.compactMode">Compact Mode</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="compactToggle" class="sr-only peer">
                 <div
@@ -1122,7 +1156,7 @@
               </label>
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelShowTooltips">Show Tooltips</span>
+              <span id="labelShowTooltips" data-i18n="settings.showTooltips">Show Tooltips</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="tooltipToggle" class="sr-only peer">
                 <div
@@ -1131,7 +1165,7 @@
               </label>
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelShowHomeTab">Show Home Tab</span>
+              <span id="labelShowHomeTab" data-i18n="settings.showHomeTab">Show Home Tab</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="showHomeTabToggle" class="sr-only peer"
                   onchange="toggleHomeTab(this.checked)">
@@ -1141,15 +1175,15 @@
               </label>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <label id="labelLanguage" for="languageSelect" class="block mb-2">Language</label>
-              <select id="languageSelect" class="w-full p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
+              <label id="labelLanguage" for="languageSelect" class="block mb-2" data-i18n="settings.language">Language</label>
+              <select id="languageSelect" onchange="window.setLanguage(this.value)" class="w-full p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
                 <option value="en">English</option>
                 <option value="vi">Tiếng Việt</option>
                 <option value="es">Español</option>
               </select>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <label id="labelStartupPage" for="startupPage" class="block mb-2">Startup Page</label>
+              <label id="labelStartupPage" for="startupPage" class="block mb-2" data-i18n="settings.startupPage">Startup Page</label>
               <select id="startupPage" class="w-full p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
                 <option value="home">Home</option>
                 <option value="profile">Profile</option>
@@ -1160,7 +1194,7 @@
               </select>
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelAutoSave">Auto Save Changes</span>
+              <span id="labelAutoSave" data-i18n="settings.autoSave">Auto Save Changes</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="autoSaveToggle" class="sr-only peer">
                 <div
@@ -1169,7 +1203,7 @@
               </label>
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelConfirmExit">Confirm Before Exit</span>
+              <span id="labelConfirmExit" data-i18n="settings.confirmExit">Confirm Before Exit</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="confirmExitToggle" class="sr-only peer">
                 <div
@@ -1179,7 +1213,7 @@
             </div>
 
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span id="labelReadReceipts">Send Read Receipts</span>
+              <span id="labelReadReceipts" data-i18n="settings.readReceipts">Send Read Receipts</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="readReceiptsToggle" class="sr-only peer">
                 <div
@@ -1197,17 +1231,17 @@
             </div>
             <div class="pt-4 border-t border-discord-gray-600">
               <button id="btnResetAll" onclick="resetAllSettings()"
-                class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Reset All
+                class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg" data-i18n="settings.resetAll">Reset All
                 Settings</button>
             </div>
           </div>
 
           <div id="appearanceSettings" class="settings-content w-full hidden space-y-6">
-            <h2 class="text-2xl font-bold text-white">Appearance</h2>
+            <h2 class="text-2xl font-bold text-white" data-i18n="settings.appearance">Appearance</h2>
 
             <!-- Theme Presets -->
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="font-semibold mb-2 text-white">Theme Presets</h3>
+              <h3 class="font-semibold mb-2 text-white" data-i18n="settings.themePresets">Theme Presets</h3>
               <select id="themePresetSelect" onchange="applyThemePreset(this.value)"
                 class="w-full bg-discord-gray-700 text-white p-2 rounded border border-discord-gray-600">
                 <option value="">Select a preset...</option>
@@ -1220,7 +1254,7 @@
 
             <!-- Moved Controls -->
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="font-semibold mb-3 text-white">Quick Settings</h3>
+              <h3 class="font-semibold mb-3 text-white" data-i18n="settings.quickSettings">Quick Settings</h3>
               <div class="flex items-center gap-3 flex-wrap mb-4">
                 <span id="themeColorSwatch"
                   class="inline-flex items-center gap-2 px-2 py-1 rounded border text-xs border-discord-gray-600">
@@ -1240,7 +1274,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="inline-flex items-center gap-2">
                   <input type="checkbox" id="solidBgToggle" class="accent-discord-blurple">
-                  <span id="labelSolidBg">Solid BG</span>
+                  <span id="labelSolidBg" data-i18n="settings.solidBg">Solid BG</span>
                 </label>
                 <div class="flex items-center gap-2">
                   <input type="file" id="bgImageInput" accept="image/*"
@@ -1254,24 +1288,24 @@
             <!-- Custom Editor Access -->
             <div class="p-3 bg-discord-gray-800 rounded-lg flex items-center justify-between">
               <div>
-                <h3 class="font-semibold text-white">Advanced Theme Editor</h3>
+                <h3 class="font-semibold text-white" data-i18n="settings.advancedThemeEditor">Advanced Theme Editor</h3>
                 <p class="text-sm text-discord-gray-400">Customize every color and background</p>
               </div>
               <button onclick="window.openThemeEditor()"
-                class="px-4 py-2 bg-discord-blurple text-white rounded hover:bg-opacity-90">Open Editor</button>
+                class="px-4 py-2 bg-discord-blurple text-white rounded hover:bg-opacity-90" data-i18n="settings.openEditor">Open Editor</button>
             </div>
 
             <!-- Reset -->
             <div class="pt-4 border-t border-discord-gray-600">
               <button onclick="resetAppearanceSettings()"
-                class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Reset Appearance to
+                class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg" data-i18n="settings.resetAppearance">Reset Appearance to
                 Default</button>
             </div>
           </div> <!-- Added this closing div for appearanceSettings -->
 
 
           <div id="soundSettings" class="settings-content w-full hidden space-y-6">
-            <h2 class="text-2xl font-bold text-white">Sound & Notifications</h2>
+            <h2 class="text-2xl font-bold text-white" data-i18n="settings.sounds">Sound & Notifications</h2>
 
             <!-- Do Not Disturb -->
             <div class="bg-discord-gray-900 p-4 rounded-lg border border-discord-gray-600 mb-4">
@@ -1281,8 +1315,8 @@
                     <i data-feather="bell-off" class="w-5 h-5"></i>
                   </div>
                   <div>
-                    <h3 class="text-white font-medium">Do Not Disturb</h3>
-                    <p class="text-xs text-discord-gray-400">Suppress all notification sounds (messages, calls).</p>
+                    <h3 class="text-white font-medium" data-i18n="settings.doNotDisturb">Do Not Disturb</h3>
+                    <p class="text-xs text-discord-gray-400" data-i18n="settings.dndDesc">Suppress all notification sounds (messages, calls).</p>
                   </div>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -1294,15 +1328,15 @@
               </div>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <label for="soundVolume" class="block mb-2">Sound Effects Volume</label>
+              <label for="soundVolume" class="block mb-2" data-i18n="settings.soundVolume">Sound Effects Volume</label>
               <input type="range" id="soundVolume" min="0" max="100" value="75" class="w-full accent-discord-blurple">
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <label for="musicVolume" class="block mb-2">Music Volume</label>
+              <label for="musicVolume" class="block mb-2" data-i18n="settings.musicVolume">Music Volume</label>
               <input type="range" id="musicVolume" min="0" max="100" value="60" class="w-full accent-green-500">
             </div>
             <div class="flex items-center justify-between p-3 bg-discord-gray-800 rounded-lg">
-              <span>Mute All Sounds</span>
+              <span data-i18n="settings.muteAll">Mute All Sounds</span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="muteAll" class="sr-only peer">
                 <div
@@ -1313,15 +1347,15 @@
             <div class="p-3 bg-discord-gray-800 rounded-lg space-y-2">
               <div class="flex items-center gap-2">
                 <input type="checkbox" id="enableSound" class="accent-discord-blurple">
-                <label for="enableSound">Enable Sound Effects</label>
+                <label for="enableSound" data-i18n="settings.enableSound">Enable Sound Effects</label>
               </div>
               <div class="flex items-center gap-2">
                 <input type="checkbox" id="enableMusic" class="accent-discord-blurple">
-                <label for="enableMusic">Enable Background Music</label>
+                <label for="enableMusic" data-i18n="settings.enableMusic">Enable Background Music</label>
               </div>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <label for="soundProfile" class="block mb-2">Sound Profile</label>
+              <label for="soundProfile" class="block mb-2" data-i18n="settings.soundProfile">Sound Profile</label>
               <select id="soundProfile" class="w-full p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
                 <option value="default">Default</option>
                 <option value="soft">Soft</option>
@@ -1330,23 +1364,23 @@
               </select>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="font-semibold mb-2">Play on events</h3>
+              <h3 class="font-semibold mb-2" data-i18n="settings.playEvents">Play on events</h3>
               <div class="flex items-center gap-2 mb-2">
                 <input type="checkbox" id="playSend" class="accent-discord-blurple" checked>
-                <label for="playSend">Message sent</label>
+                <label for="playSend" data-i18n="settings.playSend">Message sent</label>
               </div>
               <div class="flex items-center gap-2 mb-2">
                 <input type="checkbox" id="playReceive" class="accent-discord-blurple" checked>
-                <label for="playReceive">Message received</label>
+                <label for="playReceive" data-i18n="settings.playReceive">Message received</label>
               </div>
               <div class="flex items-center gap-2 mb-2">
                 <input type="checkbox" id="playUi" class="accent-discord-blurple" checked>
-                <label for="playUi">UI interactions</label>
+                <label for="playUi" data-i18n="settings.playUi">UI interactions</label>
               </div>
             </div>
             <div class="flex items-center gap-2 p-3 bg-discord-gray-800 rounded-lg">
               <input type="checkbox" id="duckMusic" class="accent-discord-blurple">
-              <label for="duckMusic">Duck music when playing effects</label>
+              <label for="duckMusic" data-i18n="settings.duckMusic">Duck music when playing effects</label>
             </div>
             <div id="saveSoundSettingsBtn" class="pt-4 border-t border-discord-gray-600" style="display: none;">
               <button onclick="showSaveSettingsModal()"
@@ -1358,15 +1392,15 @@
           </div>
 
           <div id="aboutSettings" class="settings-content w-full hidden space-y-6">
-            <h2 class="text-2xl font-bold text-white">About Us</h2>
+            <h2 class="text-2xl font-bold text-white" data-i18n="settings.about">About Us</h2>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <p class="text-discord-gray-300"><strong>Zylo v1.3.0</strong> — Created by D4niel-dev</p>
+              <p class="text-discord-gray-300"><strong>Zylo v1.3.1</strong> — Created by D4niel-dev</p>
               <p class="text-discord-gray-400 text-sm mt-1">© 2025 Zylo. All rights reserved.</p>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="text-lg font-semibold mb-2 text-white">Version Details</h3>
+              <h3 class="text-lg font-semibold mb-2 text-white" data-i18n="settings.versionDetails">Version Details</h3>
               <ul class="list-disc list-inside text-discord-gray-300 text-sm space-y-1">
-                <li>Build: 1.3.0-stable</li>
+                <li>Build: 1.3.1-stable</li>
                 <li>Release Date: August 2025</li>
                 <li>UI Framework: Tailwind CSS</li>
                 <li>Backend: Python (Flask)</li>
@@ -1392,13 +1426,13 @@
               </div>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="text-lg font-semibold mb-2 text-white">Credits</h3>
+              <h3 class="text-lg font-semibold mb-2 text-white" data-i18n="settings.credits">Credits</h3>
               <p class="text-discord-gray-300 text-sm">Special thanks to testers, designers, and contributors who
                 made
                 Zylo possible.</p>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="text-lg font-semibold mb-2 text-white">Resources</h3>
+              <h3 class="text-lg font-semibold mb-2 text-white" data-i18n="settings.resources">Resources</h3>
               <div class="flex flex-col gap-2">
                 <a href="https://github.com/D4niel-dev" target="_blank" class="text-blue-400 hover:underline">🔗 My
                   GitHub</a>
@@ -1409,13 +1443,13 @@
               </div>
             </div>
             <div class="p-3 bg-discord-gray-800 rounded-lg">
-              <h3 class="text-lg font-semibold mb-2 text-white">License</h3>
+              <h3 class="text-lg font-semibold mb-2 text-white" data-i18n="settings.license">License</h3>
               <p class="text-discord-gray-300 text-sm">This project is licensed under the MIT License.</p>
             </div>
           </div>
 
           <div id="accountSettings" class="settings-content w-full hidden space-y-6">
-            <h2 class="text-2xl font-bold text-white">My Account</h2>
+            <h2 class="text-2xl font-bold text-white" data-i18n="settings.account">My Account</h2>
             <div class="relative rounded-xl shadow-sm bg-discord-gray-800 p-4">
               <label for="settingsBannerUpload" class="banner-label block cursor-pointer">
                 <img id="settingsBanner" src="/images/default_banner.png" alt="Banner"
@@ -1480,8 +1514,8 @@
             <div class="mt-4 p-4 rounded-lg bg-discord-gray-800" aria-label="Security settings">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="font-semibold text-white">Two-Factor Authentication (2FA)</div>
-                  <div class="text-sm text-discord-gray-400">Add an extra layer of protection.</div>
+                  <div class="font-semibold text-white" data-i18n="settings.twoFactorAuth">Two-Factor Authentication (2FA)</div>
+                  <div class="text-sm text-discord-gray-400" data-i18n="settings.twoFactorDesc">Add an extra layer of protection.</div>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" id="twoFactorToggle" class="sr-only peer">
@@ -1507,7 +1541,7 @@
               </div>
               <div class="editable-row">
                 <div>
-                  <div class="editable-label">Show Email on Profile</div>
+                  <div class="editable-label" data-i18n="settings.showEmail">Show Email on Profile</div>
                   <div class="editable-value"><input type="checkbox" id="showEmail" class="accent-discord-blurple">
                   </div>
                 </div>
@@ -1515,7 +1549,7 @@
             </div>
 
             <div class="p-4 rounded-lg bg-discord-gray-800">
-              <div class="font-semibold mb-2 text-white">Change Password</div>
+              <div class="font-semibold mb-2 text-white" data-i18n="settings.changePassword">Change Password</div>
               <div class="grid sm:grid-cols-3 gap-2">
                 <input type="password" id="oldPassword" placeholder="Current password"
                   class="p-2 rounded-lg border-discord-gray-600 bg-discord-gray-700">
@@ -1531,7 +1565,7 @@
 
             <div class="border-t border-discord-gray-600 pt-4">
               <button onclick="deleteAccount()"
-                class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white w-full">Delete Account</button>
+                class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white w-full" data-i18n="settings.deleteAccount">Delete Account</button>
             </div>
 
             <div id="saveAccountSettingsBtn" class="pt-4 border-t border-discord-gray-600" style="display: none;">
@@ -2161,2005 +2195,18 @@
   </div>
 
   <script src="/files/vendor/socket.io.min.js"></script>
+  <script src="files/js/utils.js"></script>
+  <script src="files/js/socket.js"></script>
+  <script src="files/js/chat.js"></script>
+  <script src="files/js/groups.js"></script>
+  <script src="files/js/friends.js"></script>
+  <script src="files/js/cloud.js"></script>
+  <script src="files/js/moments.js"></script>
+  <script src="files/js/effects.js"></script>
   <script src="/js/app-extras.js"></script>
   <script>
+    // Chat, Groups, Friends, and Socket logic moved to separate files.
 
-    // Chat Functions (Socket.IO, etc.)
-    const baseUrl = window.location.origin;
-    const socket = navigator.onLine ? io(baseUrl, {
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: 10
-    }) : { emit: function () { }, on: function () { }, off: function () { } };
-    window.socket = socket;
-
-    // Connection status management
-    function updateConnectionStatus(status) {
-      const indicator = document.getElementById('connectionIndicator');
-      if (!indicator) return;
-
-      if (status === 'connected') {
-        indicator.className = 'w-2 h-2 rounded-full bg-green-500';
-        indicator.title = 'Connected';
-      } else if (status === 'connecting') {
-        indicator.className = 'w-2 h-2 rounded-full bg-yellow-500 animate-pulse';
-        indicator.title = 'Reconnecting...';
-      } else {
-        indicator.className = 'w-2 h-2 rounded-full bg-red-500';
-        indicator.title = 'Disconnected';
-      }
-    }
-
-    function rejoinActiveRooms() {
-      const u = localStorage.getItem('savedUsername');
-      if (u) {
-        socket.emit('join_user', { username: u });
-        socket.emit('register_status', { username: u });
-      }
-      // Rejoin active group room if viewing a group
-      if (typeof currentGroupId !== 'undefined' && currentGroupId) {
-        socket.emit('join_group', { groupId: currentGroupId, username: u });
-      }
-    }
-
-    if (navigator.onLine) {
-      socket.on('connect', () => {
-        console.log('Socket connected');
-        updateConnectionStatus('connected');
-        rejoinActiveRooms();
-      });
-
-      socket.on('disconnect', (reason) => {
-        console.log('Socket disconnected:', reason);
-        updateConnectionStatus('disconnected');
-        if (typeof showToast === 'function') {
-          showToast('Connection lost. Attempting to reconnect...', 3000);
-        }
-      });
-
-      socket.on('reconnect_attempt', (attemptNumber) => {
-        console.log('Reconnection attempt:', attemptNumber);
-        updateConnectionStatus('connecting');
-      });
-
-      socket.on('reconnect', (attemptNumber) => {
-        console.log('Reconnected after', attemptNumber, 'attempts');
-        updateConnectionStatus('connected');
-        rejoinActiveRooms();
-        if (typeof showToast === 'function') {
-          showToast('Reconnected!', 2000);
-        }
-      });
-
-      socket.on('reconnect_failed', () => {
-        console.log('Reconnection failed');
-        updateConnectionStatus('disconnected');
-        if (typeof showToast === 'function') {
-          showToast('Could not reconnect. Please check your connection.', 5000);
-        }
-      });
-
-      // User Status & Presence
-      socket.on('user_status_change', (data) => {
-        const { username, status, last_active } = data;
-        updateUserStatusUI(username, status, last_active);
-      });
-    }
-
-    // Idle Detection
-    let idleTimer;
-    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-    let isAway = false;
-
-    function resetIdleTimer() {
-      clearTimeout(idleTimer);
-      if (isAway && navigator.onLine) {
-        isAway = false;
-        const u = localStorage.getItem('savedUsername');
-        if (u) socket.emit('update_status', { username: u, status: 'online' });
-      }
-      idleTimer = setTimeout(() => {
-        isAway = true;
-        const u = localStorage.getItem('savedUsername');
-        if (u && navigator.onLine) socket.emit('update_status', { username: u, status: 'away' });
-      }, IDLE_TIMEOUT);
-    }
-
-    if (navigator.onLine) {
-      document.addEventListener('mousemove', resetIdleTimer);
-      document.addEventListener('keydown', resetIdleTimer);
-      resetIdleTimer();
-    }
-
-    function updateUserStatusUI(username, status, last_active) {
-      // 1. Sidebar DM List
-      const sidebarItem = document.querySelector(`.sidebar-dm-item[data-username="${username}"] .status-dot`);
-      if (sidebarItem) {
-        sidebarItem.className = `status-dot w-2 h-2 rounded-full absolute bottom-0 right-0 border-2 border-discord-gray-900 ${getStatusColor(status)}`;
-      }
-
-      // 2. Friend List
-      const friendItem = document.querySelector(`.friend-item[data-username="${username}"] .status-dot`);
-      if (friendItem) {
-        friendItem.className = `status-dot w-3 h-3 rounded-full border-2 border-discord-gray-800 ${getStatusColor(status)}`;
-      }
-
-      // 3. DM Header (if open)
-      if (activeFriendChat === username) {
-        const headerStatus = document.getElementById('chatHeaderStatus');
-        if (headerStatus) {
-          if (status === 'online') {
-            headerStatus.innerHTML = '<span class="text-green-500">●</span> Online';
-          } else if (status === 'away') {
-            headerStatus.innerHTML = '<span class="text-yellow-500">●</span> Away';
-          } else {
-            let timeStr = '';
-            if (last_active) {
-              const date = new Date(last_active * 1000);
-              // If today, show time, else show date
-              const isToday = new Date().toDateString() === date.toDateString();
-              timeStr = isToday ? ` today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ` on ${date.toLocaleDateString()}`;
-            }
-            headerStatus.innerHTML = `<span class="text-gray-500">●</span> Offline${timeStr ? ' • Last seen' + timeStr : ''}`;
-          }
-        }
-      }
-    }
-
-    function getStatusColor(status) {
-      if (status === 'online') return 'bg-green-500';
-      if (status === 'away') return 'bg-yellow-500';
-      return 'bg-gray-500';
-    }
-    const chatInput = document.getElementById("chatInput");
-    const chatMessagesCommunity = document.getElementById("chatMessagesCommunity");
-    const chatMessagesAI = document.getElementById("chatMessagesAI");
-    const aiControls = document.getElementById("aiControls");
-    const aiModelSelect = document.getElementById("aiModelSelect");
-    const aiPersonaSelect = document.getElementById("aiPersonaSelect");
-    let currentChatRoom = localStorage.getItem('chatRoom') || 'community';
-    let aiConversation = [];
-    const username = localStorage.getItem("savedUsername") || "N/A";
-    const email = localStorage.getItem("savedEmail") || "N/A";
-    const typingIndicator = document.getElementById("typingIndicator");
-    const activeTypers = new Set();
-    const avatarCache = new Map();
-
-    // Function to get avatar URL (Kept as is)
-    async function getUserAvatarUrl(username) {
-      if (!username || username === 'N/A') return '/images/default_avatar.png';
-      if (avatarCache.has(username)) {
-        return avatarCache.get(username);
-      }
-      try {
-        if (navigator.onLine) {
-          const res = await fetch(`/api/get-user?identifier=${encodeURIComponent(username)}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.user && data.user.avatar) {
-              const avatarUrl = data.user.avatar;
-              avatarCache.set(username, avatarUrl);
-              return avatarUrl;
-            }
-          }
-        }
-      } catch (e) {
-        console.log('Failed to fetch avatar for', username, e);
-      }
-      const fallbackUrl = `/uploads/${username}/avatar.png`;
-      avatarCache.set(username, fallbackUrl);
-      return fallbackUrl;
-    }
-
-    // Friends & Groups state (Kept as is)
-    let friendsState = { friends: [], incoming: [], outgoing: [] };
-    let groupsData = [];
-    let currentGroupId = null;
-    let activeChannelId = 'general';
-
-    // Chat input listeners (Kept as is)
-    chatInput.addEventListener("input", () => {
-      if (navigator.onLine && currentChatRoom === 'community') {
-        socket.emit("typing", { username });
-      }
-    });
-    chatInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        if (event.shiftKey) {
-          event.preventDefault();
-          const start = this.selectionStart;
-          const end = this.selectionEnd;
-          const value = this.value;
-          this.value = value.substring(0, start) + "\n" + value.substring(end);
-          this.selectionStart = this.selectionEnd = start + 1;
-        } else {
-          event.preventDefault();
-          sendMessage();
-        }
-      }
-    });
-    chatInput.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = (this.scrollHeight > 150 ? 150 : this.scrollHeight) + "px"; // Add max-height
-    });
-
-    // Register user for DM rooms
-    if (navigator.onLine && username && username !== 'N/A') {
-      try { socket.emit('register_user', { username }); } catch { }
-    }
-
-    // Global Markdown Parser (extracted for reuse)
-    window.parseDiscordMarkdown = function (text) {
-      if (!text) return '';
-      // 1. Escape HTML first to prevent XSS (critical)
-      let parsed = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-      // Headers (H1-H3)
-      parsed = parsed.replace(/^#\s+(.+)$/gm, '<h1 class="text-3xl font-bold text-white mb-2 border-b border-gray-700 pb-1">$1</h1>');
-      parsed = parsed.replace(/^##\s+(.+)$/gm, '<h2 class="text-2xl font-bold text-white mb-2">$1</h2>');
-      parsed = parsed.replace(/^###\s+(.+)$/gm, '<h3 class="text-xl font-bold text-white mb-1">$1</h3>');
-
-      // 2. Code blocks with Syntax Highlighting
-      if (typeof hljs !== 'undefined') {
-        parsed = parsed.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-          const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
-          try {
-            const highlighted = hljs.highlight(code, { language: validLang }).value;
-            return `<pre><code class="hljs language-${validLang} rounded p-2 text-sm my-2 block overflow-x-auto">${highlighted}</code></pre>`;
-          } catch (e) {
-            return `<pre><code class="bg-discord-gray-900 rounded p-2 text-sm my-2 block overflow-x-auto">${code}</code></pre>`;
-          }
-        });
-      } else {
-        parsed = parsed.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code class="bg-discord-gray-900 rounded p-2 text-sm my-2 block overflow-x-auto">$2</code></pre>');
-      }
-
-      // Fallback for ```code``` (no newline)
-      parsed = parsed.replace(/```([^`]+)```/g, '<code class="block bg-discord-gray-900 rounded p-2 text-sm font-mono my-1 whitespace-pre-wrap">$1</code>');
-
-      // 3. Inline code `code`
-      parsed = parsed.replace(/`([^`]+)`/g, '<code class="bg-discord-gray-900 text-discord-gray-100 rounded px-1.5 py-0.5 text-sm font-mono">$1</code>');
-
-      // Bold **text**
-      parsed = parsed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      // Italic *text*
-      parsed = parsed.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-      // Strikethrough ~~text~~
-      parsed = parsed.replace(/~~([^~]+)~~/g, '<del class="opacity-60">$1</del>');
-      // Spoiler ||text||
-      parsed = parsed.replace(/\|\|([^|]+)\|\|/g, '<span class="spoiler bg-discord-gray-400 text-discord-gray-400 hover:bg-transparent hover:text-white rounded px-1 cursor-pointer transition-all" onclick="this.classList.toggle(\'revealed\')">$1</span>');
-
-      return parsed;
-    };
-
-    function getStatusIcon(status) {
-      if (status === 'read') return '<span class="text-blue-400 font-bold" title="Read">✓✓</span>';
-      if (status === 'delivered') return '<span class="text-gray-400 font-bold" title="Delivered">✓✓</span>';
-      return '<span class="text-discord-gray-500 font-bold" title="Sent">✓</span>';
-    }
-
-    // === NEW MESSAGE RENDERING FUNCTION ===
-    // This helper creates the new Discord-style message layout
-    async function createDiscordMessage(data) {
-      const msgWrapper = document.createElement("div");
-      // Add message ID for deduplication
-      if (data.id) msgWrapper.setAttribute('data-msg-id', data.id);
-      // Important: Add timestamp for finding message during updates
-      if (data.timestamp || data.ts) msgWrapper.setAttribute('data-timestamp', data.timestamp || data.ts);
-
-      msgWrapper.classList.add("flex", "flex-col", "p-2", "rounded", "hover:bg-discord-gray-600/20", "leading-snug", "group", "relative");
-
-      const messageRow = document.createElement("div");
-      messageRow.className = "flex items-start gap-3 relative w-full";
-
-      // Actions (Reply / Edit)
-      const actions = document.createElement("div");
-      actions.className = "absolute right-4 -top-4 hidden group-hover:flex bg-discord-gray-900 rounded border border-discord-gray-800 shadow-sm z-20 scale-90 p-0.5";
-
-      const replyBtn = document.createElement("button");
-      replyBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white rounded-l transition";
-      replyBtn.title = "Reply";
-      replyBtn.onclick = () => startReply(data.id || Date.now(), data.username || data.from, data.message || '');
-      replyBtn.innerHTML = '<i data-feather="corner-up-left" class="w-4 h-4"></i>';
-
-      const editBtn = document.createElement("button");
-      editBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white rounded-r transition";
-      editBtn.title = "Edit";
-      editBtn.innerHTML = '<i data-feather="edit-2" class="w-4 h-4"></i>';
-
-      // Only allow editing own messages
-      const currentUser = localStorage.getItem('savedUsername') || 'User';
-      const msgAuthor = data.username || data.from;
-      const isOwnMessage = (currentUser === msgAuthor);
-
-      if (!isOwnMessage) {
-        editBtn.classList.add('opacity-30', 'cursor-not-allowed');
-        editBtn.title = "Can only edit your own messages";
-        editBtn.onclick = null;
-      } else {
-        editBtn.onclick = async () => {
-          const newT = prompt("Edit message:", data.message);
-          if (newT && newT !== data.message) {
-            // Optimistic UI update - target the message body specifically
-            const bodyEl = msgWrapper.querySelector('.msg-body-text');
-            if (bodyEl) {
-              bodyEl.textContent = newT;
-              // Add edited indicator
-              const editedSpan = document.createElement('span');
-              editedSpan.className = 'text-discord-gray-400 text-xs ml-1 italic';
-              editedSpan.textContent = '(edited)';
-              bodyEl.appendChild(editedSpan);
-            }
-
-            // Call backend API to persist the edit
-            try {
-              const payload = {
-                groupId: currentGroupId,
-                channel: activeChannelId || 'general',
-                username: currentUser,
-                timestamp: data.timestamp || data.ts,
-                newMessage: newT
-              };
-
-              // Only call API for group messages (if in group context)
-              if (currentGroupId) {
-                const res = await fetch('/api/groups/message/edit', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (!result.success) {
-                  console.error('Edit failed:', result.error);
-                  alert("Edit failed: " + result.error);
-                }
-              }
-            } catch (error) {
-              console.error('Error editing message:', error);
-            }
-          }
-        };
-      }
-
-      actions.appendChild(replyBtn);
-
-      // Discord-style Quick Reactions - inline emoji buttons
-      const quickReactions = ['👍', '❤️', '😂', '😮'];
-      quickReactions.forEach(emoji => {
-        const emojiBtn = document.createElement("button");
-        emojiBtn.className = "p-1 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white transition text-sm hover:scale-110";
-        emojiBtn.textContent = emoji;
-        emojiBtn.title = `React with ${emoji}`;
-        emojiBtn.onclick = (e) => {
-          e.stopPropagation();
-          addReactionToMessage(msgWrapper, emoji, data);
-        };
-        actions.appendChild(emojiBtn);
-      });
-
-      // More reactions button (shows full picker)
-      const moreReactBtn = document.createElement("button");
-      moreReactBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white transition relative";
-      moreReactBtn.title = "More Reactions";
-      moreReactBtn.innerHTML = '<i data-feather="plus" class="w-3 h-3"></i>';
-
-      // Full reaction picker popup - fixed positioning
-      const reactionPicker = document.createElement("div");
-      reactionPicker.className = "reaction-picker hidden";
-      reactionPicker.style.cssText = "position: absolute; bottom: 100%; right: 0; margin-bottom: 4px; background: #2f3136; border-radius: 8px; border: 1px solid #202225; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 100; min-width: 200px;";
-
-      const pickerGrid = document.createElement("div");
-      pickerGrid.style.cssText = "display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;";
-
-      const emojis = ['👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '🔥', '👀', '💯', '✅', '❌'];
-      emojis.forEach(emoji => {
-        const btn = document.createElement("button");
-        btn.className = "reaction-emoji";
-        btn.style.cssText = "font-size: 20px; padding: 4px; border-radius: 4px; background: transparent; border: none; cursor: pointer; transition: transform 0.1s, background 0.1s;";
-        btn.textContent = emoji;
-        btn.dataset.emoji = emoji;
-        btn.onmouseover = () => { btn.style.background = '#40444b'; btn.style.transform = 'scale(1.2)'; };
-        btn.onmouseout = () => { btn.style.background = 'transparent'; btn.style.transform = 'scale(1)'; };
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          addReactionToMessage(msgWrapper, emoji, data);
-          reactionPicker.classList.add('hidden');
-        };
-        pickerGrid.appendChild(btn);
-      });
-
-      reactionPicker.appendChild(pickerGrid);
-
-      moreReactBtn.onclick = (e) => {
-        e.stopPropagation();
-        // Close all other pickers first
-        document.querySelectorAll('.reaction-picker-open').forEach(p => p.classList.add('hidden'));
-        reactionPicker.classList.toggle('hidden');
-        if (!reactionPicker.classList.contains('hidden')) {
-          reactionPicker.classList.add('reaction-picker-open');
-        }
-      };
-
-      moreReactBtn.appendChild(reactionPicker);
-      actions.appendChild(moreReactBtn);
-      actions.appendChild(editBtn);
-
-      // Delete Button (only for own messages)
-      if (isOwnMessage) {
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "p-1 px-2 hover:bg-red-500/20 text-discord-gray-400 hover:text-red-400 transition";
-        deleteBtn.title = "Delete Message";
-        deleteBtn.innerHTML = '<i data-feather="trash-2" class="w-4 h-4"></i>';
-        deleteBtn.onclick = async () => {
-          if (confirm('Are you sure you want to delete this message?')) {
-            // Optimistic removal
-            msgWrapper.remove();
-
-            // Send to backend
-            try {
-              if (currentGroupId) {
-                await fetch('/api/groups/message/delete', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    groupId: currentGroupId,
-                    channel: activeChannelId || 'general',
-                    timestamp: data.timestamp,
-                    username: username
-                  })
-                });
-              }
-            } catch (err) {
-              console.error('Failed to delete message:', err);
-              // Ideally revert UI change here if needed
-            }
-          }
-        };
-        actions.appendChild(deleteBtn);
-      }
-      messageRow.appendChild(actions);
-
-
-
-      // Render Reply Context (Discord-style with message preview)
-      // Render Reply Context (Discord-style with spine)
-      if (data.replyTo) {
-        const replyContainer = document.createElement("div");
-        replyContainer.className = "flex items-center mb-0.5 cursor-pointer opacity-80 hover:opacity-100";
-
-        replyContainer.onclick = (e) => {
-          e.stopPropagation();
-          const targetId = data.replyTo.id;
-          if (targetId) {
-            const original = document.querySelector(`[data-msg-id="${targetId}"]`);
-            if (original) {
-              original.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              original.classList.add('bg-discord-blurple/30', 'transition-all');
-              setTimeout(() => original.classList.remove('bg-discord-blurple/30'), 1500);
-            }
-          }
-        };
-
-        // Spine (Curved Line)
-        const spine = document.createElement("div");
-        spine.className = "w-8 h-3 border-l-2 border-t-2 border-discord-gray-600 rounded-tl-md ml-4 mt-2 mr-2 flex-shrink-0";
-        replyContainer.appendChild(spine);
-
-        const replyContent = document.createElement("div");
-        replyContent.className = "flex items-center gap-1 text-xs text-discord-gray-300 overflow-hidden";
-
-        const rAvatar = document.createElement("img");
-        rAvatar.src = "/images/default_avatar.png";
-        rAvatar.className = "w-4 h-4 rounded-full reply-avatar object-cover flex-shrink-0";
-        replyContent.appendChild(rAvatar);
-
-        const rUser = document.createElement("span");
-        rUser.className = "font-semibold hover:underline bg-transparent text-discord-gray-200";
-        rUser.textContent = "@" + (data.replyTo.username || "User");
-        replyContent.appendChild(rUser);
-
-        const rText = document.createElement("span");
-        rText.className = "text-discord-gray-400 truncate max-w-[300px] hover:text-white transition-colors";
-        const rTxt = data.replyTo.content || data.replyTo.message || '';
-        rText.textContent = rTxt;
-        replyContent.appendChild(rText);
-
-        replyContainer.appendChild(replyContent);
-
-        if (data.replyTo.username) {
-          getUserAvatarUrl(data.replyTo.username).then(url => {
-            rAvatar.src = url;
-          });
-        }
-
-        msgWrapper.appendChild(replyContainer); // Append first
-      }
-
-      const avatar = document.createElement("img");
-      const fallbackAvatar = '/images/default_avatar.png';
-      const avatarUrl = await getUserAvatarUrl(data.username || data.from);
-      avatar.src = avatarUrl;
-      avatar.alt = `${data.username || data.from}'s avatar`;
-      avatar.className = "w-10 h-10 rounded-full object-cover cursor-pointer"; // Added cursor-pointer
-      avatar.onerror = function () { this.onerror = null; this.src = fallbackAvatar; };
-      const tUname = data.username || data.from;
-      avatar.onclick = () => showUserProfile(tUname);
-      messageRow.appendChild(avatar);
-
-      const contentWrapper = document.createElement("div");
-
-      const header = document.createElement("div");
-      header.className = "flex items-baseline gap-2";
-      const userSpan = document.createElement("span");
-
-      // Role-based color styling
-      const roleColorMap = {
-        'admin': 'text-red-500',
-        'mod': 'text-purple-500',
-        'moderator': 'text-purple-500',
-        'vip': 'text-yellow-400',
-        'user': 'text-white'
-      };
-
-      // Try to get cached role or default to white
-      let roleColor = 'text-white';
-      let roleTitle = '';
-      try {
-        const cachedUser = avatarCache.get(tUname + '_role');
-        if (cachedUser) {
-          roleColor = roleColorMap[cachedUser.toLowerCase()] || 'text-white';
-          roleTitle = cachedUser;
-        } else {
-          // Async fetch role (non-blocking) - check valid identifier first
-          if (tUname) {
-            fetch(`/api/get-user?identifier=${encodeURIComponent(tUname)}`)
-              .then(r => r.json())
-              .then(d => {
-                if (d.success && d.user && d.user.role) {
-                  avatarCache.set(tUname + '_role', d.user.role);
-                  const color = roleColorMap[d.user.role.toLowerCase()] || 'text-white';
-                  userSpan.className = `${color} font-semibold cursor-pointer hover:underline`;
-                  if (d.user.role !== 'user') {
-                    userSpan.title = d.user.role.charAt(0).toUpperCase() + d.user.role.slice(1);
-                  }
-                }
-              })
-              .catch(() => { });
-          }
-        }
-      } catch { }
-
-      userSpan.className = `${roleColor} font-semibold cursor-pointer hover:underline`;
-      if (roleTitle && roleTitle !== 'user') {
-        userSpan.title = roleTitle.charAt(0).toUpperCase() + roleTitle.slice(1);
-      }
-      userSpan.textContent = tUname;
-      userSpan.onclick = () => showUserProfile(tUname);
-      const timeSpan = document.createElement("span");
-      timeSpan.className = "text-discord-gray-400 text-xs";
-      timeSpan.textContent = new Date(data.ts ? data.ts * 1000 : Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      header.appendChild(userSpan);
-      header.appendChild(timeSpan);
-
-      // Status Indicator (Sent/Delivered/Read)
-      if (isOwnMessage) {
-        const statusSpan = document.createElement("span");
-        statusSpan.className = "ml-2 text-[10px] select-none msg-status-icon cursor-help opacity-80 hover:opacity-100";
-        // Use data.status or fallback
-        const currentStatus = data.status || (data.readBy && data.readBy.length > 1 ? 'read' : 'sent');
-        statusSpan.innerHTML = getStatusIcon(currentStatus);
-        header.appendChild(statusSpan);
-      }
-
-      contentWrapper.appendChild(header);
-
-      // Body (text OR file)
-      if (data.fileData && data.fileName) {
-        const ext = data.fileName.split(".").pop().toLowerCase();
-        const imageExts = ["png", "jpg", "jpeg", "gif", "webp", "svg"];
-        const videoExts = ["mp4", "webm", "ogg", "mov", "m4v"];
-        const audioExts = ["mp3", "wav", "ogg", "m4a", "aac", "flac", "webm"];
-
-        let body;
-        if (imageExts.includes(ext)) {
-          body = document.createElement("img");
-          body.src = data.fileData;
-          body.alt = data.fileName;
-          body.className = "max-w-xs rounded shadow-md cursor-pointer mt-1";
-        } else if (videoExts.includes(ext)) {
-          body = document.createElement("video");
-          body.controls = true;
-          body.src = data.fileData;
-          body.className = "max-w-xs rounded mt-1";
-        } else if (audioExts.includes(ext) || data.type === 'voice') {
-          // Voice message with styled player
-          body = document.createElement("div");
-          body.className = "voice-message-player flex items-center gap-2 bg-discord-gray-700/50 rounded-lg p-2 mt-1 max-w-xs";
-
-          const playBtn = document.createElement("button");
-          playBtn.className = "w-10 h-10 rounded-full bg-discord-blurple hover:bg-discord-blurple/80 flex items-center justify-center text-white transition";
-          playBtn.innerHTML = '<i data-feather="play" class="w-5 h-5"></i>';
-
-          const audioEl = document.createElement("audio");
-          audioEl.src = data.fileData;
-          audioEl.preload = "metadata";
-
-          const waveform = document.createElement("div");
-          waveform.className = "flex-1 flex items-center gap-0.5 h-8";
-          // Create waveform bars (decorative)
-          for (let i = 0; i < 20; i++) {
-            const bar = document.createElement("div");
-            bar.className = "w-1 bg-discord-gray-400 rounded-full transition-all";
-            bar.style.height = `${Math.random() * 20 + 8}px`;
-            waveform.appendChild(bar);
-          }
-
-          const durationSpan = document.createElement("span");
-          durationSpan.className = "text-xs text-discord-gray-300 min-w-[32px]";
-          durationSpan.textContent = data.duration ? `0:${String(data.duration).padStart(2, '0')}` : "0:00";
-
-          let isPlaying = false;
-          playBtn.onclick = () => {
-            if (isPlaying) {
-              audioEl.pause();
-              playBtn.innerHTML = '<i data-feather="play" class="w-5 h-5"></i>';
-            } else {
-              audioEl.play();
-              playBtn.innerHTML = '<i data-feather="pause" class="w-5 h-5"></i>';
-            }
-            isPlaying = !isPlaying;
-            feather.replace();
-          };
-
-          audioEl.onended = () => {
-            isPlaying = false;
-            playBtn.innerHTML = '<i data-feather="play" class="w-5 h-5"></i>';
-            feather.replace();
-          };
-
-          body.appendChild(playBtn);
-          body.appendChild(waveform);
-          body.appendChild(durationSpan);
-        } else {
-          body = document.createElement("a");
-          body.href = data.fileData;
-          body.download = data.fileName;
-          body.textContent = `📎 ${data.fileName}`;
-          body.className = "text-blue-400 hover:underline mt-1 block";
-        }
-        contentWrapper.appendChild(body);
-      } else if (data.sticker_src) {
-        // Modern sticker handling (saved with src)
-        const body = document.createElement("div");
-        body.className = "sticker-message mt-1";
-        const img = document.createElement("img");
-        img.src = data.sticker_src;
-        img.alt = "Sticker";
-        img.className = "sticker-img w-32 h-32 object-contain";
-        body.appendChild(img);
-        contentWrapper.appendChild(body);
-      } else if (data.message && data.message.match(/^\[sticker:(.+)\]$/)) {
-        // Fallback for legacy messages (saved as text)
-        const stickerId = data.message.match(/^\[sticker:(.+)\]$/)[1];
-        let src = '';
-        // Try to find in global AVAILABLE_STICKERS if defined
-        if (typeof AVAILABLE_STICKERS !== 'undefined') {
-          const s = AVAILABLE_STICKERS.find(x => x.id === stickerId);
-          if (s) src = s.src;
-        }
-
-        if (src) {
-          const body = document.createElement("div");
-          body.className = "sticker-message mt-1";
-          const img = document.createElement("img");
-          img.src = src;
-          img.alt = "Sticker";
-          img.className = "sticker-img w-32 h-32 object-contain";
-          body.appendChild(img);
-          contentWrapper.appendChild(body);
-        } else {
-          // If we really can't find it, show text
-          const body = document.createElement("div");
-          body.className = "text-white italic opacity-50";
-          body.textContent = `[Sticker: ${stickerId}]`;
-        }
-      } else if (data.message) {
-        const body = document.createElement("div");
-        body.className = "text-white msg-body-text whitespace-pre-wrap";
-
-        // Discord-style markdown parsing with Syntax Highlighting
-        function parseMarkdown(text) {
-          // 1. Escape HTML first to prevent XSS (critical)
-          let parsed = text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-
-
-          // Headers (H1-H3) - Support for big text
-          parsed = parsed.replace(/^#\s+(.+)$/gm, '<h1 class="text-3xl font-bold text-white mb-2 border-b border-gray-700 pb-1">$1</h1>');
-          parsed = parsed.replace(/^##\s+(.+)$/gm, '<h2 class="text-2xl font-bold text-white mb-2">$1</h2>');
-          parsed = parsed.replace(/^###\s+(.+)$/gm, '<h3 class="text-xl font-bold text-white mb-1">$1</h3>');
-
-          // 2. Code blocks with Syntax Highlighting
-          parsed = parsed.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-            const validLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
-            try {
-              const highlighted = hljs.highlight(code, { language: validLang }).value;
-              return `<pre><code class="hljs language-${validLang} rounded p-2 text-sm my-2 block overflow-x-auto">${highlighted}</code></pre>`;
-            } catch (e) {
-              return `<pre><code class="bg-discord-gray-900 rounded p-2 text-sm my-2 block overflow-x-auto">${code}</code></pre>`;
-            }
-          });
-
-          // Fallback for ```code``` (no newline)
-          parsed = parsed.replace(/```([^`]+)```/g, '<code class="block bg-discord-gray-900 rounded p-2 text-sm font-mono my-1 whitespace-pre-wrap">$1</code>');
-
-          // 3. Inline code `code`
-          parsed = parsed.replace(/`([^`]+)`/g, '<code class="bg-discord-gray-900 text-discord-gray-100 rounded px-1.5 py-0.5 text-sm font-mono">$1</code>');
-
-
-          // Bold **text**
-          parsed = parsed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-          // Italic *text*
-          parsed = parsed.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-          // Strikethrough ~~text~~
-          parsed = parsed.replace(/~~([^~]+)~~/g, '<del class="opacity-60">$1</del>');
-
-          // Spoiler ||text||
-          parsed = parsed.replace(/\|\|([^|]+)\|\|/g, '<span class="spoiler bg-discord-gray-400 text-discord-gray-400 hover:bg-transparent hover:text-white rounded px-1 cursor-pointer transition-all" onclick="this.classList.toggle(\'revealed\')">$1</span>');
-
-          return parsed;
-        }
-
-        // URL detection regex
-        const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/gi;
-        let message = data.message;
-        const urls = message.match(urlRegex) || [];
-
-        // Parse markdown first
-        message = parseMarkdown(message);
-
-        // Then make URLs clickable (after markdown to avoid breaking links)
-        if (urls.length > 0) {
-          urls.forEach(url => {
-            const escapedUrl = url.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            message = message.replace(
-              escapedUrl,
-              `<a href="${url}" target="_blank" class="text-blue-400 hover:underline">${escapedUrl}</a>`
-            );
-          });
-        }
-
-        body.innerHTML = message;
-
-        // Add (edited) indicator if message was edited - now clickable!
-        if (data.edited) {
-          const editedSpan = document.createElement("span");
-          editedSpan.className = "text-discord-gray-400 text-xs ml-1 italic cursor-pointer hover:underline hover:text-white transition-colors select-none";
-          editedSpan.textContent = "(edited)";
-          editedSpan.title = "View edit history";
-          editedSpan.onclick = (e) => {
-            e.stopPropagation();
-            showEditHistory(data.history || [], data.message, data.editedAt);
-          };
-          body.appendChild(editedSpan);
-        }
-
-        contentWrapper.appendChild(body);
-
-        // Create embed cards for URLs
-        for (const url of urls.slice(0, 3)) { // Max 3 embeds per message
-          const embedCard = document.createElement("div");
-          embedCard.className = "link-embed mt-2 p-3 bg-discord-gray-900/60 border-l-4 border-discord-blurple rounded max-w-md";
-          embedCard.innerHTML = `
-            <div class="link-embed-loading text-xs text-discord-gray-400">
-              <i class="animate-pulse">Loading preview...</i>
-            </div>
-          `;
-          contentWrapper.appendChild(embedCard);
-
-          // Async fetch preview data
-          try {
-            const hostname = new URL(url).hostname;
-            fetch(`/api/link-preview?url=${encodeURIComponent(url)}`)
-              .then(r => r.json())
-              .then(preview => {
-                if (preview.success) {
-                  embedCard.innerHTML = `
-                    <div class="flex gap-3">
-                      <div class="flex-1 min-w-0">
-                        <div class="text-xs text-discord-gray-400 mb-1">${preview.site_name || hostname}</div>
-                        <a href="${url}" target="_blank" class="text-blue-400 hover:underline font-medium text-sm block truncate">
-                          ${preview.title || url}
-                        </a>
-                        ${preview.description ? `<p class="text-xs text-discord-gray-300 mt-1 line-clamp-2">${preview.description.substring(0, 100)}...</p>` : ''}
-                      </div>
-                      ${preview.image ? `<img src="${preview.image}" class="w-16 h-16 rounded object-cover flex-shrink-0" onerror="this.style.display='none'">` : ''}
-                    </div>
-                  `;
-                } else {
-                  // Fallback - simple link card
-                  embedCard.innerHTML = `
-                    <a href="${url}" target="_blank" class="text-blue-400 hover:underline text-sm">
-                      🔗 ${hostname}
-                    </a>
-                  `;
-                }
-              })
-              .catch(() => {
-                // Fallback on error
-                const hostname = new URL(url).hostname;
-                embedCard.innerHTML = `
-                  <a href="${url}" target="_blank" class="text-blue-400 hover:underline text-sm">
-                    🔗 ${hostname}
-                  </a>
-                `;
-              });
-          } catch { }
-        }
-      }
-
-
-      // Reactions display area (below message content)
-      if (data.reactions && Object.keys(data.reactions).length > 0) {
-        const reactionsContainer = document.createElement("div");
-        reactionsContainer.className = "reactions-container flex flex-wrap gap-1 mt-1";
-
-        const username = localStorage.getItem('savedUsername') || 'User';
-        for (const [emoji, users] of Object.entries(data.reactions)) {
-          const hasUserReacted = users.includes(username);
-          const reactionBadge = document.createElement("button");
-          reactionBadge.className = `flex items-center gap-1 px-2 py-0.5 rounded text-sm border transition ${hasUserReacted ? 'bg-discord-blurple/20 border-discord-blurple text-white' : 'bg-discord-gray-800/50 hover:bg-discord-gray-700 border-discord-gray-600 text-discord-gray-300'}`;
-          reactionBadge.innerHTML = `<span>${emoji}</span><span class="text-xs">${users.length}</span>`;
-          reactionBadge.title = users.join(', ');
-          reactionBadge.onclick = () => addReactionToMessage(msgWrapper, emoji, data);
-          reactionsContainer.appendChild(reactionBadge);
-        }
-        contentWrapper.appendChild(reactionsContainer);
-      }
-
-      messageRow.appendChild(contentWrapper);
-      msgWrapper.appendChild(messageRow);
-      return msgWrapper;
-    }
-
-    // === USER PROFILE VIEW MODAL LOGIC ===
-    async function showUserProfile(targetUsername) {
-      if (!targetUsername || targetUsername === 'N/A') return;
-      const overlay = document.getElementById('userViewModalOverlay');
-      const modal = document.getElementById('userViewModal');
-
-      // Initial Loading State
-      document.getElementById('uvUsername').textContent = targetUsername;
-      document.getElementById('uvUsertag').textContent = 'Loading...';
-      document.getElementById('uvAvatar').src = '/images/default_avatar.png';
-      document.getElementById('uvBanner').src = '/images/default_banner.png';
-      document.getElementById('uvBio').textContent = 'Searching for user bio...';
-
-      overlay.classList.remove('hidden');
-      modal.classList.remove('hidden');
-      feather.replace();
-
-      if (targetUsername === 'AI') {
-        document.getElementById('uvUsername').textContent = 'Zylo AI';
-        document.getElementById('uvUsertag').textContent = '@AI';
-        document.getElementById('uvAvatar').src = '/images/Zylo_icon.ico';
-        document.getElementById('uvBio').textContent = 'Your friendly AI assistant within Zylo. I am here to help you brainstorm, answer questions, and explore ideas.';
-        document.getElementById('uvMessageBtn').classList.add('hidden');
-        document.getElementById('uvProfileBtn').classList.add('hidden');
-        return;
-      } else {
-        document.getElementById('uvMessageBtn').classList.remove('hidden');
-        document.getElementById('uvProfileBtn').classList.remove('hidden');
-      }
-
-      try {
-        const res = await fetch(`/api/get-user?identifier=${encodeURIComponent(targetUsername)}`);
-        const data = await res.json();
-        if (data.success && data.user) {
-          const u = data.user;
-          document.getElementById('uvUsername').textContent = u.username;
-          document.getElementById('uvUsertag').textContent = (u.usertag || '@user0000');
-          if (u.avatar) document.getElementById('uvAvatar').src = u.avatar;
-          if (u.banner) document.getElementById('uvBanner').src = u.banner;
-          document.getElementById('uvBio').textContent = u.about || u.aboutMe || 'No bio shared.';
-
-          // Set Up Message Button
-          const msgBtn = document.getElementById('uvMessageBtn');
-          msgBtn.onclick = () => {
-            closeUserViewModal();
-            openDMFromProfile(u.username);
-          };
-
-          // Set Up Profile Card Button
-          const profBtn = document.getElementById('uvProfileBtn');
-          profBtn.onclick = () => {
-            closeUserViewModal();
-            // If it's the current user, go to profile. If not, just viewing them is enough
-            if (u.username === localStorage.getItem('username')) {
-              switchTab('profile');
-            }
-          };
-        } else {
-          document.getElementById('uvBio').textContent = 'User details are currently unavailable.';
-        }
-      } catch (error) {
-        console.error('Failed to load user profile modal:', error);
-        document.getElementById('uvBio').textContent = 'Error loading user data.';
-      }
-    }
-
-    function closeUserViewModal() {
-      document.getElementById('userViewModalOverlay').classList.add('hidden');
-      document.getElementById('userViewModal').classList.add('hidden');
-    }
-
-    async function appendCommunityMessage(data) {
-      const msgElement = await createDiscordMessage(data);
-      chatMessagesCommunity.appendChild(msgElement);
-      chatMessagesCommunity.scrollTop = chatMessagesCommunity.scrollHeight;
-      feather.replace();
-      // Apply syntax highlighting to code blocks
-      if (typeof hljs !== 'undefined') {
-        msgElement.querySelectorAll('pre code.hljs').forEach(block => {
-          hljs.highlightElement(block);
-        });
-      }
-    }
-
-    async function appendAiBubble(role, content) {
-      const isOwn = role === 'user';
-      const data = {
-        username: isOwn ? username : 'AI',
-        message: content,
-        from: isOwn ? username : 'AI'
-      };
-
-      const msgElement = await createDiscordMessage(data);
-
-      // AI-specific: Use AI avatar
-      if (!isOwn) {
-        msgElement.querySelector('img').src = '/images/Zylo_icon.ico';
-
-        // Add feedback actions
-        const actions = document.createElement('div');
-        actions.className = 'mt-1 flex gap-2 opacity-70 text-xs';
-        const like = document.createElement('button');
-        like.textContent = '👍';
-        like.className = 'hover:opacity-100';
-        like.onclick = async () => { /* ... feedback logic ... */ like.textContent = '✅'; };
-        const dislike = document.createElement('button');
-        dislike.textContent = '👎';
-        dislike.className = 'hover:opacity-100';
-        dislike.onclick = async () => { /* ... feedback logic ... */ dislike.textContent = '✅'; };
-        actions.appendChild(like);
-        actions.appendChild(dislike);
-        msgElement.querySelector('div').appendChild(actions);
-      }
-
-      chatMessagesAI.appendChild(msgElement);
-      chatMessagesAI.scrollTop = chatMessagesAI.scrollHeight;
-      // Apply syntax highlighting to code blocks in AI chat
-      if (typeof hljs !== 'undefined') {
-        msgElement.querySelectorAll('pre code.hljs').forEach(block => {
-          hljs.highlightElement(block);
-        });
-      }
-    }
-
-    // Reply Context
-    let replyContext = null; // { id, username, content }
-
-    function startReply(id, username, content) {
-      replyContext = { id, username, content };
-
-      // Determine which bar and input to use
-      let barId = 'replyBar';
-      let textId = 'replyTargetText';
-      let inputId = 'chatInput';
-
-      const showHome = document.getElementById('tab-home')?.classList.contains('hidden') === false;
-      const showFriends = document.getElementById('tab-friends')?.classList.contains('hidden') === false;
-      const showGroup = document.getElementById('tab-group')?.classList.contains('hidden') === false;
-      const showCloud = document.getElementById('tab-cloud')?.classList.contains('hidden') === false;
-
-      // If in tab-messages, check if AI or Community
-      if (!document.getElementById('tab-messages')?.classList.contains('hidden')) {
-        if (!chatMessagesAI.classList.contains('hidden')) {
-          // AI chat doesn't really have a reply bar yet, but we'll use community's for now
-        }
-      } else if (showFriends) {
-        barId = 'friendsReplyBar';
-        textId = 'friendsReplyTargetText';
-        inputId = 'friendsChatInput';
-      } else if (showGroup) {
-        barId = 'groupReplyBar';
-        textId = 'groupReplyTargetText';
-        inputId = 'groupChatInput';
-      }
-
-      const bar = document.getElementById(barId);
-      const text = document.getElementById(textId);
-      const input = document.getElementById(inputId);
-
-      if (bar && text) {
-        bar.classList.remove('hidden');
-        text.textContent = `Replying to ${username}`;
-      }
-      if (input) {
-        input.focus();
-        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-
-    function cancelReply() {
-      replyContext = null;
-      ['replyBar', 'friendsReplyBar', 'groupReplyBar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-    }
-
-    // Add reaction to a message
-    async function addReactionToMessage(msgWrapper, emoji, data) {
-      const username = localStorage.getItem('savedUsername') || 'User';
-
-      // Find or create reactions container
-      let reactionsContainer = msgWrapper.querySelector('.reactions-container');
-      if (!reactionsContainer) {
-        reactionsContainer = document.createElement("div");
-        reactionsContainer.className = "reactions-container flex flex-wrap gap-1 mt-1 ml-12";
-        msgWrapper.appendChild(reactionsContainer);
-      }
-
-      // Initialize reactions if not present
-      if (!data.reactions) data.reactions = {};
-      if (!data.reactions[emoji]) data.reactions[emoji] = [];
-
-      // Toggle reaction (add if not present, remove if present)
-      const userIndex = data.reactions[emoji].indexOf(username);
-      if (userIndex === -1) {
-        data.reactions[emoji].push(username);
-      } else {
-        data.reactions[emoji].splice(userIndex, 1);
-        if (data.reactions[emoji].length === 0) {
-          delete data.reactions[emoji];
-        }
-      }
-
-      // Re-render reactions
-      reactionsContainer.innerHTML = '';
-      for (const [reactionEmoji, users] of Object.entries(data.reactions)) {
-        if (users.length === 0) continue;
-        const hasUserReacted = users.includes(username);
-        const reactionBadge = document.createElement("button");
-        reactionBadge.className = `flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs border transition ${hasUserReacted ? 'bg-discord-blurple/30 border-discord-blurple' : 'bg-discord-gray-700/50 hover:bg-discord-gray-600 border-discord-gray-600'}`;
-        reactionBadge.innerHTML = `<span>${reactionEmoji}</span><span class="text-discord-gray-300">${users.length}</span>`;
-        reactionBadge.title = users.join(', ');
-        reactionBadge.onclick = () => addReactionToMessage(msgWrapper, reactionEmoji, data);
-        reactionsContainer.appendChild(reactionBadge);
-      }
-
-      // Sync to backend (for group messages)
-      if (currentGroupId && data.timestamp) {
-        try {
-          await fetch('/api/groups/message/react', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              groupId: currentGroupId,
-              channel: activeChannelId || 'general',
-              timestamp: data.timestamp,
-              username,
-              emoji,
-              action: userIndex === -1 ? 'add' : 'remove'
-            })
-          });
-        } catch (e) { console.error('Reaction sync failed:', e); }
-      }
-    }
-
-    // Rate Limiting State (6.9)
-    const rateLimit = {
-      count: 5,
-      window: 10000, // 10 seconds
-      history: []
-    };
-
-    // sendMessage function
-    async function sendMessage() {
-      // Security: Rate Limiting Check
-      const now = Date.now();
-      rateLimit.history = rateLimit.history.filter(ts => now - ts < rateLimit.window);
-      if (rateLimit.history.length >= rateLimit.count) {
-        const resetTime = Math.ceil((rateLimit.history[0] + rateLimit.window - now) / 1000);
-        // Using a temporary notification instead of alert for better UX
-        const notification = document.createElement('div');
-        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-bounce';
-        notification.textContent = `Slow down! Please wait ${resetTime} seconds.`;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
-        return;
-      }
-      rateLimit.history.push(now);
-
-      const message = chatInput.value.trim();
-      if (!message) return;
-
-      if (currentChatRoom === 'community') {
-        const tempId = generateUUID();
-        const payload = {
-          id: tempId,
-          username,
-          message,
-          replyTo: replyContext ? { id: replyContext.id, username: replyContext.username, content: replyContext.content } : null,
-          ts: Date.now() / 1000
-        };
-
-        // Optimistic Render
-        if (chatMessagesCommunity) {
-          createDiscordMessage(payload).then(el => {
-            el.setAttribute('data-msg-id', tempId);
-            chatMessagesCommunity.appendChild(el);
-            chatMessagesCommunity.scrollTop = chatMessagesCommunity.scrollHeight;
-          });
-        }
-
-        chatInput.value = "";
-        chatInput.style.height = "auto";
-        cancelReply();
-
-        // Send to backend via REST (more robust + ID support)
-        try {
-          await fetch('/api/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } catch (e) {
-          console.error('Failed to send message:', e);
-        }
-        return;
-      }
-      // AI chat path
-      const model = aiModelSelect?.value || '';
-      const persona = aiPersonaSelect?.value || localStorage.getItem('ai_persona') || 'helper';
-      const payload = {
-        model,
-        persona,
-        username,
-        messages: [...aiConversation, { role: 'user', content: message }]
-      };
-      await appendAiBubble('user', message);
-      aiConversation.push({ role: 'user', content: message });
-      localStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
-      chatInput.value = "";
-      chatInput.style.height = "auto";
-      try {
-        const res = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        const reply = data.reply || data.response || 'Sorry, no reply available.';
-        await appendAiBubble('assistant', reply);
-        aiConversation.push({ role: 'assistant', content: reply });
-        localStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
-      } catch (e) {
-        await appendAiBubble('assistant', 'There was an error contacting the AI.');
-      }
-    }
-
-    // openEmojiPicker (Kept as is)
-    function toggleEmojiPicker(pickerId, inputId) {
-      const picker = document.getElementById(pickerId);
-      const input = document.getElementById(inputId);
-      if (!picker || !input) return;
-
-      if (picker.classList.contains("hidden")) {
-        // Close all other pickers
-        document.querySelectorAll('[id$="EmojiPicker"]').forEach(p => p.classList.add("hidden"));
-
-        picker.classList.remove("hidden");
-        picker.innerHTML = "";
-        const pickerInstance = new EmojiMart.Picker({
-          onEmojiSelect: (emoji) => {
-            input.value += emoji.native;
-            input.focus();
-          },
-          theme: "dark",
-        });
-        picker.appendChild(pickerInstance);
-      } else {
-        picker.classList.add("hidden");
-      }
-    }
-
-    // sendFile (Kept as is)
-    function sendFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      // Security: 10MB File Size Limit
-      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-      if (file.size > MAX_SIZE) {
-        alert("File is too large! Maximum file size is 10MB.");
-        event.target.value = ""; // Clear input
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const fileData = e.target.result;
-        socket.emit("send_file", {
-          username,
-          fileName: file.name,
-          fileType: file.type,
-          fileData: fileData
-        });
-      };
-      reader.readAsDataURL(file); // encodes file as base64
-    }
-
-    // === Voice Message Recording ===
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-    let recordingStartTime = null;
-
-    async function startVoiceRecording(context) {
-      if (isRecording) return;
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
-        isRecording = true;
-        recordingStartTime = Date.now();
-
-        // Visual feedback - add recording class
-        const btn = event.target.closest('.voice-record-btn');
-        if (btn) {
-          btn.classList.add('recording');
-          btn.style.backgroundColor = '#ef4444';
-          btn.style.animation = 'pulse 1s infinite';
-        }
-
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) {
-            audioChunks.push(e.data);
-          }
-        };
-
-        mediaRecorder.onstop = async () => {
-          const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-
-          // Only send if recording was longer than 0.5 seconds
-          if (duration >= 1) {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.onload = () => {
-              const base64Audio = reader.result;
-              sendVoiceMessage(base64Audio, duration, context);
-            };
-            reader.readAsDataURL(audioBlob);
-          }
-
-          // Stop all tracks
-          stream.getTracks().forEach(track => track.stop());
-        };
-
-        mediaRecorder.start();
-      } catch (err) {
-        console.error('Microphone access denied:', err);
-        alert('Please allow microphone access to record voice messages.');
-      }
-    }
-
-    function stopVoiceRecording(context) {
-      if (!isRecording || !mediaRecorder) return;
-
-      isRecording = false;
-      mediaRecorder.stop();
-
-      // Remove visual feedback
-      document.querySelectorAll('.voice-record-btn').forEach(btn => {
-        btn.classList.remove('recording');
-        btn.style.backgroundColor = '';
-        btn.style.animation = '';
-      });
-    }
-
-    async function sendVoiceMessage(audioData, duration, context) {
-      const currentUser = localStorage.getItem('savedUsername') || 'User';
-
-      const payload = {
-        username: currentUser,
-        type: 'voice',
-        fileData: audioData,
-        fileName: `voice_${Date.now()}.webm`,
-        fileType: 'audio/webm',
-        duration: duration,
-        timestamp: Math.floor(Date.now() / 1000)
-      };
-
-      if (context === 'community') {
-        socket.emit("send_file", payload);
-      } else if (context === 'group' && currentGroupId) {
-        payload.groupId = currentGroupId;
-        payload.channel = activeChannelId || 'general';
-
-        // Optimistic UI update
-        await appendGroupMessage(payload);
-
-        // Send to server
-        try {
-          await fetch('/api/groups/message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } catch (e) { console.error('Voice message send failed:', e); }
-      }
-    }
-
-    // Typing indicator logic (Kept as is)
-    socket.on("typing", (data) => {
-      activeTypers.add(data.username);
-      updateTypingIndicator();
-      clearTimeout(typingIndicator[data.username]);
-      typingIndicator[data.username] = setTimeout(() => {
-        activeTypers.delete(data.username);
-        updateTypingIndicator();
-      }, 2500);
-    });
-
-    // Socket message receivers (use NEW rendering function)
-    socket.on("receive_message", async (data) => {
-      await appendCommunityMessage(data);
-    });
-
-    socket.on("receive_file", async (data) => {
-      // This is now handled by createDiscordMessage, which appendCommunityMessage uses
-      await appendCommunityMessage(data);
-    });
-
-    // updateTypingIndicator
-    function updateTypingIndicator() {
-      // Main chat indicator
-      if (activeTypers.size === 0) {
-        typingIndicator.classList.add("hidden");
-        typingIndicator.textContent = "";
-      } else {
-        const typers = Array.from(activeTypers);
-        typingIndicator.classList.remove("hidden");
-        if (typers.length === 1) {
-          typingIndicator.textContent = `${typers[0]} is typing...`;
-        } else if (typers.length === 2) {
-          typingIndicator.textContent = `${typers[0]} and ${typers[1]} are typing...`;
-        } else {
-          typingIndicator.textContent = "Many people are typing...";
-        }
-      }
-
-      // Sidebar DM indicators logic
-      // clear all sidebar typing indicators first
-      document.querySelectorAll('.sidebar-typing-indicator').forEach(el => el.remove());
-
-      if (activeTypers.size > 0) {
-        activeTypers.forEach(username => {
-          // Find sidebar item for this user - simplified text match
-          // We look for elements that might be user list items
-          const sidebarItems = document.querySelectorAll('#directMessagesList > div, #friendsList > div');
-          sidebarItems.forEach(item => {
-            if (item.textContent.includes(username)) {
-              // Avoid duplicating if already added (though we cleared above)
-              if (!item.querySelector('.sidebar-typing-indicator')) {
-                const indicator = document.createElement("span");
-                indicator.className = "sidebar-typing-indicator text-xs text-discord-gray-400 italic ml-2 animate-pulse";
-                indicator.textContent = "typing...";
-                // Append to the name container usually
-                const nameContainer = item.querySelector('span.font-medium') || item;
-                nameContainer.appendChild(indicator);
-              }
-            }
-          });
-        });
-      }
-    }
-
-    // Fetch old messages (Kept as is)
-    if (navigator.onLine) {
-      fetch("/api/messages")
-        .then((res) => res.json())
-        .then(async (msgs) => {
-          for (const msg of msgs) {
-            await appendCommunityMessage(msg);
-          }
-        })
-        .catch(() => { });
-    }
-
-    // switchChatRoom (Updated to handle new sub-panel UI)
-    function switchChatRoom(room) {
-      currentChatRoom = room;
-      localStorage.setItem('chatRoom', room);
-      const btnCommunity = document.getElementById('btnRoomCommunity');
-      const btnAI = document.getElementById('btnRoomAI');
-      const title = document.getElementById('main-content-title');
-
-      // Ensure we're showing tab-messages, not tab-friends
-      const tabMessages = document.getElementById('tab-messages');
-      const tabFriends = document.getElementById('tab-friends');
-      if (tabMessages && tabFriends) {
-        tabMessages.classList.remove('hidden');
-        tabFriends.classList.add('hidden');
-      }
-
-      if (room === 'community') {
-        chatMessagesCommunity.classList.remove('hidden');
-        chatMessagesAI.classList.add('hidden');
-        aiControls.classList.add('hidden');
-        btnCommunity.classList.add('active');
-        btnAI.classList.remove('active');
-        if (title) title.textContent = '# Community';
-      } else {
-        chatMessagesCommunity.classList.add('hidden');
-        chatMessagesAI.classList.remove('hidden');
-        aiControls.classList.remove('hidden');
-        btnAI.classList.add('active');
-        btnCommunity.classList.remove('active');
-        if (title) title.textContent = '🤖 AI Chat';
-        restoreAiConversation();
-      }
-    }
-
-    // AI functions (restore, clear, load) (Kept as is)
-    function restoreAiConversation() {
-      try {
-        aiConversation = JSON.parse(localStorage.getItem('ai_conversation') || '[]');
-      } catch { aiConversation = []; }
-      chatMessagesAI.innerHTML = '';
-      (async () => {
-        for (const msg of aiConversation) {
-          await appendAiBubble(msg.role, msg.content);
-        }
-      })();
-    }
-
-    function clearAiConversation() {
-      aiConversation = [];
-      localStorage.removeItem('ai_conversation');
-      chatMessagesAI.innerHTML = '';
-    }
-
-    async function loadAiModels() {
-      try {
-        const res = await fetch('/api/ai/models');
-        const data = await res.json();
-        const models = data.models || [];
-        aiModelSelect.innerHTML = '';
-        models.forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m;
-          aiModelSelect.appendChild(opt);
-        });
-        const saved = localStorage.getItem('ai_model');
-        if (saved && models.includes(saved)) {
-          aiModelSelect.value = saved;
-        }
-        aiModelSelect.addEventListener('change', () => {
-          localStorage.setItem('ai_model', aiModelSelect.value);
-        });
-      } catch { }
-    }
-
-    async function loadAiPersonas() {
-      try {
-        const res = await fetch('/api/ai/personas');
-        const data = await res.json();
-        const personas = (data.personas || []).map(p => ({ key: p.key, name: p.name }));
-        aiPersonaSelect.innerHTML = '';
-        personas.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.key;
-          opt.textContent = p.name;
-          aiPersonaSelect.appendChild(opt);
-        });
-        const saved = localStorage.getItem('ai_persona');
-        if (saved) aiPersonaSelect.value = saved;
-        aiPersonaSelect.addEventListener('change', () => {
-          localStorage.setItem('ai_persona', aiPersonaSelect.value);
-        });
-      } catch { }
-    }
-
-    // Friends UI logic
-    let currentFriendFilter = 'all';
-    let activeFriendChat = null; // Can be a username (DM) or Group Object
-
-    async function loadFriends() {
-      const u = localStorage.getItem('username');
-      if (!u) return;
-      try {
-        const resFriends = await fetch(`/api/friends?username=${encodeURIComponent(u)}`);
-        const dataFriends = await resFriends.json();
-
-        friendsState = {
-          friends: dataFriends.friends || [],
-          incoming: dataFriends.incoming || [],
-          outgoing: dataFriends.outgoing || []
-        };
-
-        renderSidebarList(); // Update Friend List
-        renderFriendsDashboard(); // Update Main View
-      } catch (e) { console.error(e); }
-    }
-
-    // Helper: Generate consistent color for group avatar based on name
-    function getGroupColor(groupName) {
-      let hash = 0;
-      for (let i = 0; i < groupName.length; i++) {
-        hash = groupName.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const hue = Math.abs(hash % 360);
-      return `hsl(${hue}, 60%, 50%)`;
-    }
-
-    // Helper: Get first letter of group name
-    function getGroupInitial(groupName) {
-      return (groupName || 'G')[0].toUpperCase();
-    }
-
-    function renderSidebarList() {
-      const list = document.getElementById('sidebarDMList');
-      if (!list) return;
-      list.innerHTML = '';
-
-      // Friends / DMs Header
-      const header = document.createElement('div');
-      header.className = "px-2 py-1 text-xs font-semibold text-discord-gray-400 uppercase tracking-wider mb-1 mt-2";
-      header.textContent = "Direct Messages";
-      list.appendChild(header);
-
-      const saved = friendsState.friends || [];
-      saved.forEach(friend => {
-        const btn = document.createElement('div');
-        const isActive = activeFriendChat === friend;
-        btn.className = `sidebar-dm-item group flex items-center p-2 rounded cursor-pointer transition-colors mx-2 mb-0.5 ${isActive ? 'bg-discord-gray-600/50 text-white' : 'text-discord-gray-400 hover:bg-discord-gray-700/50 hover:text-discord-gray-200'}`;
-        btn.dataset.username = friend;
-        btn.onclick = () => openDM(friend);
-
-        // Avatar Container
-        const avatarContainer = document.createElement('div');
-        avatarContainer.className = "relative mr-3";
-
-        const img = document.createElement('img');
-        img.src = avatarCache.get(friend) || '/images/default_avatar.png'; // Use cache if avail
-        img.className = "w-8 h-8 rounded-full bg-discord-gray-700 object-cover";
-
-        // Fetch avatar if not cached
-        if (!avatarCache.has(friend)) {
-          getUserAvatarUrl(friend).then(url => {
-            img.src = url;
-          });
-        }
-
-        // Status Dot
-        const statusDot = document.createElement('div');
-        statusDot.className = "status-dot w-2.5 h-2.5 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-discord-gray-900 bg-gray-500";
-        // Note: we will rely on socket events to update this dot color via updateUserStatusUI
-        // But we can try to get initial status if we have it?
-        // For now, default gray is fine, the socket listener will paint it.
-
-        avatarContainer.appendChild(img);
-        avatarContainer.appendChild(statusDot);
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = "font-medium truncate flex-1";
-        nameSpan.textContent = friend;
-
-        btn.appendChild(avatarContainer);
-        btn.appendChild(nameSpan);
-
-        // Delete button placeholder (hidden by default)
-        const delBtn = document.createElement('button');
-        delBtn.className = "hidden group-hover:block text-discord-gray-400 hover:text-white p-1";
-        delBtn.innerHTML = '<i data-feather="x" class="w-3 h-3"></i>';
-        delBtn.onclick = (e) => {
-          e.stopPropagation();
-          // potentially remove friend or hide chat
-        };
-        btn.appendChild(delBtn);
-
-        list.appendChild(btn);
-      });
-      feather.replace();
-    }
-
-    function renderGroupSidebar() {
-      const container = document.getElementById('groupIconsContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      groupsData.forEach(g => {
-        const item = document.createElement('div');
-        item.className = 'group-icon-wrapper group relative flex items-center justify-center cursor-pointer my-2';
-
-        const isActive = currentGroupId === g.id;
-        const pillHeight = isActive ? 'h-10' : 'h-2';
-        const pillOpacity = isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100';
-
-        const color = getGroupColor(g.name);
-        const initial = getGroupInitial(g.name);
-
-        if (g.icon) {
-          iconStyle = `background-image: url(${g.icon}); background-size: cover; background-position: center;`;
-        } else if (!isActive) {
-          iconStyle = `background-color: ${color};`;
-        }
-
-        item.onclick = () => selectGroup(g.id);
-
-        item.innerHTML = `
-                <div class="absolute -left-2 w-1 bg-white rounded-r-full transition-all duration-200 ${pillHeight} ${pillOpacity}"></div>
-                <div class="sidebar-icon w-12 h-12 flex items-center justify-center bg-discord-gray-700 hover:bg-discord-blurple text-white font-semibold transition-all duration-200 ${isActive ? 'rounded-2xl bg-discord-blurple' : 'rounded-[24px] hover:rounded-2xl'}" style="${iconStyle}">
-                   ${g.icon ? '' : initial}
-                </div>
-                <!-- Tooltip -->
-                <div class="absolute left-full ml-4 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
-                   ${g.name}
-                </div>
-      `;
-        container.appendChild(item);
-      });
-      feather.replace();
-    }
-
-    function showGroupsModal() {
-      document.getElementById('groupsModal').classList.remove('hidden');
-    }
-
-    function closeGroupsModal() {
-      document.getElementById('groupsModal').classList.add('hidden');
-    }
-
-    function switchGroupModalTab(tab) {
-      const createTab = document.getElementById('createGroupTab');
-      const joinTab = document.getElementById('joinGroupTab');
-      const createForm = document.getElementById('createGroupForm');
-      const joinForm = document.getElementById('joinGroupForm');
-
-      if (tab === 'create') {
-        createTab.classList.add('border-b-2', 'border-discord-blurple', 'text-white');
-        createTab.classList.remove('text-discord-gray-400');
-        joinTab.classList.remove('border-b-2', 'border-discord-blurple', 'text-white');
-        joinTab.classList.add('text-discord-gray-400');
-
-        createForm.classList.remove('hidden');
-        joinForm.classList.add('hidden');
-      } else {
-        joinTab.classList.add('border-b-2', 'border-discord-blurple', 'text-white');
-        joinTab.classList.remove('text-discord-gray-400');
-        createTab.classList.remove('border-b-2', 'border-discord-blurple', 'text-white');
-        createTab.classList.add('text-discord-gray-400');
-
-        joinForm.classList.remove('hidden');
-        createForm.classList.add('hidden');
-      }
-    }
-
-
-    function filterFriends(filter) {
-      currentFriendFilter = filter;
-
-      // Update toolbar buttons
-      document.querySelectorAll('.friend-toolbar-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-discord-gray-600/50', 'text-white');
-        if (btn.textContent.toLowerCase().includes(filter) || (filter === 'add' && btn.classList.contains('add-friend'))) {
-          btn.classList.add('active');
-        }
-      });
-
-      renderFriendsDashboard();
-    }
-
-    function renderFriendsDashboard() {
-      const container = document.getElementById('friendsDashboardContent');
-      const addSection = document.getElementById('addFriendSection');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      if (currentFriendFilter === 'add') {
-        container.classList.add('hidden');
-        addSection.classList.remove('hidden');
-        return;
-      }
-
-      container.classList.remove('hidden');
-      addSection.classList.add('hidden');
-
-      // Helper to create row
-      const createRow = (username, subtext, actions) => {
-        const div = document.createElement('div');
-        div.className = 'friend-row group';
-
-        getUserAvatarUrl(username).then(url => {
-          const img = div.querySelector('.row-avatar');
-          if (img) img.src = url;
-        });
-
-        div.innerHTML = `
-              <div class="flex items-center gap-3" onclick="openDM('${username}')">
-                  <img src="/images/default_avatar.png" class="row-avatar w-10 h-10 rounded-full bg-discord-gray-700">
-                  <div>
-                      <div class="font-semibold text-white">${username}</div>
-                      <div class="text-xs text-discord-gray-400">${subtext}</div>
-                  </div>
-              </div>
-              <div class="flex items-center gap-2">
-                  ${actions}
-              </div>
-      `;
-        return div;
-      };
-
-      // Render based on filter
-      if (currentFriendFilter === 'all' || currentFriendFilter === 'online') {
-        // Note: We don't have real presence yet, assuming all friends are "Offline" visually for now or just listing them
-        friendsState.friends.forEach(f => {
-          const actions = `
-          <button class="action-icon-btn" onclick="openDM('${f}')" title="Message"><i data-feather="message-circle" class="w-4 h-4"></i></button>
-          <button class="action-icon-btn danger" onclick="removeFriend('${f}')" title="Remove"><i data-feather="trash-2" class="w-4 h-4"></i></button>
-      `;
-          container.appendChild(createRow(f, "Friend", actions));
-        });
-        if (friendsState.friends.length === 0) container.innerHTML = `<div class="text-center mt-10 text-discord-gray-400">No friends found. Wumpus is lonely.</div>`;
-      }
-
-      if (currentFriendFilter === 'pending') {
-        const headerIn = document.createElement('h3');
-        headerIn.className = "uppercase text-xs font-bold text-discord-gray-400 mb-2 mt-4";
-        headerIn.textContent = `Incoming - ${friendsState.incoming.length} `;
-        container.appendChild(headerIn);
-
-        friendsState.incoming.forEach(f => {
-          const actions = `
-          <button class="action-icon-btn success" onclick="acceptFriend('${f}')"><i data-feather="check" class="w-4 h-4"></i></button>
-          <button class="action-icon-btn danger" onclick="declineFriend('${f}')"><i data-feather="x" class="w-4 h-4"></i></button>
-      `;
-          container.appendChild(createRow(f, "Incoming Friend Request", actions));
-        });
-
-        const headerOut = document.createElement('h3');
-        headerOut.className = "uppercase text-xs font-bold text-discord-gray-400 mb-2 mt-4";
-        headerOut.textContent = `Outgoing - ${friendsState.outgoing.length}`;
-        container.appendChild(headerOut);
-
-        friendsState.outgoing.forEach(f => {
-          const actions = `
-          <button class="action-icon-btn danger" onclick="cancelFriendRequest('${f}')"><i data-feather="x" class="w-4 h-4"></i></button>
-          `;
-          container.appendChild(createRow(f, "Outgoing Friend Request", actions));
-        });
-      }
-
-      feather.replace();
-    }
-
-    async function requestFriend() {
-      const input = document.getElementById('addFriendInput');
-      const to = (input?.value || '').trim();
-      const from = localStorage.getItem('username');
-      if (!to || !from) return;
-
-      try {
-        const res = await fetch('/api/friends/request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from, to }) });
-        await res.json();
-        input.value = '';
-        loadFriends();
-      } catch { }
-    }
-
-    function requestFriendMain() {
-      const input = document.getElementById('addFriendInputMain');
-      const to = input.value.trim();
-      if (to) {
-        // Call your existing API
-        const from = localStorage.getItem('username');
-        fetch('/api/friends/request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from, to }) })
-          .then(r => r.json()).then(d => {
-            if (d.success) { alert('Request sent!'); input.value = ''; loadFriends(); }
-            else alert(d.error || 'Failed');
-          });
-      }
-    }
-
-    async function acceptFriend(from) {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-      await fetch('/api/friends/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, from }) });
-      loadFriends();
-    }
-
-    async function declineFriend(from) {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-      await fetch('/api/friends/decline', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, from }) });
-      loadFriends();
-    }
-
-    async function cancelFriendRequest(target) {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-      await fetch('/api/friends/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, to: target }) });
-      loadFriends();
-    }
-
-    async function removeFriend(friend) {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-      await fetch('/api/friends/remove', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, friend }) });
-      loadFriends();
-    }
-
-    // ---- Groups UI logic ----
-    async function openGroupChat(group) {
-      activeFriendChat = group; // Object
-      renderSidebarList();
-
-      document.getElementById('friendsDashboard').classList.add('hidden');
-      const view = document.getElementById('friendsChatView');
-      view.classList.remove('hidden');
-
-      document.getElementById('chatHeaderTitle').textContent = group.name;
-
-      const msgsContainer = document.getElementById('friendsChatMessages');
-      msgsContainer.innerHTML = '';
-
-      if (navigator.onLine) socket.emit('join_group', { groupId: group.id, username: localStorage.getItem('username') });
-
-      try {
-        const res = await fetch(`/ api / groups / ${group.id}/messages`);
-        const msgs = await res.json();
-        for (const m of msgs) {
-          const el = await createDiscordMessage(m);
-          msgsContainer.appendChild(el);
-        }
-        msgsContainer.scrollTop = msgsContainer.scrollHeight;
-        feather.replace();
-      } catch (e) { }
-    }
-
-
-
-    async function appendGroupMessage(data) {
-      const msgElement = await createDiscordMessage(data);
-      const container = document.getElementById('groupChatMessages');
-      if (container) {
-        container.appendChild(msgElement);
-        container.scrollTop = container.scrollHeight;
-        feather.replace();
-      }
-    }
-
-    async function refreshGroups() {
-      return loadGroups();
-    }
-
-    // (createNewGroup, joinExistingGroup, sendGroupMessage, sendGroupFile)
-    async function createNewGroup() {
-      const owner = localStorage.getItem('username');
-      const nameInput = document.getElementById('newGroupNameInput');
-      const descInput = document.getElementById('newGroupDescInput');
-      let name = nameInput?.value?.trim();
-
-      if (!name) { alert("Please enter a group name."); return; }
-
-      const description = descInput?.value?.trim() || "";
-
-      if (!owner) return;
-      try {
-        const res = await fetch('/api/groups/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner, name, description }) });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          closeGroupsModal();
-          refreshGroups();
-          if (nameInput) nameInput.value = '';
-          if (descInput) descInput.value = '';
-        } else {
-          alert(data.error || "Failed to create group.");
-        }
-      } catch { }
-    }
-
-    async function joinExistingGroup() {
-      const groupIdInput = document.getElementById('joinGroupIdInput');
-      const groupId = groupIdInput?.value?.trim();
-      const username = localStorage.getItem('username');
-
-      if (!username || !groupId) return;
-
-      try {
-        const res = await fetch('/api/groups/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, groupId }) });
-        const data = await res.json();
-
-        if (data.success) {
-          closeGroupsModal();
-          refreshGroups();
-          // Optionally auto-switch
-          // const g = (groupsState.list || []).find(x => x.id === groupId);
-          // if (g) setActiveGroup(g);
-          if (groupIdInput) groupIdInput.value = '';
-        } else {
-          alert(data.error || "Failed to join group.");
-        }
-      } catch { }
-    }
-    function sendGroupChatMessage() {
-      const input = document.getElementById('groupChatInput');
-      const message = (input?.value || '').trim();
-      if (!message || !groupsState.activeId) return;
-      const payload = {
-        groupId: groupsState.activeId,
-        username: localStorage.getItem('username'),
-        message,
-        replyTo: replyContext ? { id: replyContext.id, username: replyContext.username, content: replyContext.content } : null
-      };
-      if (navigator.onLine) socket.emit('send_group_message', payload);
-      else (async () => { await appendGroupMessage(payload); })();
-      input.value = ''; input.style.height = 'auto';
-      cancelReply();
-    }
-
-    function sendGroupFile(event) {
-      const file = event.target.files?.[0];
-      if (!file || !groupsState.activeId) return;
-
-      // Security: 10MB File Size Limit
-      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-      if (file.size > MAX_SIZE) {
-        alert("File is too large! Maximum file size is 10MB.");
-        event.target.value = "";
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const payload = { groupId: groupsState.activeId, username: localStorage.getItem('username'), fileName: file.name, fileType: file.type, fileData: e.target.result };
-        if (navigator.onLine) {
-          socket.emit('send_group_file', payload);
-        } else {  // Don't render optimistically when online - socket will handle it
-          (async () => { await appendGroupMessage(payload); })(); // Only render optimistically when offline
-        }
-        event.target.value = '';
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // Socket listeners for group messages (use new render function)
-    if (typeof io !== 'undefined') {
-      socket.on('receive_group_message', async (data) => {
-        if (data.groupId === groupsState.activeId) await appendGroupMessage(data);
-      });
-      socket.on('receive_group_file', async (data) => {
-        if (data.groupId === groupsState.activeId) await appendGroupMessage(data);
-      });
-    }
-
-    // Centralized Navigation Logic
-    // Centralized Navigation Logic
-    // Centralized Navigation Logic
     window.navigateTo = function (viewName, sectionId) {
       // Legacy fix: map 'chats' to 'messages'
       if (viewName === 'chats') viewName = 'messages';
@@ -4549,38 +2596,7 @@
       }
     }
 
-    const processedMessageIds = new Set();
 
-    if (typeof io !== 'undefined') {
-      socket.on('receive_dm', async (data) => {
-        const me = localStorage.getItem('savedUsername') || '';
-        const { from, to } = data || {};
-
-        // If we are currently chatting with this person (as the recipient or the sender)
-        if (activeFriendChat && typeof activeFriendChat === 'string') {
-          if ((from === me && to === activeFriendChat) || (to === me && from === activeFriendChat)) {
-            // Deduplication Check (Memory + DOM)
-            if (data.id) {
-              if (processedMessageIds.has(data.id) || document.querySelector(`[data-msg-id="${data.id}"]`)) return;
-              processedMessageIds.add(data.id);
-              // Clean up set occasionally (optional, but good practice to prevent excessive growth)
-              if (processedMessageIds.size > 1000) {
-                const it = processedMessageIds.values();
-                processedMessageIds.delete(it.next().value);
-              }
-            }
-
-            const el = await createDiscordMessage({ ...data, username: from });
-            const msgsContainer = document.getElementById('friendsChatMessages');
-            if (msgsContainer) {
-              msgsContainer.appendChild(el);
-              msgsContainer.scrollTop = msgsContainer.scrollHeight;
-              feather.replace();
-            }
-          }
-        }
-      });
-    }
 
     // Profile Functions (Kept as is, selectors still valid)
     // (loadStats, cropper logic, loadUserData, profile tab switching, etc... all kept as is)
@@ -5511,7 +3527,7 @@
       try { feather.replace(); } catch { }
     })();
 
-    let accountSettingsChanged = false;
+    let legacyAccountSettingsChanged = false;
     let originalAccountSettings = {};
 
     function trackAccountSettingsChanges() {
@@ -5535,21 +3551,21 @@
 
       if (settingsAvatarUpload) {
         settingsAvatarUpload.addEventListener('change', () => {
-          accountSettingsChanged = true;
+          legacyAccountSettingsChanged = true;
           updateAccountSaveButton();
         });
       }
 
       if (settingsBannerUpload) {
         settingsBannerUpload.addEventListener('change', () => {
-          accountSettingsChanged = true;
+          legacyAccountSettingsChanged = true;
           updateAccountSaveButton();
         });
       }
 
       if (settingsAboutMe) {
         settingsAboutMe.addEventListener('input', () => {
-          accountSettingsChanged = true;
+          legacyAccountSettingsChanged = true;
           updateAccountSaveButton();
         });
       }
@@ -5558,7 +3574,7 @@
     function updateAccountSaveButton() {
       const saveBtn = document.getElementById('saveAccountSettingsBtn');
       if (saveBtn) {
-        saveBtn.style.display = accountSettingsChanged ? 'block' : 'none';
+        saveBtn.style.display = legacyAccountSettingsChanged ? 'block' : 'none';
       }
     }
 
@@ -5567,13 +3583,13 @@
       const originalConfirmSaveSettings = window.confirmSaveSettings;
       window.confirmSaveSettings = function () {
         originalConfirmSaveSettings();
-        if (accountSettingsChanged) {  // Also save account settings if changed
+        if (legacyAccountSettingsChanged) {  // Also save account settings if changed
           saveAccountSettings();
         }
       };
     } else {
       window.confirmSaveSettings = function () {
-        if (accountSettingsChanged) { // Also save account settings if changed
+        if (legacyAccountSettingsChanged) { // Also save account settings if changed
           saveAccountSettings();
         }
       };
@@ -5619,7 +3635,7 @@
 
         const data = await res.json();
         if (data.success) {
-          accountSettingsChanged = false;
+          legacyAccountSettingsChanged = false;
           updateAccountSaveButton();
 
           const updated = data.user || {};
@@ -6465,45 +4481,7 @@
     }
 
     function applySettingsLocale() {
-      const lang = localStorage.getItem('language') || 'en';
-      const dict = {
-        en: {
-          settingsTitle: '⚙️ Settings', general: 'General', sounds: 'Sounds', account: 'Account', about: 'About Us',
-          enableAnimations: 'Enable Animations', compactMode: 'Compact Mode', showTooltips: 'Show Tooltips', language: 'Language',
-          startupPage: 'Startup Page', autoSave: 'Auto Save Changes', confirmExit: 'Confirm Before Exit', appearance: 'Appearance',
-          solidBg: 'Solid BG', resetAll: 'Reset All Settings'
-        },
-        es: {
-          settingsTitle: '⚙️ Ajustes', general: 'General', sounds: 'Sonidos', account: 'Cuenta', about: 'Acerca de',
-          enableAnimations: 'Habilitar animaciones', compactMode: 'Modo compacto', showTooltips: 'Mostrar consejos', language: 'Idioma',
-          startupPage: 'Página de inicio', autoSave: 'Guardar automáticamente', confirmExit: 'Confirmar antes de salir', appearance: 'Apariencia',
-          solidBg: 'Fondo sólido', resetAll: 'Restablecer todos los ajustes'
-        },
-        vi: {
-          settingsTitle: '⚙️ Cài đặt', general: 'Chung', sounds: 'Âm thanh', account: 'Tài khoản', about: 'Giới thiệu',
-          enableAnimations: 'Bật hiệu ứng', compactMode: 'Chế độ gọn', showTooltips: 'Hiển thị gợi ý', language: 'Ngôn ngữ',
-          startupPage: 'Trang khởi động', autoSave: 'Tự động lưu', confirmExit: 'Xác nhận trước khi thoát', appearance: 'Giao diện',
-          solidBg: 'Nền đồng màu', resetAll: 'Đặt lại tất cả cài đặt'
-        }
-      }[lang] || {};
-
-      const byId = (id) => document.getElementById(id);
-      if (byId('settingsTitle') && dict.settingsTitle) byId('settingsTitle').textContent = dict.settingsTitle;
-      if (byId('tabBtnGeneral')?.querySelector('span') && dict.general) byId('tabBtnGeneral').querySelector('span').textContent = dict.general;
-      if (byId('tabBtnAppearance')?.querySelector('span') && dict.appearance) byId('tabBtnAppearance').querySelector('span').textContent = dict.appearance;
-      if (byId('tabBtnSounds')?.querySelector('span') && dict.sounds) byId('tabBtnSounds').querySelector('span').textContent = dict.sounds;
-      if (byId('tabBtnAccount')?.querySelector('span') && dict.account) byId('tabBtnAccount').querySelector('span').textContent = dict.account;
-      if (byId('tabBtnAbout')?.querySelector('span') && dict.about) byId('tabBtnAbout').querySelector('span').textContent = dict.about;
-      if (byId('labelEnableAnimations') && dict.enableAnimations) byId('labelEnableAnimations').textContent = dict.enableAnimations;
-      if (byId('labelCompactMode') && dict.compactMode) byId('labelCompactMode').textContent = dict.compactMode;
-      if (byId('labelShowTooltips') && dict.showTooltips) byId('labelShowTooltips').textContent = dict.showTooltips;
-      if (byId('labelLanguage') && dict.language) byId('labelLanguage').textContent = dict.language;
-      if (byId('labelStartupPage') && dict.startupPage) byId('labelStartupPage').textContent = dict.startupPage;
-      if (byId('labelAutoSave') && dict.autoSave) byId('labelAutoSave').textContent = dict.autoSave;
-      if (byId('labelConfirmExit') && dict.confirmExit) byId('labelConfirmExit').textContent = dict.confirmExit;
-      if (byId('titleAppearance') && dict.appearance) byId('titleAppearance').textContent = dict.appearance;
-      if (byId('labelSolidBg') && dict.solidBg) byId('labelSolidBg').textContent = dict.solidBg;
-      if (byId('btnResetAll') && dict.resetAll) byId('btnResetAll').textContent = dict.resetAll;
+       if(window.applyLanguage) window.applyLanguage(localStorage.getItem('language') || 'en');
     }
 
     function resetAllSettings() {
@@ -6566,8 +4544,8 @@
     });
 
     document.getElementById("languageSelect").addEventListener("change", function () {
-      localStorage.setItem("language", this.value);
-      applySettingsLocale();
+      // Logic moved to window.setLanguage in translations.js
+      // But we still want to persist settings
       persistSettings({ language: this.value });
     });
 
@@ -6727,17 +4705,40 @@
     }
 
     // Two-factor authentication toggle
-    document.getElementById("twoFactorToggle").addEventListener("change", function () {
-      localStorage.setItem("twoFactorEnabled", this.checked);
+    document.getElementById("twoFactorToggle").addEventListener("change", async function () {
       const username = localStorage.getItem('username');
-
-      if (username) {
-        fetch('/api/update-settings', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, settings: { twoFactorEnabled: this.checked } })
-        }).catch(() => { });
+      const isEnabled = this.checked;
+      
+      if (!username) {
+        alert('Please log in first.');
+        this.checked = !isEnabled; // Revert toggle
+        return;
       }
-      alert(`Two-Factor Authentication ${this.checked ? 'enabled' : 'disabled'}.`);
+      
+      try {
+        const endpoint = isEnabled ? '/api/auth/2fa/enable' : '/api/auth/2fa/disable';
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          localStorage.setItem("twoFactorEnabled", isEnabled);
+          if (isEnabled && data.secret) {
+            alert(`2FA enabled!\n\nFor testing, use any 6-digit code (e.g., 123456).\n\nSecret: ${data.secret}`);
+          } else {
+            alert('Two-Factor Authentication disabled.');
+          }
+        } else {
+          alert(data.error || 'Failed to update 2FA.');
+          this.checked = !isEnabled; // Revert toggle on error
+        }
+      } catch (e) {
+        alert('Network error. Please try again.');
+        this.checked = !isEnabled; // Revert toggle
+      }
     });
 
     // Privacy toggles (defensive binding)
@@ -8094,57 +6095,7 @@
 
 
 
-    function selectGroup(groupId) {
-      // Leave previous group room if connected
-      if (typeof socket !== 'undefined' && socket && currentGroupId && currentGroupId !== groupId) {
-        socket.emit('leave', { room: currentGroupId });
-      }
 
-      currentGroupId = groupId;
-      const group = groupsData.find(g => g.id === groupId);
-      if (!group) return;
-
-      // Sync activeId if groupsState exists (legacy safety)
-      if (typeof groupsState !== 'undefined') groupsState.activeId = groupId;
-
-      // Update sidebar list
-      renderGroupSidebar();
-
-      // Show group panel and tab
-      document.querySelectorAll('.sub-panel-content').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-
-      const gPanel = document.getElementById('sub-panel-group');
-      const gTab = document.getElementById('tab-group');
-      if (gPanel) gPanel.classList.remove('hidden');
-      if (gTab) {
-        gTab.classList.remove('hidden');
-        gTab.style.display = ''; // Force remove inline display:none from navigateTo()
-      }
-
-      // Update basic info
-      const nameEl = document.getElementById('groupPanelName');
-      const descEl = document.getElementById('groupPanelDesc');
-      if (nameEl) nameEl.textContent = group.name;
-      if (descEl) descEl.textContent = group.description || 'No description';
-
-      const titleEl = document.getElementById('main-content-title');
-      if (titleEl) titleEl.textContent = `# ${group.name}`;
-
-      // Handle Socket join
-      if (typeof socket !== 'undefined' && socket) {
-        socket.emit('join', { room: group.id });
-      }
-
-      // Load specific group data
-      // Load initial channel
-      activeChannelId = 'general';
-      loadGroupChannels(group, activeChannelId);
-      loadGroupMembers(group);
-      loadGroupMessages(group, activeChannelId);
-
-      feather.replace();
-    }
 
     function loadGroupChannels(group, activeChannelId = 'general') {
       const container = document.getElementById('groupChannelsList');
@@ -9141,54 +7092,8 @@
     </div>
   </div>
 
-  <script>
-    function showGroupsModal() {
-      const modal = document.getElementById('groupsModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        switchGroupModalTab('create');
-      }
-    }
-
-    function closeGroupsModal() {
-      const modal = document.getElementById('groupsModal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function switchGroupModalTab(tab) {
-      // Toggle tabs
-      const createTab = document.getElementById('createGroupTab');
-      const joinTab = document.getElementById('joinGroupTab');
-      const createForm = document.getElementById('createGroupForm');
-      const joinForm = document.getElementById('joinGroupForm');
-      const createBtn = document.getElementById('createGroupBtn');
-      const joinBtn = document.getElementById('joinGroupBtn');
-
-      if (tab === 'create') {
-        createTab?.classList.add('text-white', 'border-discord-blurple');
-        createTab?.classList.remove('text-discord-gray-400', 'border-transparent');
-        joinTab?.classList.remove('text-white', 'border-discord-blurple');
-        joinTab?.classList.add('text-discord-gray-400', 'border-transparent');
-
-        createForm?.classList.remove('hidden');
-        joinForm?.classList.add('hidden');
-
-        createBtn?.classList.remove('hidden');
-        joinBtn?.classList.add('hidden');
-      } else {
-        joinTab?.classList.add('text-white', 'border-discord-blurple');
-        joinTab?.classList.remove('text-discord-gray-400', 'border-transparent');
-        createTab?.classList.remove('text-white', 'border-discord-blurple');
-        createTab?.classList.add('text-discord-gray-400', 'border-transparent');
-
-        joinForm?.classList.remove('hidden');
-        createForm?.classList.add('hidden');
-
-        joinBtn?.classList.remove('hidden');
-        createBtn?.classList.add('hidden');
-      }
-    }
-  </script>
+  <script src="/files/js/utils.js"></script>
+  <script src="/files/js/groups.js"></script>
 
   <!-- Call Animation Styles -->
   <style>
@@ -9560,549 +7465,24 @@
   </style>
 
   <!-- Robust Auto-Fix & Cleanup Script -->
-  <script>
-    (function () {
-      // 1. Remove any "ghost" text nodes that might have leaked into body/head
-      // This defends against browser caching of the malformed HTML state
-      function cleanGhostText() {
-        const patterns = ['Rotate chevron', 'subPanelContainer', 'margin-right: 0'];
-        [document.body, document.head].forEach(root => {
-          if (!root) return;
-          Array.from(root.childNodes).forEach(node => {
-            if (node.nodeType === 3) { // Text node
-              const text = node.textContent;
-              if (patterns.some(p => text.includes(p))) {
-                node.remove();
-              }
-            }
-          });
-        });
-      }
 
-      // Run cleanup immediately and on load
-      cleanGhostText();
-      document.addEventListener('DOMContentLoaded', cleanGhostText);
-
-      // 2. One-time Sidebar Reset to ensure clean state
-      if (!sessionStorage.getItem('fix_sidebar_v2')) {
-        localStorage.removeItem('sidebarCollapsed');
-        sessionStorage.setItem('fix_sidebar_v2', 'true');
-        document.addEventListener('DOMContentLoaded', () => {
-          const sidebar = document.getElementById('subPanelContainer');
-          if (sidebar) sidebar.classList.remove('collapsed');
-        });
-      }
-
-      // 3. Force Icon Refresh to ensure settings icons etc are visible
-      document.addEventListener('DOMContentLoaded', () => {
-        // Force re-render of feather icons if they exist
-        if (window.feather) {
-          setTimeout(() => window.feather.replace(), 100);
-          setTimeout(() => window.feather.replace(), 500); // Double tap for safety
-        }
-      });
-    })();
-  </script>
 
   <!-- Code Block Copy Function -->
-  <script>
-    function copyCodeBlock(blockId) {
-      const codeEl = document.getElementById(blockId);
-      if (!codeEl) return;
 
-      const code = codeEl.textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        // Find the copy button in the parent wrapper
-        const wrapper = codeEl.closest('.code-block-wrapper');
-        const btn = wrapper?.querySelector('.copy-code-btn');
-        if (btn) {
-          btn.classList.add('copied');
-          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-          setTimeout(() => {
-            btn.classList.remove('copied');
-            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-          }, 2000);
-        }
-      }).catch(err => {
-        console.error('Failed to copy code:', err);
-      });
-    }
-  </script>
 
   <!-- Collapsible Sidebar Function -->
-  <script>
-    function toggleSidebarCollapse() {
-      const sidebar = document.getElementById('subPanelContainer');
-      if (!sidebar) return;
 
-      const isCollapsed = sidebar.classList.toggle('collapsed');
-      localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
-
-      // Update button icon
-      const btn = document.getElementById('sidebarCollapseBtn');
-      if (btn) {
-        feather.replace();
-      }
-    }
-
-    // Initialize sidebar state on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedState = localStorage.getItem('sidebarCollapsed');
-      if (savedState === 'true') {
-        const sidebar = document.getElementById('subPanelContainer');
-        if (sidebar) {
-          sidebar.classList.add('collapsed');
-        }
-      }
-    });
-  </script>
 
   <!-- Sticker Picker JavaScript -->
-  <script>
-    // Available stickers
-    const AVAILABLE_STICKERS = [
-      { id: 'bear_crying', name: 'Bear Crying', src: '/files/stickers/bear_crying.png' },
-      { id: 'bear_laughing', name: 'Bear Laughing', src: '/files/stickers/bear_laughing.png' },
-      { id: 'bear_like', name: 'Bear Like', src: '/files/stickers/bear_like.png' },
-      { id: 'boy_crying', name: 'Boy Crying', src: '/files/stickers/boy_crying.png' },
-      { id: 'boy_excited', name: 'Boy Excited', src: '/files/stickers/boy_excited.png' },
-      { id: 'cat_celebrate', name: 'Cat Celebrate', src: '/files/stickers/cat_celebrate.png' },
-      { id: 'cat_laughing', name: 'Cat Laughing', src: '/files/stickers/cat_laughing.png' },
-      { id: 'crying', name: 'Crying', src: '/files/stickers/crying.png' },
-      { id: 'girl_crying', name: 'Girl Crying', src: '/files/stickers/girl_crying.png' },
-      { id: 'girl_excited', name: 'Girl Excited', src: '/files/stickers/girl_excited.png' },
-      { id: 'girl_happy', name: 'Girl Happy', src: '/files/stickers/girl_happy.png' },
-      { id: 'good_job', name: 'Good Job', src: '/files/stickers/good_job.png' },
-      { id: 'great_job', name: 'Great Job', src: '/files/stickers/great_job.png' },
-      { id: 'hand_heart', name: 'Hand Heart', src: '/files/stickers/hand_heart.png' },
-      { id: 'happy', name: 'Happy', src: '/files/stickers/happy.png' },
-      { id: 'happy_cat', name: 'Happy Cat', src: '/files/stickers/happy_cat.png' },
-      { id: 'heart', name: 'Heart', src: '/files/stickers/heart.png' },
-      { id: 'heart_bubble', name: 'Heart Bubble', src: '/files/stickers/heart_bubble.png' },
-      { id: 'heart_smile', name: 'Heart Smile', src: '/files/stickers/heart_smile.png' },
-      { id: 'kola_like', name: 'Kola Like', src: '/files/stickers/kola_like.png' },
-      { id: 'laugh', name: 'Laugh', src: '/files/stickers/laugh.png' },
-      { id: 'star', name: 'Star', src: '/files/stickers/star.png' },
-      { id: 'star_happy', name: 'Star Happy', src: '/files/stickers/star_happy.png' },
-      { id: 'thumbs_up', name: 'Thumbs Up', src: '/files/stickers/thumbs_up.png' }
-    ];
+  <!-- Sticker Picker JavaScript -->
+  <script src="files/js/stickers.js"></script>
 
-    // --- Account Settings Logic ---
-    let pendingAvatar = null;
-    let pendingBanner = null;
-    let pendingUsertag = null;
-
-    // Prompt functions for edit buttons
-    function promptUsernameEdit() {
-      alert("Changing username is not supported yet.");
-    }
-
-    function promptEmailEdit() {
-      alert("Changing email is not supported yet.");
-    }
-
-    function promptUsertagEdit() {
-      const current = document.getElementById('currentUsertag').innerText;
-      const newVal = prompt("Enter new Usertag (e.g. @CoolUser):", current);
-      if (newVal !== null && newVal !== current) {
-        document.getElementById('currentUsertag').innerText = newVal;
-        pendingUsertag = newVal;
-        settingsChanged = true;
-        updateSaveButtonVisibility();
-      }
-    }
-
-    // Avatar/Banner Upload Listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      const avatarInput = document.getElementById('settingsAvatarUpload');
-      const bannerInput = document.getElementById('settingsBannerUpload');
-
-      if (avatarInput) {
-        avatarInput.addEventListener('change', function (e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function (evt) {
-            document.getElementById('settingsAvatar').src = evt.target.result;
-            pendingAvatar = evt.target.result; // Data URL
-            settingsChanged = true;
-            updateSaveButtonVisibility();
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      if (bannerInput) {
-        bannerInput.addEventListener('change', function (e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function (evt) {
-            document.getElementById('settingsBanner').src = evt.target.result;
-            pendingBanner = evt.target.result; // Data URL
-            settingsChanged = true;
-            updateSaveButtonVisibility();
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-    });
-
-    // Helper to persist account settings
-    async function persistAccountSettings() {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-
-      const payload = {
-        username: username,
-      };
-
-      let hasChanges = false;
-
-      if (pendingAvatar) {
-        payload.avatar = pendingAvatar;
-        hasChanges = true;
-      }
-      if (pendingBanner) {
-        payload.banner = pendingBanner;
-        hasChanges = true;
-      }
-      if (pendingUsertag) {
-        payload.usertag = pendingUsertag;
-        hasChanges = true;
-      }
-
-      if (!hasChanges) return;
-
-      try {
-        const res = await fetch('/api/update-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-          // Update local storage if needed
-          if (data.user.avatar) localStorage.setItem('avatar', data.user.avatar);
-          if (data.user.banner) localStorage.setItem('banner', data.user.banner);
-          if (data.user.usertag) localStorage.setItem('usertag', data.user.usertag);
-
-          // Clear pending
-          pendingAvatar = null;
-          pendingBanner = null;
-          pendingUsertag = null;
-
-          // Refresh profile UI if function exists
-          if (typeof loadUserProfile === 'function') loadUserProfile();
-        } else {
-          console.error("Failed to update profile:", data.error);
-          alert("Failed to update profile: " + data.error);
-        }
-      } catch (err) {
-        console.error("Error saving profile:", err);
-        alert("Error saving profile settings.");
-      }
-    }
-
-    // Current active sticker picker (to track which input to send to)
-    let activeStickerPickerId = null;
-
-    // Initialize sticker pickers with content
-    function initStickerPickers() {
-      const pickerIds = ['communityStickerPicker', 'friendsStickerPicker', 'groupStickerPicker'];
-
-      pickerIds.forEach(pickerId => {
-        const picker = document.getElementById(pickerId);
-        if (!picker) return;
-
-        // Build sticker picker HTML
-        let html = '<div class="sticker-picker-header">Stickers</div>';
-        html += '<div class="sticker-grid">';
-
-        AVAILABLE_STICKERS.forEach(sticker => {
-          html += `
-            <div class="sticker-item" onclick="sendSticker('${sticker.id}', '${sticker.src}')" title="${sticker.name}">
-              <img src="${sticker.src}" alt="${sticker.name}" loading="lazy">
-            </div>
-          `;
-        });
-
-        html += '</div>';
-        picker.innerHTML = html;
-      });
-    }
-
-    // Toggle sticker picker visibility
-    function toggleStickerPicker(pickerId) {
-      const picker = document.getElementById(pickerId);
-      if (!picker) return;
-
-      // Close all other pickers first
-      const allPickers = document.querySelectorAll('.sticker-picker');
-      allPickers.forEach(p => {
-        if (p.id !== pickerId) p.classList.add('hidden');
-      });
-
-      // Close emoji pickers too
-      const emojiPickers = document.querySelectorAll('[id$="EmojiPicker"]');
-      emojiPickers.forEach(p => p.classList.add('hidden'));
-
-      // Toggle this picker
-      picker.classList.toggle('hidden');
-      activeStickerPickerId = picker.classList.contains('hidden') ? null : pickerId;
-    }
-
-    // Send a sticker message
-    function sendSticker(stickerId, stickerSrc) {
-      // Determine which chat we're in based on active picker
-      let chatType = 'community';
-      if (activeStickerPickerId === 'friendsStickerPicker') {
-        chatType = 'friends';
-      } else if (activeStickerPickerId === 'groupStickerPicker') {
-        chatType = 'group';
-      }
-
-      // Close the picker
-      if (activeStickerPickerId) {
-        document.getElementById(activeStickerPickerId)?.classList.add('hidden');
-        activeStickerPickerId = null;
-      }
-
-      // Send sticker based on chat type
-      if (chatType === 'friends') {
-        sendFriendSticker(stickerId, stickerSrc);
-      } else if (chatType === 'group') {
-        sendGroupSticker(stickerId, stickerSrc);
-      } else {
-        sendCommunitySticker(stickerId, stickerSrc);
-      }
-    }
-
-    // Helper for unique IDs
-    function generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
-
-    // Send sticker to community chat
-    async function sendCommunitySticker(stickerId, stickerSrc) {
-      const username = localStorage.getItem('username') || 'Anonymous';
-      const tempId = generateUUID();
-
-      const payload = {
-        id: tempId,
-        username,
-        message: `[sticker:${stickerId}]`,
-        type: 'sticker',
-        sticker_src: stickerSrc,
-        room: 'community',
-        ts: Date.now() / 1000
-      };
-
-      // Optimistic Render
-      const container = document.getElementById('chatMessagesCommunity');
-      if (container) {
-        const el = await createDiscordMessage(payload);
-        el.setAttribute('data-msg-id', tempId);
-        container.appendChild(el);
-        container.scrollTop = container.scrollHeight;
-      }
-
-      // Send to backend
-      try {
-        await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.error('Failed to send sticker:', err);
-      }
-    }
-
-    // Send sticker to friend DM
-    async function sendFriendSticker(stickerId, stickerSrc) {
-      if (!activeFriendChat) return;
-
-      const username = localStorage.getItem('username') || 'Anonymous';
-
-      const payload = {
-        from: username,
-        to: activeFriendChat,
-        message: `[sticker:${stickerId}]`,
-        type: 'sticker',
-        sticker_src: stickerSrc,
-        ts: Date.now() / 1000
-      };
-
-      // Optimistic Render
-      const container = document.getElementById('friendsChatMessages');
-      if (container) {
-        const el = await createDiscordMessage({ ...payload, username: username });
-        container.appendChild(el);
-        container.scrollTop = container.scrollHeight;
-      }
-
-      // Send to backend
-      try {
-        await fetch('/api/dm', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.error('Failed to send friend sticker:', err);
-      }
-    }
-
-    // Send sticker to group chat
-    async function sendGroupSticker(stickerId, stickerSrc) {
-      const channelName = document.getElementById('groupChatChannelName')?.textContent || 'general';
-      if (!currentGroupId) return;
-
-      const username = localStorage.getItem('username') || 'Anonymous';
-
-      const payload = {
-        groupId: currentGroupId,
-        channel: channelName,
-        username,
-        message: `[sticker:${stickerId}]`,
-        type: 'sticker',
-        sticker_src: stickerSrc,
-        ts: Date.now() / 1000
-      };
-
-      // Optimistic Render
-      const container = document.getElementById('groupChatMessages');
-      if (container) {
-        const el = await createDiscordMessage(payload);
-        container.appendChild(el);
-        container.scrollTop = container.scrollHeight;
-      }
-
-      // Send to backend
-      try {
-        await fetch('/api/groups/message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.error('Failed to send group sticker:', err);
-      }
-    }
-
-    // Close sticker picker when clicking outside
-    document.addEventListener('click', function (e) {
-      const pickers = document.querySelectorAll('.sticker-picker');
-      const stickerBtns = document.querySelectorAll('[onclick*="toggleStickerPicker"]');
-
-      let clickedInsidePicker = false;
-      pickers.forEach(p => {
-        if (p.contains(e.target)) clickedInsidePicker = true;
-      });
-      stickerBtns.forEach(btn => {
-        if (btn.contains(e.target)) clickedInsidePicker = true;
-      });
-
-      if (!clickedInsidePicker) {
-        pickers.forEach(p => p.classList.add('hidden'));
-        activeStickerPickerId = null;
-      }
-    });
-
-    // Initialize sticker pickers on DOM ready
-    document.addEventListener('DOMContentLoaded', initStickerPickers);
-  </script>
 
   <!-- QR Code Library (qrcode.js from CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- QR Code Functions -->
-  <script>
-    let currentQRUsername = null;
-    let qrCodeInstance = null;
-
-    function showQRCode() {
-      const username = document.getElementById('uvUsername')?.textContent;
-      if (!username || username === 'N/A') return;
-
-      currentQRUsername = username;
-      const modal = document.getElementById('qrCodeModal');
-      const container = document.getElementById('qrCodeContainer');
-      const usernameEl = document.getElementById('qrCodeUsername');
-
-      // Update username display
-      usernameEl.textContent = `@${username}`;
-
-      // Clear previous QR
-      container.innerHTML = '';
-
-      // Generate QR code with profile link
-      const profileLink = `zylo://u/${username}`;
-
-      try {
-        qrCodeInstance = new QRCode(container, {
-          text: profileLink,
-          width: 192,
-          height: 192,
-          colorDark: '#1a1a2e',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
-        });
-      } catch (e) {
-        // Fallback if library not loaded
-        container.innerHTML = `
-          <div class="w-48 h-48 flex items-center justify-center bg-gray-100 text-gray-500 text-center p-4 rounded">
-            <div>
-              <div class="text-2xl mb-2">🔗</div>
-              <div class="text-sm">${profileLink}</div>
-            </div>
-          </div>
-        `;
-      }
-
-      modal.classList.remove('hidden');
-      feather.replace();
-    }
-
-    function closeQRModal() {
-      const modal = document.getElementById('qrCodeModal');
-      modal.classList.add('hidden');
-      qrCodeInstance = null;
-    }
-
-    function copyProfileLink() {
-      if (!currentQRUsername) return;
-      const link = `zylo://u/${currentQRUsername}`;
-
-      navigator.clipboard.writeText(link).then(() => {
-        // Show success feedback
-        const btn = event.target.closest('button');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i data-feather="check" class="w-4 h-4 inline mr-2"></i>Copied!';
-        btn.classList.add('bg-green-600');
-        btn.classList.remove('bg-discord-blurple');
-        feather.replace();
-
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.classList.remove('bg-green-600');
-          btn.classList.add('bg-discord-blurple');
-          feather.replace();
-        }, 2000);
-      }).catch(() => {
-        alert('Failed to copy link');
-      });
-    }
-
-    // Close QR modal on click outside
-    document.getElementById('qrCodeModal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'qrCodeModal') closeQRModal();
-    });
-  </script>
+  <script src="files/js/qrcode.js"></script>
 
   <!-- Apps Modal -->
   <div id="appsModal"
@@ -10120,248 +7500,8 @@
     </div>
   </div>
 
+  <script src="files/js/apps.js"></script>
   <script>
-    // Apps Modal Functions
-    let currentApp = null;
-
-    function openAppModal(appName) {
-      currentApp = appName;
-      const modal = document.getElementById('appsModal');
-      const title = document.getElementById('appModalTitle');
-      const content = document.getElementById('appModalContent');
-
-      const apps = {
-        menu: {
-          title: '📱 Apps & Tools',
-          render: () => `
-            <div class="grid grid-cols-2 gap-3 p-2">
-              <button onclick="openAppModal('calculator')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">🧮</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Calculator</div>
-              </button>
-              <button onclick="openAppModal('calendar')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">📅</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Calendar</div>
-              </button>
-              <button onclick="openAppModal('speedtest')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">⚡</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Speed Test</div>
-              </button>
-              <button onclick="openAppModal('notes')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">📝</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Notes</div>
-              </button>
-              <button onclick="openAppModal('timer')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">⏱️</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Timer</div>
-              </button>
-              <button onclick="openAppModal('colorpicker')" class="p-4 rounded-xl bg-discord-gray-700 hover:bg-discord-gray-600 transition text-center group">
-                <div class="text-3xl mb-2">🎨</div>
-                <div class="text-sm font-medium text-gray-300 group-hover:text-white">Colors</div>
-              </button>
-            </div>
-          `
-        },
-        calculator: {
-          title: '🧮 Calculator',
-          render: () => `
-            <div class="bg-discord-gray-700 p-4 rounded-lg">
-              <input type="text" id="calcDisplay" class="w-full bg-discord-gray-900 text-white text-2xl text-right p-3 rounded mb-3" readonly value="0">
-              <div class="grid grid-cols-4 gap-2">
-                ${['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', 'C', '0', '=', '+'].map(b =>
-            `<button onclick="calcPress('${b}')" class="p-3 rounded ${b.match(/[0-9.]/) ? 'bg-discord-gray-600' : 'bg-discord-blurple'} hover:opacity-80 text-white font-bold">${b}</button>`
-          ).join('')}
-              </div>
-            </div>
-          `
-        },
-        calendar: {
-          title: '📅 Calendar',
-          render: () => {
-            const now = new Date();
-            const month = now.toLocaleString('default', { month: 'long' });
-            const year = now.getFullYear();
-            const today = now.getDate();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
-            let days = '';
-            for (let i = 0; i < firstDay; i++) days += '<div></div>';
-            for (let d = 1; d <= daysInMonth; d++) {
-              const isToday = d === today ? 'bg-discord-blurple text-white' : 'bg-discord-gray-700 hover:bg-discord-gray-600';
-              days += `<div class="p-2 text-center rounded ${isToday} cursor-pointer">${d}</div>`;
-            }
-
-            return `
-              <div class="text-center mb-4">
-                <div class="text-xl font-bold text-white">${month} ${year}</div>
-              </div>
-              <div class="grid grid-cols-7 gap-1 text-xs text-center">
-                <div class="text-discord-gray-400 font-bold">Sun</div>
-                <div class="text-discord-gray-400 font-bold">Mon</div>
-                <div class="text-discord-gray-400 font-bold">Tue</div>
-                <div class="text-discord-gray-400 font-bold">Wed</div>
-                <div class="text-discord-gray-400 font-bold">Thu</div>
-                <div class="text-discord-gray-400 font-bold">Fri</div>
-                <div class="text-discord-gray-400 font-bold">Sat</div>
-                ${days}
-              </div>
-            `;
-          }
-        },
-        speedtest: {
-          title: '⚡ Speed Test',
-          render: () => `
-            <div class="text-center">
-              <div id="speedResult" class="text-6xl font-bold text-white mb-2">--</div>
-              <div class="text-discord-gray-400 mb-4">Mbps (Download)</div>
-              <button onclick="runSpeedTest()" class="px-6 py-3 bg-discord-blurple hover:bg-opacity-80 text-white rounded-lg font-medium">
-                Run Test
-              </button>
-              <p class="text-xs text-discord-gray-500 mt-4">Note: Simulated test for demo</p>
-            </div>
-          `
-        },
-        notes: {
-          title: '📝 Quick Notes',
-          render: () => `
-            <textarea id="quickNotes" class="w-full h-48 bg-discord-gray-700 text-white p-3 rounded-lg resize-none" placeholder="Type your notes here...">${localStorage.getItem('quickNotes') || ''}</textarea>
-            <button onclick="saveNotes()" class="mt-2 w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">Save Notes</button>
-          `
-        },
-        timer: {
-          title: '⏱️ Timer',
-          render: () => `
-            <div class="text-center">
-              <div id="timerDisplay" class="text-6xl font-mono font-bold text-white mb-4">00:00</div>
-              <div class="flex gap-2 justify-center mb-4">
-                <input type="number" id="timerMinutes" class="w-20 bg-discord-gray-700 text-white p-2 rounded text-center" placeholder="Min" value="5">
-                <span class="text-2xl text-white">:</span>
-                <input type="number" id="timerSeconds" class="w-20 bg-discord-gray-700 text-white p-2 rounded text-center" placeholder="Sec" value="00">
-              </div>
-              <div class="flex gap-2 justify-center">
-                <button onclick="startTimer()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">Start</button>
-                <button onclick="stopTimer()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Stop</button>
-                <button onclick="resetTimer()" class="px-4 py-2 bg-discord-gray-600 hover:bg-discord-gray-500 text-white rounded-lg">Reset</button>
-              </div>
-            </div>
-          `
-        },
-        colorpicker: {
-          title: '🎨 Color Picker',
-          render: () => `
-            <div class="space-y-4">
-              <div id="colorPreview" class="w-full h-24 rounded-lg bg-discord-blurple border-2 border-discord-gray-600"></div>
-              <input type="color" id="colorInput" class="w-full h-12 rounded cursor-pointer" value="#5865f2" onchange="updateColorPreview()">
-              <input type="text" id="colorHex" class="w-full bg-discord-gray-700 text-white p-2 rounded text-center font-mono" value="#5865f2" onchange="updateFromHex()">
-              <button onclick="copyColor()" class="w-full py-2 bg-discord-blurple hover:bg-opacity-80 text-white rounded-lg">Copy Hex Code</button>
-            </div>
-          `
-        }
-      };
-
-      const app = apps[appName];
-      if (!app) return;
-
-      title.textContent = app.title;
-      content.innerHTML = app.render();
-      modal.classList.remove('hidden');
-      feather.replace();
-    }
-
-    function closeAppModal() {
-      document.getElementById('appsModal').classList.add('hidden');
-      currentApp = null;
-    }
-
-    // Calculator functions
-    let calcValue = '0';
-    function calcPress(btn) {
-      const display = document.getElementById('calcDisplay');
-      if (btn === 'C') {
-        calcValue = '0';
-      } else if (btn === '=') {
-        try { calcValue = String(eval(calcValue)); } catch { calcValue = 'Error'; }
-      } else {
-        if (calcValue === '0' && !btn.match(/[+\-*/]/)) calcValue = btn;
-        else calcValue += btn;
-      }
-      display.value = calcValue;
-    }
-
-    // Speed test (simulated)
-    function runSpeedTest() {
-      const result = document.getElementById('speedResult');
-      result.textContent = '...';
-      let i = 0;
-      const interval = setInterval(() => {
-        result.textContent = Math.floor(Math.random() * 100 + 50);
-        i++;
-        if (i > 20) {
-          clearInterval(interval);
-          result.textContent = Math.floor(Math.random() * 50 + 75);
-        }
-      }, 100);
-    }
-
-    // Notes functions
-    function saveNotes() {
-      const notes = document.getElementById('quickNotes').value;
-      localStorage.setItem('quickNotes', notes);
-      alert('Notes saved!');
-    }
-
-    // Timer functions
-    let timerInterval = null;
-    let timerRemaining = 0;
-    function startTimer() {
-      if (timerInterval) return;
-      const mins = parseInt(document.getElementById('timerMinutes').value) || 0;
-      const secs = parseInt(document.getElementById('timerSeconds').value) || 0;
-      timerRemaining = mins * 60 + secs;
-      timerInterval = setInterval(tickTimer, 1000);
-    }
-    function tickTimer() {
-      if (timerRemaining <= 0) {
-        stopTimer();
-        alert('Timer finished!');
-        return;
-      }
-      timerRemaining--;
-      const m = String(Math.floor(timerRemaining / 60)).padStart(2, '0');
-      const s = String(timerRemaining % 60).padStart(2, '0');
-      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
-    }
-    function stopTimer() {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-    function resetTimer() {
-      stopTimer();
-      document.getElementById('timerDisplay').textContent = '00:00';
-      timerRemaining = 0;
-    }
-
-    // Color picker functions
-    function updateColorPreview() {
-      const color = document.getElementById('colorInput').value;
-      document.getElementById('colorPreview').style.backgroundColor = color;
-      document.getElementById('colorHex').value = color;
-    }
-    function updateFromHex() {
-      const hex = document.getElementById('colorHex').value;
-      document.getElementById('colorInput').value = hex;
-      document.getElementById('colorPreview').style.backgroundColor = hex;
-    }
-    function copyColor() {
-      const hex = document.getElementById('colorHex').value;
-      navigator.clipboard.writeText(hex).then(() => alert('Copied: ' + hex));
-    }
-
-    // Close app modal on click outside
-    document.getElementById('appsModal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'appsModal') closeAppModal();
-    });
 
     // --- Moments / Diary Functions (Part A) ---
     async function loadMomentsFeed() {
@@ -10446,172 +7586,9 @@
       document.getElementById('tabBtnGeneral')?.click();
     });
 
-    function renderMomentCard(post) {
-      const isLiked = post.reactions && post.reactions.includes(localStorage.getItem('username'));
-      const likeCount = post.reactions ? post.reactions.length : 0;
-      const comments = post.comments || [];
-
-      return `
-        <div class="bg-discord-gray-800 rounded-lg p-4 shadow-sm animate-fadeIn">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-full bg-discord-gray-700 overflow-hidden">
-               <img src="/images/default_avatar.png" class="w-full h-full object-cover">
-            </div>
-            <div>
-              <div class="font-semibold text-white">${post.username}</div>
-              <div class="text-xs text-discord-gray-400">${new Date(post.createdAt * 1000).toLocaleString()}</div>
-            </div>
-          </div>
-          
-          <div class="mb-3 text-discord-gray-100 whitespace-pre-wrap">${post.caption}</div>
-          
-          ${post.url ? `<div class="mb-3 rounded-lg overflow-hidden bg-black max-h-[400px] flex items-center justify-center">
-            <img src="${post.url}" class="max-w-full max-h-[400px] object-contain" loading="lazy">
-          </div>` : ''}
-          
-          <div class="flex items-center gap-4 border-t border-discord-gray-700 pt-3">
-            <button onclick="reactToMoment('${post.id}')" class="flex items-center gap-2 ${isLiked ? 'text-red-500' : 'text-discord-gray-400 hover:text-red-400'} transition">
-              <i data-feather="heart" class="${isLiked ? 'fill-current' : ''} w-5 h-5"></i>
-              <span>${likeCount || 'Like'}</span>
-            </button>
-            <button onclick="document.getElementById('commentInput-${post.id}').focus()" class="flex items-center gap-2 text-discord-gray-400 hover:text-white transition">
-              <i data-feather="message-square" class="w-5 h-5"></i>
-              <span>Comment</span>
-            </button>
-          </div>
-
-          <!-- Comments Section -->
-          ${comments.length > 0 ? `
-            <div class="mt-3 space-y-2 pl-4 border-l-2 border-discord-gray-700">
-              ${comments.slice(-3).map(c => `
-                <div class="text-sm">
-                  <span class="font-semibold text-white text-xs">${c.username}</span>: 
-                  <span class="text-discord-gray-300">${c.text}</span>
-                </div>
-              `).join('')}
-              ${comments.length > 3 ? `<div class="text-xs text-discord-gray-500 cursor-pointer">View all ${comments.length} comments</div>` : ''}
-            </div>
-          ` : ''}
-          
-          <div class="mt-3 flex gap-2">
-            <input id="commentInput-${post.id}" type="text" placeholder="Write a comment..." 
-              class="flex-1 bg-discord-gray-900 border-none rounded-full px-4 py-2 text-sm text-white focus:ring-1 focus:ring-discord-blurple"
-              onkeydown="if(event.key === 'Enter') commentOnMoment('${post.id}', this.value)">
-          </div>
-        </div>
-      `;
-    }
-
-    async function reactToMoment(postId) {
-      const username = localStorage.getItem('username');
-      if (!username) return;
-
-      try {
-        const res = await fetch('/api/moments/react', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId, username })
-        });
-        const data = await res.json();
-        if (data.success) {
-          // Optimistic reload or targeted update could be better, but reload is easiest
-          loadMomentsFeed();
-        }
-      } catch (e) { console.error(e); }
-    }
-
-    async function commentOnMoment(postId, text) {
-      const username = localStorage.getItem('username');
-      if (!username || !text.trim()) return;
-
-      try {
-        const res = await fetch('/api/moments/comment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId, username, comment: text })
-        });
-        const data = await res.json();
-        if (data.success) {
-          loadMomentsFeed();
-        }
-      } catch (e) { console.error(e); }
-    }
-
-    // Share Button Logic
-    document.getElementById('momentsShareBtn')?.addEventListener('click', async () => {
-      const caption = document.getElementById('momentsCaption').value;
-      const fileInput = document.getElementById('momentsFile');
-      const file = fileInput.files[0];
-      const username = localStorage.getItem('username');
-
-      if (!username) return alert('Please log in');
-      if (!caption && !file) return; // Empty
-
-      const btn = document.getElementById('momentsShareBtn');
-      btn.disabled = true;
-      btn.textContent = 'Posting...';
-
-      const payload = {
-        username,
-        caption,
-        fileData: null,
-        fileName: null
-      };
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          payload.fileData = e.target.result;
-          payload.fileName = file.name;
-          await sendPost(payload);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Usually API requires fileData for image posts, but let's try just caption if allowed? 
-        // Looking at backend: "if not username or not file_data: return error". 
-        // So we MUST have a file? User request said "Add photos...". 
-        // If backend insists on file, we might need a dummy or change backend.
-        // Let's assume file is required based on backend code I saw.
-        if (!file) {
-          alert("Please attach an image (Backend requires it currently).");
-          btn.disabled = false;
-          btn.textContent = 'Share';
-          return;
-        }
-      }
-    });
-
-    async function sendPost(payload) {
-      try {
-        const res = await fetch('/api/explore/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById('momentsCaption').value = '';
-          document.getElementById('momentsFile').value = '';
-          loadMomentsFeed();
-        } else {
-          alert('Failed: ' + data.error);
-        }
-      } catch (e) {
-        console.error(e);
-        alert('Error posting');
-      } finally {
-        const btn = document.getElementById('momentsShareBtn');
-        btn.disabled = false;
-        btn.textContent = 'Share';
-      }
-    }
-
-    // Auto-load feed handler
-    window.addEventListener('load', () => {
-      // Logic for Moments/Cloud moved to navigateTo to avoid duplication
-    });
-
   </script>
+
+
   <script src="/files/sw-register.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -10620,148 +7597,7 @@
   </script>
   <script src="/files/vendor/cropper.min.js"></script>
 
-  <script>
-    // Cloud Functions
-    async function loadCloudFiles() {
-      const username = localStorage.getItem('username');
-      if (!username) return;
 
-      const container = document.getElementById('filesListContainer');
-      container.innerHTML = '<div class="col-span-full text-center py-8"><div class="animate-spin w-8 h-8 border-2 border-discord-blurple border-t-transparent rounded-full mx-auto"></div></div>';
-
-      try {
-        const res = await fetch(`/api/cloud/files?username=${encodeURIComponent(username)}`);
-        const data = await res.json();
-
-        if (data.success && data.files.length > 0) {
-          container.innerHTML = data.files.map(file => {
-            let previewHtml = '';
-            // Backend stores 'url', frontend upload flow might have 'fileData' temporarily but we check url first
-            const imgSrc = file.url || file.fileData;
-
-            if (file.fileType.startsWith('image/') && imgSrc) {
-              previewHtml = `<img src="${imgSrc}" class="w-10 h-10 rounded object-cover border border-discord-gray-600 bg-black">`;
-            } else {
-              previewHtml = `<div class="w-10 h-10 rounded bg-discord-gray-700 flex items-center justify-center text-2xl">${getFileIcon(file.fileType)}</div>`;
-            }
-
-            return `
-            <div class="bg-discord-gray-800 p-3 rounded-lg flex items-center gap-3 group hover:bg-discord-gray-700 transition relative">
-              ${previewHtml}
-              <div class="overflow-hidden flex-1">
-                <h4 class="text-sm font-medium text-white truncate" title="${file.fileName}">${file.fileName}</h4>
-                <p class="text-xs text-discord-gray-400">${new Date(file.createdAt * 1000).toLocaleDateString()}</p>
-              </div>
-               <button onclick="deleteCloudFile('${file.id}')" class="p-2 text-red-400 opacity-0 group-hover:opacity-100 transition hover:bg-discord-gray-600 rounded">
-                <i data-feather="trash-2" class="w-4 h-4"></i>
-              </button>
-            </div>
-          `}).join('');
-          feather.replace();
-        } else {
-          container.innerHTML = `
-            <div class="col-span-full py-12 text-center text-discord-gray-500">
-              <i data-feather="folder" class="w-12 h-12 mx-auto mb-3 opacity-20"></i>
-              <p>No files yet. Upload your first file!</p>
-            </div>
-          `;
-          feather.replace();
-        }
-      } catch (err) {
-        console.error('Failed to load files:', err);
-        container.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load files.</p>';
-      }
-    }
-
-    function getFileIcon(type) {
-      if (!type) return '❓';
-      if (type.startsWith('image/')) return '🖼️';
-      if (type.startsWith('video/')) return '🎥';
-      if (type.startsWith('audio/')) return '🎵';
-      if (type.includes('pdf')) return '📄';
-      if (type.includes('zip') || type.includes('compressed')) return '📦';
-      return '📁';
-    }
-
-    async function uploadCloudFile(files) {
-      if (!files || files.length === 0) return;
-
-      const username = localStorage.getItem('username');
-      if (!username) return alert("Please log in first.");
-
-      const progress = document.getElementById('cloudUploadProgress');
-      progress.classList.remove('hidden');
-
-      for (let file of files) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          try {
-            await fetch('/api/cloud/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username,
-                fileName: file.name,
-                fileType: file.type,
-                fileData: e.target.result
-              })
-            });
-            loadCloudFiles(); // Refresh list
-          } catch (err) {
-            console.error('Upload failed:', err);
-            alert('Failed to upload ' + file.name);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-
-      setTimeout(() => progress.classList.add('hidden'), 2000);
-    }
-
-    async function deleteCloudFile(fileId) {
-      if (!confirm("Delete this file?")) return;
-      const username = localStorage.getItem('username');
-      try {
-        const res = await fetch('/api/cloud/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, fileId })
-        });
-        const data = await res.json();
-        if (data.success) {
-          loadCloudFiles();
-        } else {
-          alert("Delete failed: " + data.error);
-        }
-      } catch (err) {
-        alert("Delete failed");
-      }
-    }
-
-    // Initialize logic
-    // Add drag-drop listeners
-    const dropZone = document.getElementById('cloudUploadArea');
-    if (dropZone) {
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-discord-blurple');
-      });
-      dropZone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-discord-blurple');
-      });
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-discord-blurple');
-        uploadCloudFile(e.dataTransfer.files);
-      });
-    }
-
-    // Helper for legacy calls
-    window.refreshFilesList = loadCloudFiles;
-
-    // Auto-load if settings is open (optional)
-  </script>
 
   <!-- Mobile Bottom Navigation Bar -->
   <nav id="mobileBottomNav"
@@ -11296,10 +8132,73 @@
       vid.src = ""; // Stop buffering
     }
 
+    // === Session Management ===
+
+    async function doLogout() {
+      const token = localStorage.getItem('session_token');
+      try {
+        if (token) {
+            // Attempt server-side logout, but don't block UI if it fails
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token })
+            });
+        }
+      } catch (e) {
+        console.error('Logout API error:', e);
+      }
+
+      // Clear local storage session data
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('usertag');
+      
+      // Redirect to login
+      window.location.href = 'login.html';
+    }
+
+    async function validateSessionOnLoad() {
+      const token = localStorage.getItem('session_token');
+      const currentUser = localStorage.getItem('username'); // Legacy check
+
+      // If no token, maybe we are on legacy auth? Check if username exists.
+      // If no username either, definitely redirect.
+      if (!token && !currentUser) {
+         console.warn("No session token or user found, redirecting to login.");
+         window.location.href = 'login.html';
+         return;
+      }
+
+      if (token) {
+          try {
+            const res = await fetch('/api/auth/validate-session', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ token })
+            });
+            const data = await res.json();
+            if (!data.valid) {
+               console.warn('Session invalid/expired:', data.error);
+               doLogout(); // Expired token -> logout
+            }
+          } catch (e) {
+            console.error('Session validation network error:', e);
+            // On network error, we might optionally let them stay or retry. 
+            // For security, usually fail closed, but for UX, maybe warn.
+            // Let's not auto-logout on simple potential network glitch immediately unless we want strict security.
+          }
+      }
+    }
+    
+    // Run validation immediately
+    validateSessionOnLoad();
+
     // Final alias
     window.switchTab = window.navigateTo;
 
   </script>
+  <script src="/files/js/settings.js"></script>
 </body>
 
 </html>

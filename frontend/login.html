@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#0b1020" />
   <script src="/files/vendor/tailwindcss.js"></script>
   <script src="/files/vendor/feather-icons.js"></script>
+  <script src="/files/js/translations.js"></script> <!-- Translations -->
   <link rel="stylesheet" href="/files/style.css">
   <script>
     tailwind.config = {
@@ -22,12 +23,8 @@
           },
           keyframes: {
             ringPulse: {
-              '0%, 100%': {
-                boxShadow: '0 0 0 0 rgba(59,130,246,0.7)',
-              },
-              '50%': {
-                boxShadow: '0 0 0 6px rgba(59,130,246,0)',
-              },
+              '0%, 100%': { boxShadow: '0 0 0 0 rgba(59,130,246,0.7)', },
+              '50%': { boxShadow: '0 0 0 6px rgba(59,130,246,0)', },
             },
             fadeIn: {
               '0%': { opacity: '0', transform: 'translateY(20px)' },
@@ -48,61 +45,92 @@
     };
   </script>
 </head>
-<body id="body" class="min-h-screen flex flex-col items-center justify-center transition-colors duration-500 dark:text-white">
+<body id="body" class="min-h-screen flex flex-col items-center justify-center transition-colors duration-500 dark:text-white animated-bg">
 
-  <!-- Theme Toggle -->
-  <div class="absolute top-4 right-4 z-50">
-    <button id="toggleTheme" class="flex items-center gap-1 bg-white text-gray-800 dark:bg-gray-800 dark:text-white px-3 py-1 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
+  <!-- Theme & Language Toggle -->
+  <div class="absolute top-4 right-4 z-50 flex gap-2">
+    <!-- Language Picker -->
+    <select id="pageLanguageSelect" onchange="window.setLanguage(this.value)" class="bg-white text-gray-800 dark:bg-gray-800 dark:text-white px-2 py-1 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700 text-sm border-none focus:ring-0 cursor-pointer">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="vi">Tiếng Việt</option>
+    </select>
+    
+    <button id="toggleTheme" aria-label="Toggle Dark Mode" class="flex items-center gap-1 bg-white text-gray-800 dark:bg-gray-800 dark:text-white px-3 py-1 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
       <i id="themeIcon" data-feather="sun" class="w-5 h-5"></i>
-      <span id="themeText" class="ml-1">
-        Light Mode
-      </span>
+      <span id="themeText" class="ml-1 hidden sm:inline">Light</span>
     </button>
   </div>
   
   <div class="w-full max-w-sm px-4 flex flex-col items-center space-y-4">
 
     <!-- Login Card -->
-    <div class="bg-white/20 backdrop-blur-md dark:bg-gray-800/30 shadow-2xl rounded-xl w-[90%] max-w-sm p-6 space-y-4 border border-white/10">
+    <div class="w-[90%] max-w-sm p-6 space-y-4 rounded-xl glass-card">
 
       <!-- Avatar -->
       <div class="flex justify-center mb-1">
-        <img id="loginAvatar" src="/images/default_avatar.png" alt="Avatar" class="w-20 h-20 rounded-full shadow-md ring-2 ring-blue-400 dark:ring-blue-500 animate-ringPulse" />
+        <img id="loginAvatar" src="/images/default_avatar.png" alt="User Avatar" class="w-20 h-20 rounded-full shadow-md ring-2 ring-blue-400 dark:ring-blue-500 animate-ringPulse" />
       </div>
 
-      <h2 class="zylo-heading text-2xl font-bold text-center">Welcome back!</h2>
+      <h2 class="zylo-heading text-2xl font-bold text-center" data-i18n="auth.welcomeBack">Welcome back!</h2>
 
       <!-- Inputs -->
-      <div class="space-y-3">
-        <input id="username" type="text" placeholder="Username or Email" class="zylo-input w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 "/>
+      <div id="login-inputs" class="space-y-3">
+        <input id="username" type="text" placeholder="Username or Email" data-i18n-placeholder="auth.usernameOrEmail" aria-label="Username or Email" class="zylo-input w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect"/>
 
         <div class="relative">
-          <input id="password" type="password" placeholder="Password" class="zylo-input w-full px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 "/>
-          <span id="togglePassword" class="absolute top-2.5 right-3 text-blue-500 dark:text-blue-300 cursor-pointer text-sm select-none"><i id="eyeIcon" data-feather="eye"></i></span>
+          <input id="password" type="password" placeholder="Password" data-i18n-placeholder="auth.password" aria-label="Password" class="zylo-input w-full px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect"/>
+          <span id="togglePassword" role="button" tabindex="0" aria-label="Toggle password visibility" class="absolute top-2.5 right-3 text-blue-500 dark:text-blue-300 cursor-pointer text-sm select-none"><i id="eyeIcon" data-feather="eye"></i></span>
         </div>
-        <p id="capsWarn" class="text-xs text-yellow-600 dark:text-yellow-400 hidden">Caps Lock is ON</p>
+        <p id="capsWarn" role="alert" class="text-xs text-yellow-600 dark:text-yellow-400 hidden">Caps Lock is ON</p>
+      </div>
+
+      <!-- 2FA Input (hidden by default) -->
+      <div id="twofa-section" class="hidden space-y-3" aria-live="polite">
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center"><i data-feather="shield" class="inline w-4 h-4 mr-1"></i><span data-i18n="auth.enterCode">Enter your 2FA code</span></p>
+        <input id="twofa-code" type="text" maxlength="6" placeholder="000000" aria-label="2FA Code" class="zylo-input w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center text-xl tracking-widest font-mono"/>
+        <button id="verify2faBtn" onclick="verify2FA()" aria-label="Verify 2FA Code" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition duration-200 flex items-center justify-center gap-2 btn-hover-effect">
+          <svg id="verify2faSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+          <span id="verify2faBtnText" data-i18n="auth.verify">Verify</span>
+        </button>
+        <button onclick="reset2FAFlow()" class="text-sm text-blue-500 hover:underline w-full text-center" data-i18n="auth.backToLogin">Back to login</button>
       </div>
 
       <!-- Remember -->
       <div class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-        <input type="checkbox" id="rememberMe" class="accent-blue-500">
-        <label for="rememberMe">Remember me</label>
+        <input type="checkbox" id="rememberMe" class="accent-blue-500" aria-label="Remember me">
+        <label for="rememberMe" data-i18n="auth.rememberMe">Remember me</label>
       </div>
 
       <!-- Button -->
-      <button id="loginBtn" onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+      <button id="loginBtn" onclick="login()" aria-label="Sign In" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed btn-hover-effect">
         <svg id="loginSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
-        <span id="loginBtnText">Sign In</span>
+        <span id="loginBtnText" data-i18n="auth.signIn">Sign In</span>
       </button>
 
       <!-- Error -->
-      <p id="error-msg" class="text-red-600 dark:text-red-400 text-sm text-center hidden">Invalid credentials.</p>
+      <p id="error-msg" role="alert" class="text-red-600 dark:text-red-400 text-sm text-center hidden">Invalid credentials.</p>
+
+      <!-- Social login -->
+      <div id="social-login-container" class="mt-2">
+          <div class="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
+            <span class="px-2" data-i18n="auth.orSignInWith">or sign in with</span>
+            <hr class="flex-grow border-t border-gray-300 dark:border-gray-600">
+          </div>
+          <div class="grid grid-cols-4 gap-2"> <!-- Compact social icons -->
+              <button onclick="socialLogin('Google')" aria-label="Sign in with Google" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/google-original.svg" alt="Google" class="w-5 h-5"></button>
+              <button onclick="socialLogin('GitHub')" aria-label="Sign in with GitHub" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/github-original.svg" alt="GitHub" class="w-5 h-5"></button>
+              <button onclick="socialLogin('Discord')" aria-label="Sign in with Discord" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/discordjs-original.svg" alt="Discord" class="w-5 h-5"></button>
+              <button onclick="socialLogin('Microsoft')" aria-label="Sign in with Microsoft" class="p-2 border rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-center btn-hover-effect"><img src="/images/devicons/windows8-original.svg" alt="Microsoft" class="w-5 h-5"></button>
+          </div>
+      </div>
 
       <!-- Extra -->
       <div class="text-center text-sm space-y-1 mt-2">
-        <a href="forgot.html" class="text-blue-600 hover:underline dark:text-blue-400">Forgot your password?</a><br>
-        <span class="text-gray-600 dark:text-gray-400">Don't have an account?</span>
-        <a href="signup.html" class="text-blue-600 hover:underline dark:text-blue-400 ml-1">Create one</a>
+        <a href="forgot.html" class="text-blue-600 hover:underline dark:text-blue-400" data-i18n="auth.forgotPassLink">Forgot your password?</a><br>
+        <span class="text-gray-600 dark:text-gray-400" data-i18n="auth.noAccount">Don't have an account?</span>
+        <a href="signup.html" class="text-blue-600 hover:underline dark:text-blue-400 ml-1" data-i18n="auth.createOne">Create one</a>
       </div>
     </div>
 
@@ -110,24 +138,22 @@
     <footer class="w-full mt-6 py-4 bg-white bg-opacity-70 dark:bg-transparent text-center text-xs text-gray-800 dark:text-gray-400 rounded-lg shadow-inner">
       <p class="text-gray-700 dark:text-gray-400 mb-1">&copy; 2025 Zylo Inc. All rights reserved.</p>
       <div class="space-x-3">
-        <button type="button" onclick="openModal('pp')" class="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</button>
+        <button type="button" onclick="openModal('pp')" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="auth.privacyPolicy">Privacy Policy</button>
         <span class="text-gray-600 dark:text-gray-500">|</span>
-        <button type="button" onclick="openModal('tos')" class="text-blue-600 dark:text-blue-400 hover:underline">Terms of Service</button>
+        <button type="button" onclick="openModal('tos')" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="auth.termsOfService">Terms of Service</button>
       </div>
     </footer>
   </div>
 
-  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4">
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
     <div class="bg-white dark:bg-gray-800 max-w-2xl w-full p-6 rounded-lg shadow-lg overflow-y-auto max-h-[80vh]">
       <h3 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Document</h3>
       <pre id="modalContent" class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap overflow-auto"></pre>
       <div class="flex justify-end mt-4">
-        <button onclick="closeModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"><i data-feather="x"></i></button>
+        <button onclick="closeModal()" aria-label="Close Modal" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"><i data-feather="x"></i></button>
       </div>
     </div>
   </div>
-</body>
-
   <!-- JS -->
   <script>
     const body = document.getElementById('body');
@@ -140,7 +166,7 @@
     const loginBtnText = document.getElementById('loginBtnText');
 
     // Toggle password visibility
-    toggleEye.onclick = () => {
+    function togglePasswordVis() {
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         document.getElementById('eyeIcon').setAttribute('data-feather', 'eye-off');
@@ -149,7 +175,15 @@
         document.getElementById('eyeIcon').setAttribute('data-feather', 'eye');
       }
       feather.replace();
-    };
+    }
+    
+    toggleEye.onclick = togglePasswordVis;
+    toggleEye.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePasswordVis();
+        }
+    });
 
     // Caps Lock indicator
     function handleCaps(e){
@@ -195,6 +229,8 @@
     };
 
     // Login logic
+    let pending2FAUsername = null; // Store username during 2FA flow
+
     async function login() {
       const identifier = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -222,10 +258,25 @@
       const result = await response.json();
       if (result.success) {
         localStorage.setItem("username", result.username || identifier);
-        localStorage.setItem("usertag", result.usertag); 
+        localStorage.setItem("usertag", result.usertag);
+        localStorage.setItem("session_token", result.session_token);
         remember ? localStorage.setItem("savedUsername", identifier) : localStorage.removeItem("savedUsername");
         try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
         goToPage("loading.html");
+      } else if (result.requires_2fa) {
+        // Show 2FA input
+        pending2FAUsername = result.username;
+        document.getElementById("login-inputs").classList.add("hidden");
+        document.getElementById("rememberMe").parentElement.classList.add("hidden");
+        document.getElementById("loginBtn").classList.add("hidden");
+        document.getElementById("twofa-section").classList.remove("hidden");
+        document.getElementById("twofa-code").focus();
+        errorMsg.classList.add("hidden");
+        // Re-enable login button for later
+        loginBtn.disabled = false;
+        loginSpinner.classList.add('hidden');
+        loginBtnText.textContent = 'Sign In';
+        feather.replace();
       } else {
         errorMsg.textContent = result.error || "Login failed.";
         errorMsg.classList.remove("hidden");
@@ -234,6 +285,95 @@
         loginBtn.disabled = false;
         loginSpinner.classList.add('hidden');
         loginBtnText.textContent = 'Sign In';
+      }
+    }
+
+    async function verify2FA() {
+      const code = document.getElementById("twofa-code").value.trim();
+      const errorMsg = document.getElementById("error-msg");
+      const verifyBtn = document.getElementById("verify2faBtn");
+      const verifySpinner = document.getElementById("verify2faSpinner");
+      const verifyBtnText = document.getElementById("verify2faBtnText");
+
+      if (!code || code.length !== 6) {
+        errorMsg.textContent = "Please enter a 6-digit code.";
+        errorMsg.classList.remove("hidden");
+        return;
+      }
+
+      verifyBtn.disabled = true;
+      verifySpinner.classList.remove("hidden");
+      verifyBtnText.textContent = "Verifying…";
+
+      try {
+        const res = await fetch("/api/auth/2fa/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: pending2FAUsername, code })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem("username", data.username);
+          localStorage.setItem("usertag", data.usertag);
+          localStorage.setItem("session_token", data.session_token);
+          try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
+          goToPage("loading.html");
+        } else {
+          errorMsg.textContent = data.error || "Invalid code.";
+          errorMsg.classList.remove("hidden");
+          try { new Audio('/files/audio/error.mp3').play().catch(()=>{}); } catch {}
+        }
+      } catch (e) {
+        errorMsg.textContent = "Network error.";
+        errorMsg.classList.remove("hidden");
+      }
+
+      verifyBtn.disabled = false;
+      verifySpinner.classList.add("hidden");
+      verifyBtnText.textContent = "Verify";
+    }
+
+    function reset2FAFlow() {
+      pending2FAUsername = null;
+      document.getElementById("twofa-section").classList.add("hidden");
+      document.getElementById("login-inputs").classList.remove("hidden");
+      document.getElementById("rememberMe").parentElement.classList.remove("hidden");
+      document.getElementById("loginBtn").classList.remove("hidden");
+      document.getElementById("twofa-code").value = "";
+      document.getElementById("error-msg").classList.add("hidden");
+    }
+
+    async function socialLogin(provider) {
+      const errorMsg = document.getElementById("error-msg");
+      errorMsg.classList.add("hidden");
+      
+      try { new Audio('/files/audio/click.mp3').play().catch(()=>{}); } catch {}
+      document.body.classList.add("cursor-wait");
+
+      try {
+          const res = await fetch('/api/auth/social', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ provider })
+          });
+          const data = await res.json();
+          
+          if (data.success) {
+              localStorage.setItem("username", data.username);
+              localStorage.setItem("usertag", data.usertag);
+              localStorage.setItem("session_token", data.session_token);
+              try { new Audio('/files/audio/login.mp3').play().catch(()=>{}); } catch {}
+              goToPage("loading.html");
+          } else {
+              errorMsg.textContent = data.error || "Login failed.";
+              errorMsg.classList.remove("hidden");
+              document.body.classList.remove("cursor-wait");
+          }
+      } catch (e) {
+          errorMsg.textContent = "Network error. Try again.";
+          errorMsg.classList.remove("hidden");
+          document.body.classList.remove("cursor-wait");
       }
     }
 
@@ -404,7 +544,7 @@ If you have any questions about these Terms, contact us at zylosupp0rt@gmail.com
   <div id="modalBox" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-2xl max-h-[90vh] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-lg overflow-y-auto hidden">
     <div class="p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
       <h3 id="modalTitle" class="text-lg font-semibold">Title</h3>
-      <button onclick="closeModal()" class="text-red-500 hover:text-red-600"><i data-feather="x"></i></button>
+      <button onclick="closeModal()" aria-label="Close Modal" class="text-red-500 hover:text-red-600"><i data-feather="x"></i></button>
     </div>
     <div id="modalContent" class="p-4 space-y-2 text-sm whitespace-pre-line overflow-y-auto max-h-[70vh]"></div>
   </div>
