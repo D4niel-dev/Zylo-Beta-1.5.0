@@ -79,19 +79,58 @@ function renderGroupChannels() {
     const group = groupsData.find(g => g.id === currentGroupId);
     const channels = (group && group.channels) ? group.channels : [{ id: 'general', name: 'general' }];
 
+    // Group by category, default "Text Channels"
+    const categories = {};
     channels.forEach(ch => {
-        const channelName = typeof ch === 'string' ? ch : ch.name;
-        const channelId = typeof ch === 'string' ? ch : ch.id;
-        
-        const btn = document.createElement('div');
-        const isActive = (typeof activeChannelId !== 'undefined' ? activeChannelId : 'general') === channelId;
-        btn.className = `channel-item group flex items-center p-2 rounded cursor-pointer transition-colors mb-0.5 ${isActive ? 'bg-discord-gray-600/50 text-white' : 'text-discord-gray-400 hover:bg-discord-gray-700/50 hover:text-discord-gray-200'}`;
-        btn.innerHTML = `<span class="text-discord-gray-400 mr-1">#</span> ${channelName}`;
-        btn.onclick = () => {
-             switchGroupChannel(group, channelId);
-        };
-        list.appendChild(btn);
+        const cat = ch.category || 'Text Channels';
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(ch);
     });
+
+    // Render grouped
+    // Order: Text Channels first, then others alphabetical, or alphabetical
+    const sortedCats = Object.keys(categories).sort((a, b) => {
+        if (a === 'Text Channels') return -1;
+        if (b === 'Text Channels') return 1;
+        return a.localeCompare(b);
+    });
+
+    sortedCats.forEach(cat => {
+        // Render Header
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between px-2 pt-4 pb-1 text-xs font-bold text-discord-gray-400 uppercase hover:text-discord-gray-300 group select-none transition-colors';
+        header.innerHTML = `
+            <div class="flex items-center gap-0.5 cursor-pointer">
+                <span>\/</span>
+                <span>${cat}</span>
+            </div>
+            <!-- Future: Add "+" btn for admin -->
+        `;
+        list.appendChild(header);
+
+        // Render Channels
+        categories[cat].forEach(ch => {
+            const channelName = typeof ch === 'string' ? ch : ch.name;
+            const channelId = typeof ch === 'string' ? ch : ch.id;
+            const type = ch.type || 'text';
+            
+            const btn = document.createElement('div');
+            const isActive = (typeof activeChannelId !== 'undefined' ? activeChannelId : 'general') === channelId;
+            btn.className = `channel-item group flex items-center px-2 py-1.5 mx-2 rounded cursor-pointer transition-colors mb-0.5 ${isActive ? 'bg-discord-gray-600/50 text-white' : 'text-discord-gray-400 hover:bg-discord-gray-700/50 hover:text-discord-gray-200'}`;
+            
+            const icon = type === 'voice' ? 'volume-2' : 'hash';
+            
+            btn.innerHTML = `
+                <i data-feather="${icon}" class="w-4 h-4 mr-1.5 text-discord-gray-400"></i>
+                <span class="truncate font-medium">${channelName}</span>
+            `;
+            btn.onclick = () => {
+                 switchGroupChannel(group, channelId);
+            };
+            list.appendChild(btn);
+        });
+    });
+    if (window.feather) feather.replace();
 
     // Also update header info if available
     const nameEl = document.getElementById('groupPanelName');
@@ -184,13 +223,54 @@ function loadGroupMembers(group) {
 
     members.forEach(member => {
         const item = document.createElement('div');
-        item.className = 'flex items-center gap-2 p-1 text-sm';
+        item.className = 'flex items-center gap-2 p-1 text-sm cursor-pointer hover:bg-discord-gray-700/50 rounded';
+        
+        let roleIcon = '';
+        let roleColor = 'text-discord-gray-300';
+        let tooltip = 'Member';
+        
+        const roles = group.roles || {};
+        const isAdmin = (roles.admin || []).includes(member);
+        const isMod = (roles.moderator || []).includes(member);
+        const isOwner = group.owner === member;
+
+        if (isOwner) {
+            roleIcon = '<i data-feather="monitor" class="w-3 h-3 text-yellow-500"></i>';
+            roleColor = 'text-yellow-500 font-bold';
+            tooltip = 'Owner';
+        } else if (isAdmin) {
+            roleIcon = '<i data-feather="shield" class="w-3 h-3 text-red-500"></i>';
+            roleColor = 'text-red-400 font-medium';
+            tooltip = 'Admin';
+        } else if (isMod) {
+            roleIcon = '<i data-feather="shield" class="w-3 h-3 text-green-500"></i>';
+            roleColor = 'text-green-400 font-medium';
+            tooltip = 'Moderator';
+        }
+        
+        item.title = tooltip;
         item.innerHTML = `
-            <div class="w-2 h-2 rounded-full bg-green-500"></div>
-            <span class="text-discord-gray-300">${member}</span>
-          `;
+            <div class="relative">
+                 <div class="w-2 h-2 rounded-full ${isOwner ? 'bg-yellow-500' : (isAdmin ? 'bg-red-500' : (isMod ? 'bg-green-500' : 'bg-green-500'))}"></div>
+            </div>
+            <span class="${roleColor}">${member}</span>
+            ${roleIcon}
+        `;
+        
+        // Context menu for owner to assign roles (simple implementation)
+        const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+        if (group.owner === me && member !== me) {
+             item.oncontextmenu = (e) => {
+                 e.preventDefault();
+                 const action = confirm(`Manage role for ${member}?\nOK for Admin, Cancel for Moderator.`); // Very basic, improved in next step if needed or rely on settings
+                 // Actually relying on settings tab is better UX. 
+                 // Let's just add a simple onclick to open profile or something.
+             };
+        }
+        
         container.appendChild(item);
     });
+    if (window.feather) feather.replace();
 
     // Update member count
     const countEl = document.getElementById('groupChatMemberCount');
@@ -224,6 +304,15 @@ async function loadGroupMessages(group, channelId) {
             await appendGroupMessage(msg);
         }
 
+        // Apply pinned status
+        const currentChObj = (group.channels || []).find(c => (c.id || c) === channelId);
+        if (currentChObj && currentChObj.pinned_messages) {
+            currentChObj.pinned_messages.forEach(mid => {
+                const el = container.querySelector(`[data-msg-id="${mid}"]`);
+                if (el) updatePinnedMessageUI(el, true);
+            });
+        }
+
         container.scrollTop = container.scrollHeight;
     } catch (error) {
         console.log('No messages yet or error loading:', error);
@@ -244,11 +333,87 @@ async function appendGroupMessage(msg) {
     if (!container || !window.createDiscordMessage) return;
 
     const el = await createDiscordMessage(msg);
+    
+    // Check if pinned (if msg has pinned property from backend, currently not sent but we can update later)
+    // For now, rely on updates or separate fetch.
+    
+    // Context Menu for Pinning
+    el.addEventListener('contextmenu', (e) => {
+        // Check permissions
+        const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+        const group = groupsData.find(g => g.id === currentGroupId);
+        if (!group) return;
+        
+        const roles = group.roles || {};
+        const isOwner = group.owner === me;
+        const isAdmin = (roles.admin || []).includes(me);
+        const isMod = (roles.moderator || []).includes(me);
+        
+        if (isOwner || isAdmin || isMod) {
+            e.preventDefault();
+            // Simple toggle prompt for MVP
+            // Ideally check if already pinned to toggle text
+            if (confirm("Pin/Unpin this message?")) {
+                 const action = confirm("Click OK to PIN, Cancel to UNPIN") ? 'pin' : 'unpin';
+                 window.socket.emit('pin_message', {
+                     groupId: currentGroupId,
+                     channelId: activeChannelId,
+                     messageId: msg.id,
+                     username: me,
+                     action: action
+                 });
+            }
+        }
+    });
+
     container.appendChild(el);
     container.scrollTop = container.scrollHeight;
     if (window.feather) feather.replace();
 }
 window.appendGroupMessage = appendGroupMessage;
+
+// Pin Listeners
+function setupPinListeners() {
+    const s = window.socket;
+    if (!s) { setTimeout(setupPinListeners, 500); return; }
+    if (s.__pinListenersAttached) return;
+    s.__pinListenersAttached = true;
+    
+    s.on('message_pinned_update', (data) => {
+        if (data.groupId === currentGroupId && data.channelId === activeChannelId) {
+            // Update UI for all messages in the list
+            // data.pinnedMessages is an array of IDs
+            const allMsgs = document.querySelectorAll('#groupChatMessages > div');
+            allMsgs.forEach(el => {
+                const mid = el.getAttribute('data-msg-id');
+                if (mid) {
+                    const isPinned = data.pinnedMessages.includes(mid);
+                    updatePinnedMessageUI(el, isPinned);
+                }
+            });
+        }
+    });
+}
+
+function updatePinnedMessageUI(el, isPinned) {
+    let pinIcon = el.querySelector('.pin-icon');
+    if (isPinned) {
+        if (!pinIcon) {
+            pinIcon = document.createElement('div');
+            pinIcon.className = 'pin-icon absolute -left-2 top-2 text-red-500 transform -rotate-45';
+            pinIcon.innerHTML = '<i data-feather="map-pin" class="w-3 h-3"></i>';
+            el.appendChild(pinIcon);
+            if (window.feather) feather.replace();
+        }
+    } else {
+        if (pinIcon) pinIcon.remove();
+    }
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupPinListeners);
+} else {
+    setupPinListeners();
+}
 
 // Remove old openGroupChat - no longer needed since selectGroup handles everything
 
@@ -309,21 +474,37 @@ async function createNewGroup() {
     const owner = localStorage.getItem('username');
     const nameInput = document.getElementById('newGroupNameInput');
     const descInput = document.getElementById('newGroupDescInput');
+    const iconInput = document.getElementById('newGroupIconInput');
     let name = nameInput?.value?.trim();
 
     if (!name) { alert("Please enter a group name."); return; }
 
     const description = descInput?.value?.trim() || "";
+    
+    // Read icon data if provided
+    let iconData = null;
+    if (iconInput && iconInput.files && iconInput.files[0]) {
+        iconData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.readAsDataURL(iconInput.files[0]);
+        });
+    }
 
     if (!owner) return;
     try {
-        const res = await fetch('/api/groups/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner, name, description }) });
+        const res = await fetch('/api/groups/create', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ owner, name, description, iconData }) 
+        });
         const data = await res.json();
         if (res.ok && data.success) {
             closeGroupsModal();
             refreshGroups();
             if (nameInput) nameInput.value = '';
             if (descInput) descInput.value = '';
+            if (iconInput) iconInput.value = '';
         } else {
             alert(data.error || "Failed to create group.");
         }
@@ -354,38 +535,32 @@ async function joinExistingGroup() {
 window.joinExistingGroup = joinExistingGroup;
 
 function sendGroupChatMessage() {
-    const input = document.getElementById('friendsChatInput'); // Reusing friend input if that's the view
-    // Wait, mainapp.html had 'groupChatInput' in some places, but if we are reusing 'friendsChatView', we might use 'friendsChatInput'.
-    // Logic in mainapp.html says: 
-    // "startReply... if(showGroup) inputId = 'groupChatInput'"
-    // But `openGroupChat` shows `friendsChatView`.
-    // Let's check `mainapp.html` again. 
-    // `sendFriendMessage` handles Group if `activeFriendChat` is object.
-    // `sendGroupChatMessage` uses `groupChatInput` and `groupsState.activeId`.
-    // It seems there were TWO implementations of Groups: one separate tab, and one integrated into Friends view.
-    // Key decision: support the Integrated one via `sendFriendMessage`.
-    // `sendGroupChatMessage` might be legacy or for a specific separate tab.
-    // I will keep `sendGroupChatMessage` just in case, but point it to `sendFriendMessage` logic if possible or keep independent.
-    
-    // Implementation:
     const inputAlt = document.getElementById('groupChatInput');
-    if(inputAlt && !inputAlt.offsetParent) { 
-        // if groupChatInput is hidden/not used, maybe use friendsChatInput via sendFriendMessage?
-        if(window.sendFriendMessage) return window.sendFriendMessage();
-    }
+    if (!inputAlt) return;
     
-    const message = (inputAlt?.value || '').trim();
+    const message = (inputAlt.value || '').trim();
     if (!message || !currentGroupId) return;
     
+    const username = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    const channel = activeChannelId || 'general';
+    
     const payload = {
+        id: (typeof generateUUID === 'function' ? generateUUID() : 'grp_' + Date.now()),
         groupId: currentGroupId,
-        username: localStorage.getItem('username'),
+        channel: channel,
+        username: username,
         message,
-        replyTo: window.replyContext ? { id: replyContext.id, username: replyContext.username, content: replyContext.content } : null
+        replyTo: window.replyContext ? { id: replyContext.id, username: replyContext.username, content: replyContext.content } : null,
+        ts: Date.now() / 1000
     };
     
-    if (navigator.onLine && window.socket) window.socket.emit('send_group_message', payload);
-    else (async () => { await appendGroupMessage(payload); })();
+    // Optimistic UI - show message immediately
+    (async () => { await appendGroupMessage(payload); })();
+    
+    // Send to server
+    if (navigator.onLine && window.socket) {
+        window.socket.emit('send_group_message', payload);
+    }
     
     inputAlt.value = ''; 
     inputAlt.style.height = 'auto';
@@ -433,12 +608,256 @@ function sendGroupFile(event) {
 }
 window.sendGroupFile = sendGroupFile;
 
-// Listeners
-if (typeof socket !== 'undefined') {
-    socket.on('receive_group_message', async (data) => {
+// Listeners - Deferred setup to ensure socket is ready
+function setupGroupSocketListeners() {
+    const s = window.socket;
+    if (!s) {
+        // Retry if socket not ready yet
+        setTimeout(setupGroupSocketListeners, 500);
+        return;
+    }
+    if (s.__groupListenersAttached) return;
+    s.__groupListenersAttached = true;
+    
+    s.on('receive_group_message', async (data) => {
+        if (data.groupId === currentGroupId) {
+            await appendGroupMessage(data);
+            // If viewing this channel, mark as read
+            if (activeChannelId === (data.channel || 'general')) {
+                markGroupChannelRead();
+            }
+        }
+    });
+    s.on('receive_group_file', async (data) => {
         if (data.groupId === currentGroupId) await appendGroupMessage(data);
     });
-    socket.on('receive_group_file', async (data) => {
-        if (data.groupId === currentGroupId) await appendGroupMessage(data);
+    
+    s.on('group_read_update', (data) => {
+        // data = { groupId, channel, username, messageId }
+        if (data.groupId === currentGroupId) {
+            // Find messages and update tick
+            const selector = data.messageId ? `[data-msg-id="${data.messageId}"]` : `.chat-messages > div`;
+            const msgs = document.querySelectorAll(selector);
+            msgs.forEach(msgEl => {
+                 // Only update own messages
+                 // But wait, createDiscordMessage only renders status for OWN messages.
+                 // So selecting all is fine, the non-own ones won't have the status icon container or we check author.
+                 // Actually, simpler: find .msg-status-icon inside.
+                 const icon = msgEl.querySelector('.msg-status-icon');
+                 if (icon) {
+                     icon.innerHTML = '<span class="text-blue-400 font-bold" title="Read">✓✓</span>';
+                 }
+            });
+        }
     });
 }
+
+function markGroupChannelRead() {
+    if (!currentGroupId || !activeChannelId || !window.socket) return;
+    const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    window.socket.emit('mark_group_read', {
+        groupId: currentGroupId,
+        channel: activeChannelId,
+        username: me
+    });
+}
+
+// Initialize on DOM ready or immediately if already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupGroupSocketListeners);
+} else {
+    setupGroupSocketListeners();
+}
+// Role Management
+function showAssignRoleModal(role) {
+    const username = prompt(`Enter username to assign as ${role}:`);
+    if (username) {
+        assignRole(username, role);
+    }
+}
+window.showAssignRoleModal = showAssignRoleModal;
+
+function assignRole(targetUser, role) {
+    if (!currentGroupId || !window.socket) return;
+    const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    
+    window.socket.emit('assign_role', {
+        groupId: currentGroupId,
+        username: me,
+        targetUser: targetUser,
+        role: role
+    });
+}
+
+function updateRolesUI(groupId, roles) {
+    // Only update if we are in settings for this group
+    if (currentGroupId !== groupId) return;
+    
+    // In a real app, we would re-render the list. 
+    // For now, let's just alert success or refresh logic if needed.
+    // The simple UI we built doesn't list individual members yet except via logic we need to add.
+    // Let's implement a simple member list fetch/refresh if open.
+    console.log('Roles updated:', roles);
+}
+
+// Enhance setupGroupSocketListeners from previous step
+// We need to re-declare it or append to it. 
+// Since we can't easily append to inside a function without replacing it, 
+// let's add a separate listener setup that runs finding the socket.
+
+function setupRoleListeners() {
+    const s = window.socket;
+    if (!s) { setTimeout(setupRoleListeners, 500); return; }
+    if (s.__roleListenersAttached) return;
+    s.__roleListenersAttached = true;
+    
+    s.on('group_roles_updated', (data) => {
+        if (data.groupId === currentGroupId) {
+            // updateRolesUI(data.groupId, data.roles);
+            // Refresh groups data to get new roles
+            loadGroups(); 
+            alert('Roles updated successfully!');
+        }
+    });
+    
+    s.on('user_kicked', (data) => {
+        if (data.username === (localStorage.getItem('username') || localStorage.getItem('savedUsername'))) {
+            alert(`You have been kicked from the group.`);
+            location.reload(); // Simple reload to reset state
+        } else if (data.groupId === currentGroupId) {
+            loadGroups(); // Refresh member list
+        }
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupRoleListeners);
+    setupRoleListeners();
+}
+
+// Channel Creation
+async function showCreateChannelInput() {
+    const name = prompt("Enter new channel name:");
+    if (!name) return;
+    
+    // Simple verification for category input for now
+    const category = prompt("Enter category (e.g. Text Channels, Voice Channels):", "Text Channels");
+    
+    // Determine type based on name or ask? 
+    const type = confirm("Is this a Voice Channel? OK for Yes, Cancel for No") ? 'voice' : 'text';
+    
+    if (!currentGroupId) return;
+    
+    const username = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    
+    try {
+        const res = await fetch('/api/groups/channels/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                groupId: currentGroupId,
+                username: username,
+                channelName: name,
+                type: type,
+                category: category || 'Text Channels'
+            })
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+            // Refresh group data
+            loadGroups(); // This will re-render channels
+            alert('Channel created!');
+        } else {
+            alert(data.error || 'Failed to create channel');
+        }
+    } catch (e) {
+        console.error('Error creating channel:', e);
+        alert('Failed to connect to server.');
+    }
+}
+window.showCreateChannelInput = showCreateChannelInput;
+
+// Pinned Messages Modal Logic
+function togglePinnedMessagesModal() {
+    const m = document.getElementById('pinnedMessagesModal');
+    if (!m) return;
+    
+    if (m.classList.contains('hidden')) {
+        m.classList.remove('hidden');
+        renderPinnedMessagesList();
+    } else {
+        m.classList.add('hidden');
+    }
+}
+window.togglePinnedMessagesModal = togglePinnedMessagesModal;
+
+async function renderPinnedMessagesList() {
+    const list = document.getElementById('pinnedMessagesList');
+    if(!list) return;
+    list.innerHTML = '<div class="text-center text-gray-500 py-4">Loading...</div>';
+    
+    if (!currentGroupId || !activeChannelId) return;
+
+    try {
+        const res = await fetch(`/api/groups/${currentGroupId}/channels/${activeChannelId}/pins`);
+        const data = await res.json();
+        
+        if (!data.success || !data.messages || data.messages.length === 0) {
+            list.innerHTML = `<div class="text-center text-gray-500 py-8 flex flex-col items-center">
+                <i data-feather="map-pin" class="w-8 h-8 mb-2 opacity-50"></i>
+                <p>No pinned messages yet.</p>
+            </div>`;
+            if (window.feather) feather.replace();
+            return;
+        }
+
+        list.innerHTML = '';
+        data.messages.forEach(msg => {
+            let content = msg.message || "";
+            // Check for file
+            if (msg.fileName && !content) content = `File: ${msg.fileName}`;
+            if (msg.fileName && content) content += ` (File: ${msg.fileName})`;
+            
+            // Clean up content
+            content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            const item = document.createElement('div');
+            item.className = "bg-discord-gray-900 p-3 rounded text-sm mb-2 border border-discord-gray-700 hover:border-discord-gray-600 transition-colors";
+            item.innerHTML = `
+                <div class="font-bold text-discord-blurple mb-1 flex justify-between items-center">
+                    <span>${msg.username || 'Unknown'}</span>
+                    <span class="text-[10px] bg-discord-gray-800 px-2 py-0.5 rounded cursor-pointer hover:bg-discord-blurple hover:text-white transition" onclick="scrollToMessage('${msg.id}')">JUMP</span>
+                </div>
+                <div class="text-gray-300 line-clamp-3 break-words">${content}</div>
+                <div class="text-[10px] text-gray-500 mt-1">${new Date((msg.ts || Date.now()) * 1000).toLocaleString()}</div>
+            `;
+            list.appendChild(item);
+        });
+        if (window.feather) feather.replace();
+        
+    } catch (e) {
+        console.error('Error fetching pins:', e);
+        list.innerHTML = '<div class="text-red-400 text-center py-4">Failed to load pins.</div>';
+    }
+}
+
+function scrollToMessage(mid) {
+    const el = document.querySelector(`[data-msg-id="${mid}"]`);
+    if (el) {
+        togglePinnedMessagesModal(); // close
+        el.scrollIntoView({behavior: 'smooth', block: 'center'});
+        
+        // Highlight effect
+        el.style.transition = 'background-color 0.5s';
+        const originalBg = el.style.backgroundColor;
+        el.style.backgroundColor = 'rgba(88, 101, 242, 0.3)'; // Blurple transparent
+        
+        setTimeout(() => {
+            el.style.backgroundColor = originalBg;
+            setTimeout(() => { el.style.backgroundColor = ''; }, 500);
+        }, 1500);
+    } else {
+        alert("Message is not currently loaded in the view. Scroll up to load context.");
+    }
+}
+window.scrollToMessage = scrollToMessage;

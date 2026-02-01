@@ -1,0 +1,27 @@
+
+/* Sidebar Collapsed State Overrides */
+#subPanelContainer.collapsed .sub-panel-item span,
+#subPanelContainer.collapsed .sub-panel-header,
+#subPanelContainer.collapsed .dm-list-section,
+#subPanelContainer.collapsed .group-info,
+#subPanelContainer.collapsed #userPanelUsername,
+#subPanelContainer.collapsed #userPanelUsertag,
+#subPanelContainer.collapsed #connectionIndicator {
+  display: none !important;
+}
+
+#subPanelContainer.collapsed .sidebar-btn-logout {
+  display: none !important;
+}
+
+#subPanelContainer.collapsed .sidebar-btn-settings {
+  /* Ensure settings button is centered or prominent if needed, 
+     but default flex behavior might be fine if logout is gone. 
+     Just ensuring it's visible. */
+  display: flex !important;
+  margin: 0 auto;
+}
+
+#subPanelContainer.collapsed #userPanelAvatar {
+  margin: 0 auto;
+}

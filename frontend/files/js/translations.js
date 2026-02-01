@@ -53,7 +53,7 @@ const translations = {
         "auth.enterCode": "Enter the 6-digit code sent to your email",
         
         // Settings
-        "settings.title": "⚙️ Settings",
+        "settings.title": "Settings",
         "settings.general": "General",
         "settings.sounds": "Sounds",
         "settings.account": "Account",
@@ -153,7 +153,7 @@ const translations = {
         "auth.enterCode": "Ingresa el código de 6 dígitos enviado",
 
         // Settings
-        "settings.title": "⚙️ Ajustes",
+        "settings.title": "Ajustes",
         "settings.general": "General",
         "settings.sounds": "Sonidos",
         "settings.account": "Cuenta",
@@ -253,7 +253,7 @@ const translations = {
         "auth.enterCode": "Nhập mã 6 chữ số đã gửi đến email",
 
         // Settings
-        "settings.title": "⚙️ Cài đặt",
+        "settings.title": "Cài đặt",
         "settings.general": "Chung",
         "settings.sounds": "Âm thanh",
         "settings.account": "Tài khoản",

@@ -760,7 +760,7 @@ function initMainApp() {
     }
 
     if (socket) {
-        socket.on("receive_message", appendMessage);
+        // receive_message is handled in chat.js, do not duplicate here
         socket.on("typing", (data) => {
             if (typingIndicator) {
                 typingIndicator.textContent = `${data.username} is typing...`;

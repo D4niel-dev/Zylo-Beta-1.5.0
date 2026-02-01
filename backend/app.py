@@ -161,6 +161,7 @@ try:
         clear_user_memory as memory_clear_user,
     )
     from ai.learner import PersonaLearner
+    from ai.model_manager import model_manager
 except Exception:
     ai_list_personas = lambda: [
         {"key": "helper", "name": "Helper AI", "style": "helpful, structured"},
@@ -798,32 +799,28 @@ def verify_email():
 @app.route("/api/auth/resend-verification", methods=["POST"])
 def resend_verification():
     data = request.json or {}
-    username = data.get("username")
+    email = data.get("email")
     
-    if not username:
-        return jsonify({"success": False, "error": "Username required"}), 400
-    
+    if not email:
+        return jsonify({"success": False, "error": "Email required"}), 400
+        
     users = load_users()
-    
     for user in users:
-        if user["username"] == username:
+        if user["email"] == email:
             if user.get("email_verified"):
                 return jsonify({"success": False, "error": "Email already verified"}), 400
-            
+                
             # Generate new code
-            new_code = str(random.randint(100000, 999999))
-            user["verification_code"] = new_code
+            verification_code = str(random.randint(100000, 999999))
+            user["verification_code"] = verification_code
             save_users(users)
             
-            # Send email
-            send_verification_email(user["email"], new_code)
+            send_verification_email(email, verification_code)
+            return jsonify({"success": True, "message": "Verification code resent."})
+            
+    return jsonify({"success": False, "error": "Email not found"}), 404
 
-            return jsonify({
-                "success": True, 
-                "message": "Verification code resent to your email."
-            })
-    
-    return jsonify({"success": False, "error": "User not found"}), 404
+
 
 @app.route("/api/forgot", methods=["POST"])
 def forgot():
@@ -1067,26 +1064,24 @@ def handle_send_group_message(data):
     group_id = (data or {}).get('groupId')
     username = (data or {}).get('username')
     message = (data or {}).get('message')
+    channel = (data or {}).get('channel', 'general')
+    msg_id = (data or {}).get('id') or str(uuid.uuid4())
+    reply_to = (data or {}).get('replyTo')
+
     if not group_id or not username or not message:
         return
     all_groups = load_groups()
     for idx, g in enumerate(all_groups):
         if g.get('id') == group_id:
-            entry = { 'username': username, 'message': message }
-            msgs = g.get('messages') or []
-            entry = { 'username': username, 'message': message, 'ts': int(__import__('time').time()) }
-            msgs = g.get('messages') or []
-            msgs.append(entry)
-            all_groups[idx]['messages'] = msgs
-            save_groups(all_groups)
-            # Emit to the correct event name and room
-            emit('receive_group_message', entry, room=group_id)
-            
-            # Add XP
-            _add_xp(username, 5)
-            return
-
-@socketio.on('send_group_file')
+            entry = {
+                'id': msg_id,
+                'username': username,
+                'message': message,
+                'channel': channel,
+                'replyTo': reply_to,
+                'read_by': [username], # Sender has read it
+                'ts': int(__import__('time').time())
+            }
 def handle_send_group_file(data):
     """Handle file sharing within a group room."""
     group_id = (data or {}).get('groupId')
@@ -1330,6 +1325,8 @@ def mock_ai_response(messages: list) -> str:
         "I can also draft examples or explain trade-offs."
     )
 
+
+
 # Chat with an AI assistant. Uses Ollama if available, else mock.
 @app.route('/api/ai/chat', methods=['POST'])
 def ai_chat():
@@ -1343,7 +1340,10 @@ def ai_chat():
         messages_in = [{"role": "user", "content": str(single_message)}]
         
     messages_in = messages_in[-6:]
-    model = (data.get('model') or os.getenv('Zylo_AI_MODEL') or 'llama3.1:8b')
+    # Respect user selected model, default to gemma:2b if not set
+    model = (data.get('model') or os.getenv('Zylo_AI_MODEL') or 'gemma:2b')
+    if model == 'loading': model = 'gemma:2b'
+    
     provider = os.getenv('Zylo_AI_PROVIDER', 'auto').lower()
     persona = pick_persona(persona_key)
 
@@ -1353,57 +1353,42 @@ def ai_chat():
             payload = {
                 "model": model,
                 "messages": [{"role": "system", "content": persona.system_prompt}] + messages_in,
+                "stream": False
             }
-            resp = http_post_json("http://127.0.0.1:11434/api/chat", payload, timeout=15)
+            # Add stream: False to ensure we get json back
+            resp = http_post_json("http://127.0.0.1:11434/api/chat", payload, timeout=600)
             reply = None
 
             # === Parse response ===
             if isinstance(resp, dict):
-                if "message" in resp and isinstance(resp["message"], dict):    # Full JSON response (3.1:8b, 3.2:1b)
+                if "message" in resp and isinstance(resp["message"], dict):
                     reply = resp["message"].get("content")
                 elif "messages" in resp and isinstance(resp["messages"], list):
+                     # Handle other formats if any
                     reply = " ".join(
                         m.get("content", "") for m in resp["messages"] if m.get("role") == "assistant"
                     )
                 elif "response" in resp:
                     reply = resp["response"]
-            elif isinstance(resp, str) and model.startswith("tinyllama"):   
-                lines = resp.strip().splitlines()
-                contents = []
-                for line in lines:
-                    try:
-                        obj = json.loads(line)
-                        if "content" in obj:
-                            contents.append(obj["content"])
-                    except Exception:
-                        pass
-                reply = " ".join(contents)
-
+                elif "error" in resp:
+                     # Ollama returned specific error
+                     return jsonify({"success": False, "error": f"Ollama Error: {resp['error']}"})
+            
             if reply:
                 return jsonify({"success": True, "provider": "ollama", "model": model, "reply": reply, "persona": persona.key})
             else:
                 print(f"Ollama response parsing failed for model {model}: {resp}")
 
         except Exception as e:
-            print(f"Ollama chat failed for model {model}:", e)
-
+            print(f"Ollama chat failed for model {model}: {e}")
+            err_str = str(e)
+            if "404" in err_str:
+                return jsonify({"success": False, "error": f"Model '{model}' not found. Please run 'ollama pull {model}' in your terminal."})
+                
     # === Fallback: mock ===
     reply = mock_ai_response(messages_in)
-    try:
-        memory_append_conversation(username, messages_in[-10:])
-    except Exception:
-        pass
-
-    try:
-        suggestion = persona_learner.suggest_phrase(
-            persona.key, username, messages_in[-1]['content'] if messages_in else ''
-        )
-        if suggestion and isinstance(suggestion, str):
-            reply = f"{reply}\n\n(phrase preference noted: {suggestion})"
-    except Exception:
-        pass
-
     return jsonify({"success": True, "provider": "mock", "model": "mock", "reply": reply, "persona": persona.key})
+
 
 @app.route('/api/ai/feedback', methods=['POST'])
 def ai_feedback():
@@ -2481,6 +2466,7 @@ def create_group_channel():
     username = data.get('username', '').strip()
     channel_name = data.get('channelName', '').strip()
     channel_type = data.get('type', 'text').strip() # 'text' or 'voice'
+    category = data.get('category', 'Text Channels').strip()
 
     if not group_id or not username or not channel_name:
         return jsonify({"success": False, "error": "Missing required fields"}), 400
@@ -2488,7 +2474,12 @@ def create_group_channel():
     all_groups = load_groups()
     for idx, g in enumerate(all_groups):
         if g.get('id') == group_id:
-            if g.get('owner') != username:
+            # Permission: Owner OR Admin
+            roles = g.get('roles', {})
+            is_owner = g.get('owner') == username
+            is_admin = username in roles.get('admin', [])
+            
+            if not (is_owner or is_admin):
                 return jsonify({"success": False, "error": "Not authorized"}), 403
             
             channels = g.get('channels', [])
@@ -2499,7 +2490,8 @@ def create_group_channel():
             new_channel = {
                 "id": str(random.randint(1000, 9999)), # Simplified channel ID
                 "name": channel_name,
-                "type": channel_type
+                "type": channel_type,
+                "category": category
             }
             channels.append(new_channel)
             all_groups[idx]['channels'] = channels
@@ -2673,6 +2665,21 @@ def react_group_message_api():
                     messages[msg_idx]['reactions'] = reactions
                     all_groups[idx]['messages'] = messages
                     save_groups(all_groups)
+                    
+                    # Emit socket update
+                    # Use socketio.emit directly if possible, or import if needed
+                    # (Assuming socketio is available in this scope or globally)
+                    try:
+                        socketio.emit('message_reaction_update', {
+                            'groupId': group_id,
+                            'channelId': channel,
+                            'messageId': msg.get('id'), # Use ID if available
+                            'timestamp': msg.get('timestamp'),
+                            'reactions': reactions
+                        }, room=group_id)
+                    except Exception as e:
+                        print(f"Socket emit error: {e}")
+
                     return jsonify({"success": True, "reactions": reactions})
             return jsonify({"success": False, "error": "Message not found"}), 404
     
@@ -2830,6 +2837,503 @@ def webauthn_verify():
         })
         
     return jsonify({"success": False, "error": "Verification failed"}), 400
+
+@app.route('/api/groups/message/edit', methods=['POST'])
+def edit_group_message():
+    data = request.json or {}
+    group_id = data.get('groupId')
+    username = data.get('username')
+    new_text = data.get('newMessage')
+    timestamp = data.get('timestamp')
+    msg_id = data.get('id')
+    
+    if not group_id or not username or not new_text:
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+
+    all_groups = load_groups()
+    changed = False
+    
+    for g in all_groups:
+        if g.get('id') == group_id:
+            msgs = g.get('messages') or []
+            for m in msgs:
+                match = False
+                if msg_id and m.get('id') == msg_id:
+                    match = True
+                elif timestamp and (m.get('ts') == timestamp or m.get('timestamp') == timestamp):
+                    match = True
+                
+                if match:
+                    if m.get('username') != username:
+                        return jsonify({"success": False, "error": "Unauthorized"}), 403
+                    
+                    if 'history' not in m:
+                        m['history'] = []
+                    
+                    m['history'].append({
+                        'message': m.get('message'),
+                        'timestamp': int(__import__('time').time())
+                    })
+                    
+                    m['message'] = new_text
+                    m['isEdited'] = True
+                    changed = True
+                    
+                    socketio.emit('group_message_updated', {
+                        'groupId': group_id,
+                        'id': m.get('id'),
+                        'timestamp': m.get('ts'),
+                        'message': new_text,
+                        'isEdited': True
+                    }, room=group_id)
+                    break
+            if changed:
+                save_groups(all_groups)
+                return jsonify({"success": True})
+            
+    return jsonify({"success": False, "error": "Message not found"}), 404
+
+@app.route('/api/groups/message/history', methods=['POST'])
+def get_message_history():
+    data = request.json or {}
+    group_id = data.get('groupId')
+    msg_id = data.get('id')
+    timestamp = data.get('timestamp')
+    
+    if not group_id:
+        return jsonify({"success": False, "error": "Missing groupId"}), 400
+        
+    all_groups = load_groups()
+    for g in all_groups:
+        if g.get('id') == group_id:
+            msgs = g.get('messages') or []
+            for m in msgs:
+                match = False
+                if msg_id and m.get('id') == msg_id:
+                    match = True
+                elif timestamp and (m.get('ts') == timestamp or m.get('timestamp') == timestamp):
+                    match = True
+                    
+                if match:
+                    return jsonify({
+                        "success": True, 
+                        "history": m.get('history', []),
+                        "currentMessage": m.get('message'),
+                        "lastEditedAt": m.get('history')[-1]['timestamp'] if m.get('history') else 0
+                    })
+                    
+    return jsonify({"success": False, "error": "Message not found"}), 404
+
+@app.route('/api/groups/message/delete', methods=['POST'])
+def delete_group_message():
+    data = request.json or {}
+    group_id = data.get('groupId')
+    username = data.get('username')
+    msg_id = data.get('id')
+    timestamp = data.get('timestamp')
+    
+    if not group_id or not username:
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+
+    all_groups = load_groups()
+    deleted = False
+    
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            msgs = g.get('messages') or []
+            
+            # Permission Check
+            roles = g.get('roles', {})
+            is_owner = g.get('owner') == username
+            is_admin = username in roles.get('admin', [])
+            is_mod = username in roles.get('moderator', [])
+            
+            new_msgs = []
+            deleted_id = None
+            
+            for m in msgs:
+                match = False
+                if msg_id and m.get('id') == msg_id:
+                    match = True
+                elif timestamp and (m.get('ts') == timestamp or m.get('timestamp') == timestamp):
+                    match = True
+                
+                if match:
+                    msg_author = m.get('username')
+                    
+                    # Logic: 
+                    # Owner can delete anyone
+                    # Admin can delete anyone except Owner
+                    # Mod can delete anyone except Owner/Admin
+                    # User can delete their own
+                    
+                    allowed = False
+                    if msg_author == username:
+                        allowed = True
+                    elif is_owner:
+                        allowed = True
+                    elif is_admin:
+                        author_is_owner = g.get('owner') == msg_author
+                        allowed = not author_is_owner
+                    elif is_mod:
+                        author_is_owner = g.get('owner') == msg_author
+                        author_is_admin = msg_author in roles.get('admin', [])
+                        allowed = not (author_is_owner or author_is_admin)
+
+                    if allowed:
+                        deleted_id = m.get('id')
+                        deleted = True
+                        continue 
+                    else:
+                        return jsonify({"success": False, "error": "Unauthorized"}), 403
+                new_msgs.append(m)
+            
+            if deleted:
+                all_groups[idx]['messages'] = new_msgs
+                save_groups(all_groups)
+                
+                socketio.emit('group_message_deleted', {
+                    'groupId': group_id,
+                    'id': deleted_id,
+                    'timestamp': timestamp
+                }, room=group_id)
+                
+                return jsonify({"success": True})
+                
+    return jsonify({"success": False, "error": "Message not found"}), 404
+
+# Role Management Events
+@socketio.on('assign_role')
+def handle_assign_role(data):
+    group_id = (data or {}).get('groupId')
+    requester = (data or {}).get('username')
+    target_user = (data or {}).get('targetUser')
+    role = (data or {}).get('role') # 'admin', 'moderator', 'member' (remove role)
+    
+    if not group_id or not requester or not target_user or not role:
+        return
+        
+    all_groups = load_groups()
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            # Only Owner can assign roles currently
+            if g.get('owner') != requester:
+                return 
+            
+            if 'roles' not in g:
+                all_groups[idx]['roles'] = {'admin': [], 'moderator': []}
+            
+            # Remove from existing roles first
+            if target_user in all_groups[idx]['roles'].get('admin', []):
+                all_groups[idx]['roles']['admin'].remove(target_user)
+            if target_user in all_groups[idx]['roles'].get('moderator', []):
+                all_groups[idx]['roles']['moderator'].remove(target_user)
+                
+            # Add to new role
+            if role == 'admin':
+                if 'admin' not in all_groups[idx]['roles']: all_groups[idx]['roles']['admin'] = []
+                all_groups[idx]['roles']['admin'].append(target_user)
+            elif role == 'moderator':
+                if 'moderator' not in all_groups[idx]['roles']: all_groups[idx]['roles']['moderator'] = []
+                all_groups[idx]['roles']['moderator'].append(target_user)
+            
+            save_groups(all_groups)
+            
+            emit('group_roles_updated', {
+                'groupId': group_id,
+                'roles': all_groups[idx]['roles']
+            }, room=group_id)
+            return
+
+@socketio.on('kick_user')
+def handle_kick_user(data):
+    group_id = (data or {}).get('groupId')
+    requester = (data or {}).get('username')
+    target_user = (data or {}).get('targetUser')
+    
+    if not group_id or not requester or not target_user:
+        return
+
+    all_groups = load_groups()
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            roles = g.get('roles', {})
+            is_owner = g.get('owner') == requester
+            is_admin = requester in roles.get('admin', [])
+            is_mod = requester in roles.get('moderator', [])
+            
+            target_is_owner = g.get('owner') == target_user
+            target_is_admin = target_user in roles.get('admin', [])
+            target_is_mod = target_user in roles.get('moderator', [])
+            
+            allowed = False
+            if is_owner:
+                allowed = True
+            elif is_admin:
+                allowed = not (target_is_owner or target_is_admin)
+            elif is_mod:
+                allowed = not (target_is_owner or target_is_admin or target_is_mod)
+                
+            if allowed and target_user in (g.get('members') or []):
+                all_groups[idx]['members'].remove(target_user)
+                
+                # Also remove from roles if present
+                if target_user in roles.get('admin', []): roles['admin'].remove(target_user)
+                if target_user in roles.get('moderator', []): roles['moderator'].remove(target_user)
+                
+                save_groups(all_groups)
+                
+                emit('user_kicked', {
+                    'groupId': group_id,
+                    'username': target_user
+                }, room=group_id)
+            return
+
+@socketio.on('pin_message')
+def handle_pin_message(data):
+    group_id = (data or {}).get('groupId')
+    channel_id = (data or {}).get('channelId')
+    msg_id = (data or {}).get('messageId')
+    username = (data or {}).get('username')
+    action = (data or {}).get('action') # 'pin' or 'unpin'
+    
+    if not group_id or not channel_id or not msg_id or not username:
+        return
+
+    all_groups = load_groups()
+    for idx, g in enumerate(all_groups):
+        if g.get('id') == group_id:
+            # Permissions: Owner, Admin, or Moderator can pin
+            roles = g.get('roles', {})
+            is_owner = g.get('owner') == username
+            is_admin = username in roles.get('admin', [])
+            is_mod = username in roles.get('moderator', [])
+            
+            if not(is_owner or is_admin or is_mod):
+                return # unauthorized
+            
+            channels = g.get('channels', [])
+            target_channel = next((c for c in channels if (c.get('id') == channel_id or c == channel_id)), None)
+            
+            if not target_channel or isinstance(target_channel, str):
+                # Basic string channels don't support pins yet, or upgrade them?
+                # For v1, let's skip strings or convert them.
+                # If it's a string, we can't easily attach pinned_messages without object conversion.
+                # Assuming objects for newer channels.
+                return 
+
+            if 'pinned_messages' not in target_channel:
+                target_channel['pinned_messages'] = []
+                
+            if action == 'pin':
+                if msg_id not in target_channel['pinned_messages']:
+                    target_channel['pinned_messages'].append(msg_id)
+            elif action == 'unpin':
+                 if msg_id in target_channel['pinned_messages']:
+                    target_channel['pinned_messages'].remove(msg_id)
+            
+            # Save
+            all_groups[idx]['channels'] = channels # (reference updated, but safe to be explicit)
+            save_groups(all_groups)
+            
+            # Emit update
+            emit('message_pinned_update', {
+                'groupId': group_id,
+                'channelId': channel_id,
+                'pinnedMessages': target_channel['pinned_messages']
+            }, room=group_id)
+            return
+
+@app.route('/api/groups/<group_id>/channels/<channel_id>/pins', methods=['GET'])
+def get_pinned_messages(group_id, channel_id):
+    all_groups = load_groups()
+    group = next((g for g in all_groups if g.get('id') == group_id), None)
+    if not group:
+        return jsonify({"success": False, "error": "Group not found"}), 404
+        
+    channels = group.get('channels', [])
+    channel = next((c for c in channels if (c.get('id') == channel_id or c == channel_id)), None)
+    
+    if not channel or isinstance(channel, str):
+         return jsonify({"success": True, "messages": []})
+         
+    pinned_ids = channel.get('pinned_messages', [])
+    if not pinned_ids:
+        return jsonify({"success": True, "messages": []})
+        
+    # Fetch actual messages from group['messages']
+    all_msgs = group.get('messages', [])
+    # Filter by IDs
+    found_msgs = [m for m in all_msgs if m.get('id') in pinned_ids]
+    
+    # Sort by timestamp to keep order? Or keep pin order?
+    # Usually pin order (insertion order in list) is preferred, but here we just return them.
+    # To preserve pin order:
+    ordered_msgs = []
+    msg_map = {m['id']: m for m in found_msgs}
+    for pid in pinned_ids:
+        if pid in msg_map:
+            ordered_msgs.append(msg_map.get(pid))
+            
+    return jsonify({"success": True, "messages": ordered_msgs})
+
+@socketio.on('message_reaction')
+def handle_message_reaction(data):
+    # Unified handler for DMs and Groups
+    group_id = (data or {}).get('groupId')
+    msg_id = (data or {}).get('messageId')
+    username = (data or {}).get('username')
+    emoji = (data or {}).get('emoji')
+    action = (data or {}).get('action', 'add') # add/remove
+    
+    if not msg_id or not username or not emoji:
+        return
+        
+    if group_id:
+        # handle group reaction logic (reusing or duplicating logic for speed)
+        # We can call the logic logic from react_group_message_api but tailored for socket
+        all_groups = load_groups()
+        for idx, g in enumerate(all_groups):
+            if g.get('id') == group_id:
+                messages = g.get('messages', [])
+                # Find message by ID
+                target_msg = next((m for m in messages if m.get('id') == msg_id), None)
+                if target_msg:
+                    if 'reactions' not in target_msg: target_msg['reactions'] = {}
+                    reactions = target_msg['reactions']
+                    
+                    if emoji not in reactions: reactions[emoji] = []
+                    
+                    if action == 'add':
+                        if username not in reactions[emoji]: reactions[emoji].append(username)
+                    else:
+                        if username in reactions[emoji]: reactions[emoji].remove(username)
+                        if not reactions[emoji]: del reactions[emoji]
+                    
+                    # Update Reference
+                    # messages list content updated in place
+                    all_groups[idx]['messages'] = messages
+                    save_groups(all_groups)
+                    
+                    # Emit
+                    emit('message_reaction_update', {
+                        'groupId': group_id,
+                        'messageId': msg_id,
+                        'reactions': reactions
+                    }, room=group_id)
+                return
+    else:
+        # DM Reaction
+        global dms
+        target_msg = next((m for m in dms if m.get('id') == msg_id), None)
+        if target_msg:
+            if 'reactions' not in target_msg: target_msg['reactions'] = {}
+            reactions = target_msg['reactions']
+            
+            if emoji not in reactions: reactions[emoji] = []
+            
+            if action == 'add':
+                if username not in reactions[emoji]: reactions[emoji].append(username)
+            else:
+                if username in reactions[emoji]: reactions[emoji].remove(username)
+                if not reactions[emoji]: del reactions[emoji]
+            
+            save_dms(dms)
+            
+            # Emit to both sender and recipient
+            # target_msg['from'] and target_msg['to']
+            sender = target_msg.get('from')
+            recipient = target_msg.get('to')
+            
+            payload = {
+                'messageId': msg_id,
+                'reactions': reactions,
+                'peer': username # Who reacted
+            }
+            
+            if sender: socketio.emit('message_reaction_update', payload, room=f"dm:{sender}")
+            if recipient: socketio.emit('message_reaction_update', payload, room=f"dm:{recipient}")
+
+# ==========================================
+# MOMENTS IMPLEMENTATION
+# ==========================================
+MOMENTS_FILE = os.path.join(DATA_DIR, 'moments.json')
+
+def load_moments():
+    if not os.path.exists(MOMENTS_FILE):
+        return []
+    try:
+        with open(MOMENTS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_moments(data):
+    try:
+        with open(MOMENTS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Error saving moments: {e}")
+
+@app.route('/api/moments', methods=['GET'])
+def get_moments():
+    moments = load_moments()
+    # Sort by timestamp desc
+    moments.sort(key=lambda x: x.get('timestamp', 0), reverse=True)
+    return jsonify({"success": True, "moments": moments})
+
+@app.route('/api/moments', methods=['POST'])
+def create_moment():
+    data = request.json or {}
+    username = data.get('username')
+    content = data.get('content')
+    image = data.get('image') # Base64 or URL
+    
+    if not username or (not content and not image):
+        return jsonify({"success": False, "error": "Missing content"}), 400
+        
+    moments = load_moments()
+    new_moment = {
+        'id': str(__import__('uuid').uuid4()),
+        'username': username,
+        'content': content,
+        'image': image,
+        'likes': [],
+        'comments': [],
+        'timestamp': int(__import__('time').time())
+    }
+    
+    moments.append(new_moment)
+    save_moments(moments)
+    
+    return jsonify({"success": True, "moment": new_moment})
+
+@app.route('/api/moments/like', methods=['POST'])
+def like_moment():
+    data = request.json or {}
+    moment_id = data.get('id')
+    username = data.get('username')
+    
+    if not moment_id or not username:
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+        
+    moments = load_moments()
+    moment = next((m for m in moments if m.get('id') == moment_id), None)
+    
+    if not moment:
+        return jsonify({"success": False, "error": "Moment not found"}), 404
+        
+    if 'likes' not in moment: moment['likes'] = []
+    
+    if username in moment['likes']:
+        moment['likes'].remove(username)
+        action = 'unlike'
+    else:
+        moment['likes'].append(username)
+        action = 'like'
+        
+    save_moments(moments)
+    return jsonify({"success": True, "action": action, "likes": moment['likes']})
 
 # Run the app (IMPORTANT: Use socketio.run to enable Socket.IO support)
 if __name__ == "__main__":

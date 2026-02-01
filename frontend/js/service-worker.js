@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1-zylo';
+const CACHE_VERSION = 'v2-zylo';
 const CORE_CACHE = `core-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const API_CACHE = `api-${CACHE_VERSION}`;

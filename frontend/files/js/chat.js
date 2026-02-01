@@ -24,9 +24,10 @@ var aiModelSelect = document.getElementById("aiModelSelect");
 var aiPersonaSelect = document.getElementById("aiPersonaSelect");
 var typingIndicator = document.getElementById("typingIndicator");
 
-// Load AI Conversation
+// Load AI Conversation (per-user)
 try {
-    aiConversation = JSON.parse(localStorage.getItem('ai_conversation') || '[]');
+    const aiUser = localStorage.getItem('username') || localStorage.getItem('savedUsername') || 'guest';
+    aiConversation = JSON.parse(localStorage.getItem('ai_conversation_' + aiUser) || '[]');
 } catch { aiConversation = []; }
 
 
@@ -60,90 +61,6 @@ async function createDiscordMessage(data) {
     actions.className = "absolute right-4 -top-4 hidden group-hover:flex bg-discord-gray-900 rounded border border-discord-gray-800 shadow-sm z-20 scale-90 p-0.5";
 
     const replyBtn = document.createElement("button");
-    replyBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white rounded-l transition";
-    replyBtn.title = "Reply";
-    replyBtn.onclick = () => startReply(data.id || Date.now(), data.username || data.from, data.message || '');
-    replyBtn.innerHTML = '<i data-feather="corner-up-left" class="w-4 h-4"></i>';
-
-    const editBtn = document.createElement("button");
-    editBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white rounded-r transition";
-    editBtn.title = "Edit";
-    editBtn.innerHTML = '<i data-feather="edit-2" class="w-4 h-4"></i>';
-
-    // Only allow editing own messages
-    const currentUser = localStorage.getItem('savedUsername') || 'User';
-    const msgAuthor = data.username || data.from;
-    const isOwnMessage = (currentUser === msgAuthor);
-
-    if (!isOwnMessage) {
-        editBtn.classList.add('opacity-30', 'cursor-not-allowed');
-        editBtn.title = "Can only edit your own messages";
-        editBtn.onclick = null;
-    } else {
-        editBtn.onclick = async () => {
-            const newT = prompt("Edit message:", data.message);
-            if (newT && newT !== data.message) {
-                // Optimistic UI update - target the message body specifically
-                const bodyEl = msgWrapper.querySelector('.msg-body-text');
-                if (bodyEl) {
-                    bodyEl.textContent = newT;
-                    // Add edited indicator
-                    const editedSpan = document.createElement('span');
-                    editedSpan.className = 'text-discord-gray-400 text-xs ml-1 italic';
-                    editedSpan.textContent = '(edited)';
-                    bodyEl.appendChild(editedSpan);
-                }
-
-                // Call backend API to persist the edit
-                try {
-                    const payload = {
-                        groupId: currentGroupId,
-                        channel: activeChannelId || 'general',
-                        username: currentUser,
-                        timestamp: data.timestamp || data.ts,
-                        newMessage: newT
-                    };
-
-                    // Only call API for group messages (if in group context)
-                    if (currentGroupId) {
-                        const res = await fetch('/api/groups/message/edit', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await res.json();
-                        if (!result.success) {
-                            console.error('Edit failed:', result.error);
-                            alert("Edit failed: " + result.error);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error editing message:', error);
-                }
-            }
-        };
-    }
-
-    actions.appendChild(replyBtn);
-
-    // Discord-style Quick Reactions - inline emoji buttons
-    const quickReactions = ['👍', '❤️', '😂', '😮'];
-    quickReactions.forEach(emoji => {
-        const emojiBtn = document.createElement("button");
-        emojiBtn.className = "p-1 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white transition text-sm hover:scale-110";
-        emojiBtn.textContent = emoji;
-        emojiBtn.title = `React with ${emoji}`;
-        emojiBtn.onclick = (e) => {
-            e.stopPropagation();
-            addReactionToMessage(msgWrapper, emoji, data);
-        };
-        actions.appendChild(emojiBtn);
-    });
-
-    // More reactions button (shows full picker)
-    const moreReactBtn = document.createElement("button");
-    moreReactBtn.className = "p-1 px-2 hover:bg-discord-gray-700 text-discord-gray-400 hover:text-white transition relative";
-    moreReactBtn.title = "More Reactions";
     moreReactBtn.innerHTML = '<i data-feather="plus" class="w-3 h-3"></i>';
 
     // Full reaction picker popup - fixed positioning
@@ -345,7 +262,8 @@ async function createDiscordMessage(data) {
     if (isOwnMessage) {
         const statusSpan = document.createElement("span");
         statusSpan.className = "ml-2 text-[10px] select-none msg-status-icon cursor-help opacity-80 hover:opacity-100";
-        const currentStatus = data.status || (data.readBy && data.readBy.length > 1 ? 'read' : 'sent');
+        const readList = data.readBy || data.read_by || [];
+        const currentStatus = data.status || (readList.length > 1 ? 'read' : 'sent');
         statusSpan.innerHTML = getStatusIcon(currentStatus);
         header.appendChild(statusSpan);
     }
@@ -491,11 +409,18 @@ async function createDiscordMessage(data) {
         body.innerHTML = message;
 
         // Add (edited) indicator
-        if (data.edited) {
+        // Add (edited) indicator - supports legacy 'edited' and new 'isEdited'/'history' keys
+        if (data.edited || data.isEdited || (data.history && data.history.length > 0)) {
             const editedSpan = document.createElement("span");
             editedSpan.className = "text-discord-gray-400 text-xs ml-1 italic cursor-pointer hover:underline hover:text-white transition-colors select-none";
             editedSpan.textContent = "(edited)";
             editedSpan.title = "View edit history";
+            editedSpan.onclick = (e) => {
+                e.stopPropagation();
+                if (window.fetchEditHistory && currentGroupId) {
+                    fetchEditHistory(currentGroupId, data.id, data.timestamp || data.ts);
+                }
+            };
             editedSpan.onclick = (e) => {
                 e.stopPropagation();
                 if(window.showEditHistory) showEditHistory(data.history || [], data.message, data.editedAt);
@@ -555,26 +480,21 @@ async function createDiscordMessage(data) {
     }
 
 
-    // Reactions display area
-    if (data.reactions && Object.keys(data.reactions).length > 0) {
-        const reactionsContainer = document.createElement("div");
-        reactionsContainer.className = "reactions-container flex flex-wrap gap-1 mt-1";
-
-        const username = localStorage.getItem('savedUsername') || 'User';
-        for (const [emoji, users] of Object.entries(data.reactions)) {
-            const hasUserReacted = users.includes(username);
-            const reactionBadge = document.createElement("button");
-            reactionBadge.className = `flex items-center gap-1 px-2 py-0.5 rounded text-sm border transition ${hasUserReacted ? 'bg-discord-blurple/20 border-discord-blurple text-white' : 'bg-discord-gray-800/50 hover:bg-discord-gray-700 border-discord-gray-600 text-discord-gray-300'}`;
-            reactionBadge.innerHTML = `<span>${emoji}</span><span class="text-xs">${users.length}</span>`;
-            reactionBadge.title = users.join(', ');
-            reactionBadge.onclick = () => addReactionToMessage(msgWrapper, emoji, data);
-            reactionsContainer.appendChild(reactionBadge);
-        }
-        contentWrapper.appendChild(reactionsContainer);
+    // Reactions display area - using shared helper
+    if (data.reactions) {
+        // Must wait for contentWrapper to be appended to messageRow? 
+        // renderReactions finds container inside msgWrapper, but contentWrapper isn't yet in msgWrapper?
+        // Wait, contentWrapper is appended to messageRow later?
+        // renderReactions logic: looks for .reactions-container or appends to .msg-body-wrapper.
+        // Let's defer this call until after messageRow is assembled.
     }
 
     messageRow.appendChild(contentWrapper);
     msgWrapper.appendChild(messageRow);
+    
+    // Render initial reactions
+    if (data.reactions) renderReactions(msgWrapper, data.reactions);
+    
     return msgWrapper;
 }
 
@@ -654,6 +574,11 @@ function closeUserViewModal() {
 window.closeUserViewModal = closeUserViewModal;
 
 async function appendCommunityMessage(data) {
+    // Deduplication: If message with this ID already exists (optimistic UI), skip
+    if (data.id && chatMessagesCommunity.querySelector(`[data-msg-id="${data.id}"]`)) {
+        return;
+    }
+    
     const msgElement = await createDiscordMessage(data);
     chatMessagesCommunity.appendChild(msgElement);
     chatMessagesCommunity.scrollTop = chatMessagesCommunity.scrollHeight;
@@ -849,30 +774,15 @@ async function sendMessage() {
     }
     
     // AI Chat
-    // ...AI Logic...
-    const model = aiModelSelect?.value || '';
-    const persona = aiPersonaSelect?.value || localStorage.getItem('ai_persona') || 'helper';
-    const payload = {
-        model,
-        persona,
-        username,
-        messages: [...aiConversation, { role: 'user', content: message }]
-    };
-    await appendAiBubble('user', message);
-    aiConversation.push({ role: 'user', content: message });
-    localStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
+    if (window.aiManager) {
+        window.aiManager.sendMessage(message);
+    } else {
+        console.error("AI Manager not fully loaded.");
+        alert("AI System is initializing, please try again.");
+    }
+    
     chatInput.value = "";
     chatInput.style.height = "auto";
-    try {
-        const res = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json();
-        const reply = data.reply || data.response || 'Sorry, no reply available.';
-        await appendAiBubble('assistant', reply);
-        aiConversation.push({ role: 'assistant', content: reply });
-        localStorage.setItem('ai_conversation', JSON.stringify(aiConversation));
-    } catch (e) {
-        await appendAiBubble('assistant', 'There was an error contacting the AI.');
-    }
 }
 window.sendMessage = sendMessage;
 
@@ -1065,7 +975,7 @@ function switchChatRoom(room) {
     localStorage.setItem('chatRoom', room);
     const btnCommunity = document.getElementById('btnRoomCommunity');
     const btnAI = document.getElementById('btnRoomAI');
-    const title = document.getElementById('main-content-title');
+    const title = document.getElementById('subPanelTitle');
 
     // Ensure we're showing tab-messages, not tab-friends
     const tabMessages = document.getElementById('tab-messages');
@@ -1079,9 +989,17 @@ function switchChatRoom(room) {
         chatMessagesCommunity.classList.remove('hidden');
         chatMessagesAI.classList.add('hidden');
         aiControls.classList.add('hidden');
-        if (btnCommunity) btnCommunity.classList.add('active');
         if (btnAI) btnAI.classList.remove('active');
         if (title) title.textContent = '# Community';
+        
+        // Hide AI specific UI
+        const aiTabBar = document.getElementById('aiTabBar');
+        if (aiTabBar) aiTabBar.classList.add('hidden');
+        
+        // Reset ID
+        const input = document.getElementById('chatInput');
+        if (input) input.placeholder = "Message #Community";
+
     } else {
         chatMessagesCommunity.classList.add('hidden');
         chatMessagesAI.classList.remove('hidden');
@@ -1089,30 +1007,34 @@ function switchChatRoom(room) {
         if (btnAI) btnAI.classList.add('active');
         if (btnCommunity) btnCommunity.classList.remove('active');
         if (title) title.textContent = '🤖 AI Chat';
+        
+        // Show AI UI
+        const aiTabBar = document.getElementById('aiTabBar');
+        // Only show if there are active sessions? 
+        // aiManager.updateUI() handles this logic but we should ensure it's not force-hidden if sessions exist
+        if (aiTabBar && window.aiManager && window.aiManager.activeSessionId) {
+             aiTabBar.classList.remove('hidden');
+        }
+        
         restoreAiConversation();
+        
+        // Trigger UI update to set placeholder
+        if (window.aiManager) window.aiManager.updateUI();
     }
 }
 window.switchChatRoom = switchChatRoom;
 
 function restoreAiConversation() {
-    try {
-        aiConversation = JSON.parse(localStorage.getItem('ai_conversation') || '[]');
-    } catch { aiConversation = []; }
-    if (chatMessagesAI) {
-        chatMessagesAI.innerHTML = '';
-        (async () => {
-            for (const msg of aiConversation) {
-                await appendAiBubble(msg.role, msg.content);
-            }
-        })();
-    }
+    console.log("Legacy restoreAiConversation disabled (using Tabbed AI)");
+    // Legacy logic removed to prevent overwriting Tabbed AI interface
 }
 window.restoreAiConversation = restoreAiConversation;
 
 function clearAiConversation() {
-    aiConversation = [];
-    localStorage.removeItem('ai_conversation');
-    if (chatMessagesAI) chatMessagesAI.innerHTML = '';
+    console.log("Legacy clearAiConversation disabled");
+    if (window.aiManager && window.aiManager.clearCurrentTab) {
+        // window.aiManager.clearCurrentTab(); // If implemented
+    }
 }
 window.clearAiConversation = clearAiConversation;
 
@@ -1467,7 +1389,7 @@ function showEditHistory(history, currentMessage, lastEditedAt) {
                el.className = 'bg-discord-gray-900/30 p-3 rounded';
                el.innerHTML = `
                    <div class="flex justify-between mb-1">
-                       <span class="text-xs text-gray-400 uppercase font-bold">Previous</span>
+                       <span class="text-xs text-discord-gray-400 uppercase font-bold">Previous</span>
                        <span class="text-xs text-gray-500">${new Date(h.timestamp * 1000).toLocaleString()}</span>
                    </div>
                    <div class="text-gray-300 text-sm whitespace-pre-wrap line-through opacity-70">${h.message}</div>
@@ -1484,3 +1406,114 @@ function showEditHistory(history, currentMessage, lastEditedAt) {
     modal.classList.remove('hidden');
 }
 window.showEditHistory = showEditHistory;
+
+// === Reaction Logic ===
+
+function toggleReaction(msgId, emoji, groupId) {
+    if (!msgId || !emoji) return;
+    const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    
+    // Determine context (Group/DM)
+    // If groupId is passed, use it. Else fall back to global currentGroupId if set.
+    const gid = groupId || currentGroupId; 
+    
+    // Determine action: Check if we already reacted
+    // We need the current state.
+    // Optimistic toggle: We don't know state easily without querying DOM or store.
+    // Basic implementation: Always 'add' unless we can verify?
+    // Backend handles toggle logic? No, backend expects 'add' or 'remove'.
+    // Let's check the DOM first.
+    
+    const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
+    let action = 'add';
+    if (msgEl) {
+        const reactionsContainer = msgEl.querySelector('.reactions-container');
+        if (reactionsContainer) {
+            const pill = reactionsContainer.querySelector(`[data-emoji="${emoji}"]`);
+            if (pill && pill.classList.contains('reacted-by-me')) {
+                action = 'remove';
+            }
+        }
+    }
+    
+    window.socket.emit('message_reaction', {
+        groupId: gid, // null for DM
+        messageId: msgId,
+        username: me,
+        emoji: emoji,
+        action: action
+    });
+}
+
+function addReactionToMessage(msgWrapper, emoji, data) {
+    toggleReaction(data.id, emoji, data.groupId || currentGroupId);
+}
+
+function renderReactions(msgWrapper, reactions) {
+    // reactions: { "❤️": ["user1", "user2"], ... }
+    let container = msgWrapper.querySelector('.reactions-container');
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "reactions-container flex flex-wrap gap-1 mt-1 empty:hidden";
+        // Insert after message body (contentWrapper)
+        // Need to find contentWrapper. Best effort:
+        const body = msgWrapper.querySelector('.msg-body-wrapper') || msgWrapper.querySelector('.flex.items-baseline').parentNode; // fallback
+        if (body) {
+             body.appendChild(container);
+        } else {
+             msgWrapper.appendChild(container);     
+        }
+    }
+    
+    container.innerHTML = '';
+    const me = localStorage.getItem('username') || localStorage.getItem('savedUsername');
+    
+    if (!reactions || Object.keys(reactions).length === 0) {
+        return;
+    }
+
+    Object.entries(reactions).forEach(([emoji, users]) => {
+        if (!users || users.length === 0) return;
+        
+        const count = users.length;
+        const iReacted = users.includes(me);
+        
+        const pill = document.createElement("div");
+        pill.className = `flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer text-xs border transition select-none ${iReacted ? 'bg-discord-blurple/20 border-discord-blurple text-blue-200 reacted-by-me' : 'bg-discord-gray-800 border-transparent text-gray-400 hover:border-discord-gray-600'}`;
+        pill.dataset.emoji = emoji;
+        pill.innerHTML = `<span>${emoji}</span><span class="font-bold">${count}</span>`;
+        pill.onclick = (e) => {
+            e.stopPropagation();
+            toggleReaction(msgWrapper.getAttribute('data-msg-id'), emoji, currentGroupId); 
+        };
+        
+        // Tooltip for users
+        pill.title = users.join(', ');
+        
+        container.appendChild(pill);
+    });
+}
+
+// Socket Listener for Reactions
+function setupReactionListeners() {
+    const s = window.socket;
+    if (!s) { setTimeout(setupReactionListeners, 1000); return; }
+    if (s.__reactionListeners) return;
+    s.__reactionListeners = true;
+    
+    s.on('message_reaction_update', (data) => {
+        // data: { messageId, reactions, groupId, ... }
+        const { messageId, reactions } = data;
+        if (!messageId) return;
+        
+        const el = document.querySelector(`[data-msg-id="${messageId}"]`);
+        if (el) {
+            renderReactions(el, reactions);
+        }
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupReactionListeners);
+} else {
+    setupReactionListeners();
+}

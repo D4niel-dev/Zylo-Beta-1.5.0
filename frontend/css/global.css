@@ -148,8 +148,16 @@ h2,
 
 /* Apply system fonts for full offline support */
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
 }
@@ -158,7 +166,9 @@ body {
 body {
   background: #ffffff;
   color: #2e3338;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Light theme - specific UI elements */
@@ -258,7 +268,9 @@ body.page-loading {
   background-color: white;
   border-radius: 0 4px 4px 0;
   transform: scaleY(0);
-  transition: transform 0.2s ease, height 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    height 0.2s ease;
 }
 
 .sidebar-tab.active .sidebar-pill,
@@ -304,7 +316,9 @@ body.page-loading {
   padding: 0.5rem 0.75rem;
   border-radius: 0.25rem;
   color: var(--text-secondary);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .sub-panel-item:hover {
@@ -476,7 +490,7 @@ body.page-loading {
 /* Main chat messages area */
 .chat-messages {
   flex: 1;
-  padding: 2.5rem 1rem 1rem 1rem;
+  padding: 1rem 1rem 1rem 1rem;
   border-radius: 0.5rem;
   overflow-y: auto;
   display: flex;
@@ -610,7 +624,9 @@ body.page-loading {
   gap: 0.5rem;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
   color: #b91c1c;
 }
 
@@ -940,7 +956,9 @@ body.dark .profile-card {
 
 /* Neon Glow Effect */
 .banner-effect-neon-glow {
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.3),
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.5),
+    0 0 40px rgba(0, 255, 255, 0.3),
     0 0 60px rgba(0, 255, 255, 0.1);
   border: 2px solid #00ffff;
 }
@@ -953,7 +971,8 @@ body.dark .profile-card {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: linear-gradient(rgba(0, 255, 255, 0.3) 1px, transparent 1px),
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.3) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.3) 1px, transparent 1px);
   background-size: 20px 20px;
   border-top-left-radius: 1rem;
@@ -1071,7 +1090,8 @@ body.dark .profile-card {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 20% 80%,
       rgba(255, 0, 150, 0.3) 0%,
       transparent 50%
@@ -1150,8 +1170,10 @@ body.dark .avatar-img {
 
 /* Softer ambient glow around avatar */
 .avatar-effect-glow {
-  box-shadow: 0 0 6px rgba(99, 102, 241, 0.45),
-    0 0 14px rgba(59, 130, 246, 0.35), 0 0 22px rgba(236, 72, 153, 0.25);
+  box-shadow:
+    0 0 6px rgba(99, 102, 241, 0.45),
+    0 0 14px rgba(59, 130, 246, 0.35),
+    0 0 22px rgba(236, 72, 153, 0.25);
   animation: glowPulse 3.2s ease-in-out infinite;
 }
 
@@ -1193,7 +1215,8 @@ body.dark .avatar-img {
   content: "";
   position: absolute;
   inset: -14px;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       4px 4px at 18% 32%,
       rgba(255, 255, 255, 0.6),
       rgba(255, 255, 255, 0) 60%
@@ -1228,7 +1251,10 @@ body.dark .avatar-img {
 /* Neon Border Effect */
 .avatar-effect-neon-border {
   border: 3px solid #00ffff;
-  box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff,
+  box-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff,
+    0 0 30px #00ffff,
     inset 0 0 10px rgba(0, 255, 255, 0.2);
 }
 
@@ -1290,7 +1316,9 @@ body.dark .avatar-img {
 .avatar-effect-matrix {
   filter: hue-rotate(90deg) contrast(1.5) brightness(0.8);
   border: 2px solid #00ff00;
-  box-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00,
+  box-shadow:
+    0 0 15px #00ff00,
+    0 0 30px #00ff00,
     inset 0 0 15px rgba(0, 255, 0, 0.3);
   position: relative;
   overflow: hidden;
@@ -1320,7 +1348,9 @@ body.dark .avatar-img {
   background: linear-gradient(45deg, #ff0080, #00ffff, #ff0080);
   padding: 3px;
   border-radius: 50%;
-  box-shadow: 0 0 20px #ff0080, 0 0 40px #ff0080;
+  box-shadow:
+    0 0 20px #ff0080,
+    0 0 40px #ff0080;
 }
 
 .avatar-effect-cyberpunk .avatar-img {
@@ -1574,13 +1604,17 @@ body.dark .stat-label {
 @keyframes glowPulse {
   0%,
   100% {
-    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5),
-      0 0 10px rgba(59, 130, 246, 0.35), 0 0 18px rgba(236, 72, 153, 0.25);
+    box-shadow:
+      0 0 5px rgba(99, 102, 241, 0.5),
+      0 0 10px rgba(59, 130, 246, 0.35),
+      0 0 18px rgba(236, 72, 153, 0.25);
   }
 
   50% {
-    box-shadow: 0 0 9px rgba(99, 102, 241, 0.7),
-      0 0 16px rgba(59, 130, 246, 0.55), 0 0 24px rgba(236, 72, 153, 0.35);
+    box-shadow:
+      0 0 9px rgba(99, 102, 241, 0.7),
+      0 0 16px rgba(59, 130, 246, 0.55),
+      0 0 24px rgba(236, 72, 153, 0.35);
   }
 }
 
@@ -1825,7 +1859,9 @@ body.theme-custom .zylo-heading {
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: #2f3136;
   /* discord-gray-800 */
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 /* Unify settings inputs look */
@@ -1896,7 +1932,9 @@ body.dark .editable-value {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
 }
 
 .edit-icon:hover {
@@ -1945,7 +1983,10 @@ body.dark .edit-icon:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   opacity: 0;
   transform: scale(0.9);
-  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
   pointer-events: none;
 }
 
@@ -2258,7 +2299,8 @@ body:not(.dark) .sidebar-tab:hover .sidebar-icon {
 
 /* Shadow overrides for light theme */
 body:not(.dark) .shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -2581,7 +2623,9 @@ body.dark .animated-bg {
 
 /* Micro-Animations */
 .input-focus-effect {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-focus-effect:focus {
@@ -2590,7 +2634,9 @@ body.dark .animated-bg {
 }
 
 .btn-hover-effect {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-hover-effect:hover {
@@ -2601,14 +2647,16 @@ body.dark .animated-bg {
 /* Neumorphism (Optional Accents) */
 .neomorphic {
   background: #e0e5ec;
-  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+  box-shadow:
+    9px 9px 16px rgba(163, 177, 198, 0.6),
     -9px -9px 16px rgba(255, 255, 255, 0.5);
   border-radius: 16px;
 }
 
 body.dark .neomorphic {
   background: #2f3136;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+  box-shadow:
+    5px 5px 10px rgba(0, 0, 0, 0.3),
     -5px -5px 10px rgba(255, 255, 255, 0.05);
 }
 
@@ -2655,7 +2703,9 @@ body.dark .animated-bg {
 
 /* Micro-Animations */
 .input-focus-effect {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-focus-effect:focus {
@@ -2664,7 +2714,9 @@ body.dark .animated-bg {
 }
 
 .btn-hover-effect {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-hover-effect:hover {
@@ -2675,14 +2727,16 @@ body.dark .animated-bg {
 /* Neumorphism (Optional Accents) */
 .neomorphic {
   background: #e0e5ec;
-  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6),
+  box-shadow:
+    9px 9px 16px rgba(163, 177, 198, 0.6),
     -9px -9px 16px rgba(255, 255, 255, 0.5);
   border-radius: 16px;
 }
 
 body.dark .neomorphic {
   background: #2f3136;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+  box-shadow:
+    5px 5px 10px rgba(0, 0, 0, 0.3),
     -5px -5px 10px rgba(255, 255, 255, 0.05);
 }
 
@@ -2693,219 +2747,224 @@ body.dark .neomorphic {
 /* === CSS Variable Overrides for Light Theme === */
 /* These override the :root variables, automatically adapting all components */
 body:not(.dark) {
-    /* Discord color palette - inverted for light theme */
-    --discord-gray-900: #e5e7eb;
-    --discord-gray-800: #f3f4f6;
-    --discord-gray-700: #f9fafb;
-    --discord-gray-600: #e5e7eb;
-    --discord-gray-500: #d1d5db;
-    --discord-gray-400: #6b7280;
-    --discord-gray-300: #374151;
+  /* Discord color palette - inverted for light theme */
+  --discord-gray-900: #e5e7eb;
+  --discord-gray-800: #f3f4f6;
+  --discord-gray-700: #f9fafb;
+  --discord-gray-600: #e5e7eb;
+  --discord-gray-500: #d1d5db;
+  --discord-gray-400: #6b7280;
+  --discord-gray-300: #374151;
 
-    /* Semantic background colors - light versions */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f3f4f6;
-    --bg-tertiary: #e5e7eb;
-    --bg-input: #ffffff;
-    --bg-hover: #e5e7eb;
-    --bg-active: #dbeafe;
+  /* Semantic background colors - light versions */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --bg-tertiary: #e5e7eb;
+  --bg-input: #ffffff;
+  --bg-hover: #e5e7eb;
+  --bg-active: #dbeafe;
 
-    /* Semantic text colors - dark for light background */
-    --text-primary: #111827;
-    --text-secondary: #4b5563;
-    --text-muted: #9ca3af;
-    --text-heading: #111827;
+  /* Semantic text colors - dark for light background */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-heading: #111827;
 
-    /* Border colors */
-    --border-primary: #d1d5db;
-    --border-secondary: #e5e7eb;
+  /* Border colors */
+  --border-primary: #d1d5db;
+  --border-secondary: #e5e7eb;
 
-    /* Scrollbar */
-    --scrollbar-thumb: #d1d5db;
+  /* Scrollbar */
+  --scrollbar-thumb: #d1d5db;
 }
 
 /* Override all discord-gray backgrounds for light theme */
 body:not(.dark) .bg-discord-gray-900,
 body:not(.dark) [class*="bg-discord-gray-900"] {
-    background-color: #e5e7eb !important;
+  background-color: #e5e7eb !important;
 }
 
 body:not(.dark) .bg-discord-gray-800,
 body:not(.dark) [class*="bg-discord-gray-800"] {
-    background-color: #f3f4f6 !important;
+  background-color: #f3f4f6 !important;
 }
 
 body:not(.dark) .bg-discord-gray-700,
 body:not(.dark) [class*="bg-discord-gray-700"] {
-    background-color: #f9fafb !important;
+  background-color: #f9fafb !important;
 }
 
 body:not(.dark) .bg-discord-gray-600,
 body:not(.dark) [class*="bg-discord-gray-600"] {
-    background-color: #e5e7eb !important;
+  background-color: #e5e7eb !important;
 }
 
 body:not(.dark) .bg-discord-gray-500,
 body:not(.dark) [class*="bg-discord-gray-500"] {
-    background-color: #d1d5db !important;
+  background-color: #d1d5db !important;
 }
 
 /* Override text colors for light theme */
 body:not(.dark) .text-discord-gray-400,
 body:not(.dark) [class*="text-discord-gray-400"] {
-    color: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 body:not(.dark) .text-discord-gray-300,
 body:not(.dark) [class*="text-discord-gray-300"] {
-    color: #374151 !important;
+  color: #374151 !important;
 }
 
 body:not(.dark) .text-white,
 body:not(.dark) [class*="text-white"] {
-    color: #111827 !important;
+  color: #111827 !important;
 }
 
 /* Override borders for light theme */
 body:not(.dark) .border-discord-gray-900,
 body:not(.dark) [class*="border-discord-gray-900"] {
-    border-color: #d1d5db !important;
+  border-color: #d1d5db !important;
 }
 
 body:not(.dark) .border-discord-gray-800,
 body:not(.dark) [class*="border-discord-gray-800"] {
-    border-color: #e5e7eb !important;
+  border-color: #e5e7eb !important;
 }
 
 body:not(.dark) .border-discord-gray-700,
 body:not(.dark) [class*="border-discord-gray-700"] {
-    border-color: #e5e7eb !important;
+  border-color: #e5e7eb !important;
 }
 
 body:not(.dark) .border-discord-gray-600,
 body:not(.dark) [class*="border-discord-gray-600"] {
-    border-color: #d1d5db !important;
+  border-color: #d1d5db !important;
 }
 
 /* Override hover states for light theme */
 body:not(.dark) .hover\:bg-discord-gray-600\/50:hover,
 body:not(.dark) .hover\:bg-discord-gray-600:hover {
-    background-color: #e5e7eb !important;
+  background-color: #e5e7eb !important;
 }
 
 body:not(.dark) .hover\:bg-discord-gray-500:hover {
-    background-color: #d1d5db !important;
+  background-color: #d1d5db !important;
 }
 
 body:not(.dark) .hover\:text-white:hover {
-    color: #111827 !important;
+  color: #111827 !important;
 }
 
 /* Light theme specific component overrides */
 body:not(.dark) .sub-panel-header {
-    color: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 body:not(.dark) .sub-panel-item {
-    color: #4b5563 !important;
+  color: #4b5563 !important;
 }
 
 body:not(.dark) .sub-panel-item:hover {
-    background-color: #e5e7eb !important;
-    color: #111827 !important;
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
 }
 
 body:not(.dark) .sub-panel-item.active {
-    background-color: #dbeafe !important;
-    color: #1e40af !important;
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
 }
 
 body:not(.dark) .dm-list-section {
-    color: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 body:not(.dark) .group-item {
-    color: #4b5563 !important;
+  color: #4b5563 !important;
 }
 
 body:not(.dark) .group-item:hover {
-    background-color: #e5e7eb !important;
-    color: #111827 !important;
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
 }
 
 body:not(.dark) .group-item.active {
-    background-color: #dbeafe !important;
-    color: #1e40af !important;
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
 }
 
 body:not(.dark) .group-name {
-    color: #111827 !important;
+  color: #111827 !important;
 }
 
 body:not(.dark) .channel-indicator {
-    color: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 body:not(.dark) .member-count {
-    color: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 /* Input fields in light theme */
 body:not(.dark) input,
 body:not(.dark) textarea,
 body:not(.dark) select {
-    background-color: #ffffff !important;
-    color: #111827 !important;
-    border-color: #d1d5db !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
 }
 
 body:not(.dark) input::placeholder,
 body:not(.dark) textarea::placeholder {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 /* Cards and panels in light theme */
 body:not(.dark) .profile-card {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
 body:not(.dark) .friend-row {
-    border-top-color: #e5e7eb !important;
+  border-top-color: #e5e7eb !important;
 }
 
 body:not(.dark) .friend-row:hover {
-    background-color: #f3f4f6 !important;
+  background-color: #f3f4f6 !important;
 }
 
 /* Headers in light theme */
 body:not(.dark) header {
-    background-color: #f9fafb !important;
-    border-bottom-color: #e5e7eb !important;
+  background-color: #f9fafb !important;
+  border-bottom-color: #e5e7eb !important;
 }
 
 /* Ensure sidebar icons work in light mode */
 body:not(.dark) .sidebar-icon {
-    background-color: #e5e7eb !important;
-    color: #4b5563 !important;
+  background-color: #e5e7eb !important;
+  color: #4b5563 !important;
 }
 
 body:not(.dark) .sidebar-tab.active .sidebar-icon,
 body:not(.dark) .sidebar-tab:hover .sidebar-icon {
-    background-color: #5865F2 !important;
-    color: white !important;
+  background-color: #5865f2 !important;
+  color: white !important;
 }
 
 /* Chat messages in light theme */
 body:not(.dark) .chat-messages {
-    background-color: transparent !important;
+  background-color: transparent !important;
 }
 
 body:not(.dark) .message.self {
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
 }
 
 body:not(.dark) .message.other {
-    background-color: #e5e7eb !important;
-    color: #111827 !important;
+  background-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* Hide Logout button when sidebar is collapsed */
+#subPanelContainer.collapsed #sidebarLogoutBtn {
+  display: none !important;
 }

@@ -108,20 +108,27 @@
 
 ---
 
-## **Zylo-Beta-v1.3.1** *(Latest)*
+## **Zylo-Beta-v1.3.2** — *The Visual Polish*
 
 ### NEW :
-- **Multi-step Signup Wizard**: Completely overhauled registration flow into 4 steps (Account, Profile, Personal, Confirm) for better UX.
-- **Social Login Integration**: Added OAuth support for Google, GitHub, Discord, and Microsoft.
-- **Two-Factor Authentication (2FA)**: Implemented 2FA security layer with verification codes.
-- **Email Verification**: Added email verification flow during signup (simulated).
-- **Settings I18n**: Added internationalization support for all Settings panels (Appearance, Sound, About, Security).
-- **Session Management**: Enhanced session handling and security.
-
-### IMPROVEMENT :
-- **Form Validation**: Added real-time username/email availability checking and visual password strength meter.
-- **Visual Polish**: Applied glassmorphism and animated backgrounds to auth pages as per Phase 2 plan.
+- **Visual Overhaul**: Major refinements to sidebar navigation, tab transitions, and overall UI responsiveness.
+- **Zylo Moments**: A clean, modern social feed interface for sharing photo updates.
+- **Avatar Sync**: Seamless avatar synchronization across Profile, Chat, and Moments.
 
 ### FIX :
-- **Backend Startup**: Switched startup script to use standard `python` executable for better stability.
+- **Sidebar Glitches**: Fixed overlap and logout button visibility issues.
+- **Tab Rendering**: Solved "ghost tabs" where content wouldn't load properly on switch.
 
+---
+
+## **Zylo-Beta-v1.4.2** *(Latest)*
+
+### NEW :
+- **Dual AI Persona System**: Choose between **Diszi** (Analytical) and **Zily** (Creative) assistants.
+- **Smart Chat Interface**: Model switching, typing indicators, and comprehensive history management.
+- **Voice & Video UI**: New interface elements supporting future call features.
+- **Sidebar Optimization**: Logout button now intelligently hides when sidebar is collapsed.
+
+### FIX :
+- **Logout Button**: Fixed visibility bug in collapsed sidebar state.
+- **Avatar Loading**: Fixed avatar display issues in Moments feed.
