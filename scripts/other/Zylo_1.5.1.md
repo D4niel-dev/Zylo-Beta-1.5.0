@@ -1408,8 +1408,8 @@ const perfMonitor = new PerformanceMonitor();
 
 - **Zily :** Thinking (`lfm2.5-thinking`), Writer (`qwen3:4b`), Review (`gemm3:latest/gemma3:1b`).
 
+- **Also add a new dropdown menu that shows the thoughts of the AI's when they are in `Thinking` mode in their message when they are running.**
 
-**Add a new dropdown menu that shows the thoughts of the AI's when they are in `Thinking` mode in their message when they are running.**
 ---
 
 ## 8. Performance Benchmarks 📊
