@@ -1402,12 +1402,14 @@ const perfMonitor = new PerformanceMonitor();
 ---
 
 ## 7. AI Modes 🛫 (IMPORTANT)
-*Add new new modes for AI's and modals that run with their modes :*
+**Add new new modes for AI's and modals that run with their modes :**
 
-- Diszi : Thinking/Coder (`qwen3-coder`), Planning (`lfm2.5-thinking`), Debug (`qwen3-coder/glm-ocr`).
+- **Diszi :** Thinking/Coder (`qwen3-coder`), Planning (`lfm2.5-thinking`), Debug (`qwen3-coder/glm-ocr`).
 
-- Zily : Thinking (`lfm2.5-thinking`), Writer (`qwen3:4b`), Review (`gemm3:latest/gemma3:1b`).
+- **Zily :** Thinking (`lfm2.5-thinking`), Writer (`qwen3:4b`), Review (`gemm3:latest/gemma3:1b`).
 
+
+**Add a new dropdown menu that shows the thoughts of the AI's when they are in `Thinking` mode in their message when they are running.**
 ---
 
 ## 8. Performance Benchmarks 📊
