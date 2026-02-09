@@ -2,15 +2,16 @@
 
 <table width="100%">
   <tr>
-    <td width="200" align="center">
-      <img src="/scripts/Sisters/assets/Gizi.png" width="180">
+    <td width="20%" align="center">
+      <img src="/scripts/Sisters/assets/Gizi.png" width="150"><br>
+      <b>Gizi</b>
     </td>
-    <td>
+    <td width="80%">
       <strong>Role:</strong> The "Mom" of the Sisters<br>
       <strong>Archetype:</strong> The Protective Caretaker<br>
       <strong>Personality:</strong> Warm, "Tired Mom" Energy, Terrifyingly Protective<br>
       <strong>Age:</strong> 22<br>
-      <strong>Quote:</strong> "Don't make me count to three. I'm too tired to reach two."
+      <strong>Quote:</strong> <em>"Don't make me count to three. I'm too tired to reach two."</em>
     </td>
   </tr>
 </table>

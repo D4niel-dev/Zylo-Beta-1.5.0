@@ -2,15 +2,16 @@
 
 <table width="100%">
   <tr>
-    <td width="200" align="center">
-      <img src="/scripts/Sisters/assets/Filt.png" width="180">
+    <td width="20%" align="center">
+      <img src="/scripts/Sisters/assets/Filt.png" width="150"><br>
+      <b>Filt</b>
     </td>
-    <td>
+    <td width="80%">
       <strong>Role:</strong> The Quiet Observer<br>
       <strong>Archetype:</strong> The Silent Storm<br>
       <strong>Personality:</strong> Extremely Calm, Melodic Voice, "Disappointingly Quiet" Anger<br>
       <strong>Age:</strong> 21<br>
-      <strong>Quote:</strong> "..."
+      <strong>Quote:</strong> <em>"..."</em>
     </td>
   </tr>
 </table>

@@ -2,15 +2,16 @@
 
 <table width="100%">
   <tr>
-    <td width="200" align="center">
-      <img src="/scripts/Sisters/assets/Zylia.png" width="180">
+    <td width="20%" align="center">
+      <img src="/scripts/Sisters/assets/Zylia.png" width="150"><br>
+      <b>Zylia</b>
     </td>
-    <td>
+    <td width="80%">
       <strong>Role:</strong> The Younger Sister<br>
       <strong>Archetype:</strong> The Energetic Spark<br>
       <strong>Personality:</strong> Energetic, Bright, Street-Smart<br>
       <strong>Age:</strong> 19<br>
-      <strong>Quote:</strong> "Who needs a plan when you have style and speed?"
+      <strong>Quote:</strong> <em>"Who needs a plan when you have style and speed?"</em>
     </td>
   </tr>
 </table>

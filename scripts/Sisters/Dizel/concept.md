@@ -2,15 +2,16 @@
 
 <table width="100%">
   <tr>
-    <td width="200" align="center">
-      <img src="/scripts/Sisters/assets/Dizel.png" width="180">
+    <td width="20%" align="center">
+      <img src="/scripts/Sisters/assets/Dizel.png" width="150"><br>
+      <b>Dizel</b>
     </td>
-    <td>
+    <td width="80%">
       <strong>Role:</strong> The Big Sister<br>
       <strong>Archetype:</strong> The Analytical Anchor<br>
       <strong>Personality:</strong> Calm, Cool, Analytical<br>
       <strong>Age:</strong> 24<br>
-      <strong>Quote:</strong> "The data doesn't lie, but it definitely doesn't explain *this* mess."
+      <strong>Quote:</strong> <em>"The data doesn't lie, but it definitely doesn't explain *this* mess."</em>
     </td>
   </tr>
 </table>
