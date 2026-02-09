@@ -1,8 +1,19 @@
 # Character Concept: Aris
 
-| Profile | Details |
-| :---: | :--- |
-| <img src="/scripts/Sisters/assets/Aris.png" width="180"> | **Role:** The Father<br>**Archetype:** The Heart of the Family<br>**Personality:** Supportive, Loving, Occasionally Scolded<br>**Age:** 45<br>**Quote:** "As long as you're all safe, that's what matters." |
+<table width="100%">
+  <tr>
+    <td width="200" align="center">
+      <img src="/scripts/Sisters/assets/Aris.png" width="180">
+    </td>
+    <td>
+      <strong>Role:</strong> The Father<br>
+      <strong>Archetype:</strong> The Heart of the Family<br>
+      <strong>Personality:</strong> Supportive, Loving, Occasionally Scolded<br>
+      <strong>Age:</strong> 45<br>
+      <strong>Quote:</strong> "As long as you're all safe, that's what matters."
+    </td>
+  </tr>
+</table>
 
 ## Description
 Aris is the single father raising four unique and powerful daughters. He is the emotional glue that binds them.
