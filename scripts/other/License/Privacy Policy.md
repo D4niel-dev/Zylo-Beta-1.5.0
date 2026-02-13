@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **Effective Date:** January 4, 2026  
-**Last Updated:** January 4, 2026
+**Last Updated:** February 13, 2026
 
 ## Introduction
 
@@ -214,7 +214,7 @@ Your continued use of the Service after changes constitutes acceptance of the up
 If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
 
 **Email:** zylosupp0rt@gmail.com  
-**Website:** [CURRENTLY UNAVAILABLE]  
+**Website:** https://d4niel-dev.github.io/Zylo/  
 **GitHub:** https://github.com/D4niel-dev
 
 ---
