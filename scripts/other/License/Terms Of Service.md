@@ -178,7 +178,7 @@ The Service may contain links to third-party websites. We do not endorse or cont
 
 ## 7. Privacy and Data Protection
 
-Your privacy is important to us. Our collection and use of personal information is governed by our [Privacy Policy](link-to-privacy-policy), which is incorporated into these Terms by reference.
+Your privacy is important to us. Our collection and use of personal information is governed by our [Privacy Policy](https://github.com/D4niel-dev/Zylo-Beta-1.5.1/blob/main/scripts%2Fother%2FLicense%2FPrivacy%20Policy.md), which is incorporated into these Terms by reference.
 
 By using the Service, you also agree to our Privacy Policy.
 
@@ -302,7 +302,7 @@ These Terms are provided in English. Translations may be available, but the Engl
 For questions, concerns, or notices regarding these Terms, please contact us:
 
 **Email:** zylosupp0rt@gmail.com  
-**Website:** [CURRENTLY UNAVAILABLE]  
+**Website:** https://d4niel-dev.github.io/Zylo/  
 **GitHub:** https://github.com/D4niel-dev  
 **Mailing Address:** nguyenkhacduy1372@gmail.com
 
@@ -347,5 +347,5 @@ BY CLICKING "I AGREE," CREATING AN ACCOUNT, OR USING THE SERVICE, YOU ACKNOWLEDG
 
 ---
 
-**Version:** 1.0
+**Version:** 2.0
 **Effective:** January 4, 202626
