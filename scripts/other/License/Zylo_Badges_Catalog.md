@@ -5,7 +5,7 @@ _A comprehensive badge catalogue for Zylo. Use this as a reference for product, 
 ---
 
 ## Usage notes
-- **Show at most 3 active badges** on the user's profile header. Store the rest in `badges_unlocked`.
+- **Show at most 3 active badges** on the user's profile header. Store the rest in `badges_unlocked`, ban show more with *"Show more >"* next to the 3 shown badges.
 - Badges are represented as strings in the DB and mapped to icon + label in the frontend.
 - Consider making some badges "hidden" (not displayed publicly until unlocked).
 - Provide a toast/animation on unlock and an entry in an "Achievements" page with details.
