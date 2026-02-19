@@ -96,10 +96,10 @@ Privacy is a top priority for Zylo.
 ---
 
 > [!NOTE]
-> Zylo is currently in **Beta**. We are actively fixing bugs and improving performance for the full release. If you want to use the `ai-chat`, please install **Ollama** and choose any models that you want. You can use cloud models too.
+> Zylo is currently in **Beta**. We are actively fixing bugs and improving performance for the full release. If you want to use the `ai-chat`, please install **Ollama** and choose any models that you want or use your own API key for the provider.
 
 > [!IMPORTANT]
-> Any feedback or reports should/would be sent to **@d4niel_1f**.
+> Any feedback or reports should/would be sent to **@d4niel_1f**. Will get responsed after 2~5 hours after it is sended.
 
 <p align="center" style="font-size: 520%; margin-top: 12px;">
   Developed with ❤️ by <strong>Daniel</strong>
